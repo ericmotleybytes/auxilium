@@ -1,0 +1,367 @@
+#!/usr/bin/bash
+#
+# auxenv - A "sourceable" bash script to show and setup environment variables.
+#
+#
+# define all logic in a function to isolate local variables
+#
+function auxenv_main_func() {
+    local action
+    local scriptname
+    local envname
+    local part
+    local subpart
+    local newdir
+    local olddir
+    local result
+    local cnt
+    local dupflag
+    local foundflag
+    local existsflag
+    local intflag
+    local insertedflag
+    local befaft
+    local re
+    local tgtcnt
+    local remcnt
+    local IFS
+    #
+    # get base script name
+    #
+    scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
+    #
+    # look on command line for user selected action
+    #
+    action="$1"
+    if [ -z "$action" ]; then action="help"; fi
+    action=${action,,}   # lowercase action
+    #
+    # do appropriate action
+    #
+    if [ "$action" == "help" ]; then
+        echo "Command:"
+        echo "  $scriptname - A sourceable bash script to display/setup environment variables."
+        echo "Syntax:"
+        echo "  $scriptname help                    # display script usage help."
+        echo "  $scriptname show    <envname>       # display environment var readably."
+        echo "  $scriptname prepend <envname> <dir> # prepend directory to env var."
+        echo "  $scriptname append  <envname> <dir> # prepend directory to env var."
+        echo "  $scriptname remove  <envname> <dir> [<n>] # remove directory up to n times."
+        echo "  $scriptname dedep   <envname>       # deduplicate entries."
+        echo "  $scriptname purge   <envname>       # purge directories that do not exist."
+        echo "  $scriptname insert  <envname> <dir> before <olddir> # add newdir before olddir."
+        echo "  $scriptname insert  <envname> <dir> after  <olddir> # add newdir after olddir."
+        echo "  $scriptname insert  <envname> <dir> before <pos>    # add newdir before position."
+        echo "  $scriptname insert  <envname> <dir> after  <pos>    # add newdir after position."
+        echo "  $scriptname count   <envname> [<dir>] # count all entries of occurances of dir."
+        echo "  $scriptname find    <envname> <dir>   # get position of directory."
+        echo "  $scriptname get     <envname> <pos>   # get entry at position."
+        echo "  $scriptname reverse <envname>         # reverse order of all entries."
+        return 0
+    elif [ "$action" == "show" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        echo "**** $envname is set to:"
+        echo "${!envname}"
+        IFS=":"
+        let cnt=0
+        for part in ${!envname}; do
+            let cnt=$cnt+1
+            if [ "$cnt" == "1" ]; then echo "** Part breakdown:"; fi
+            echo "  $cnt=$part"
+        done
+        return 0
+    elif [ "$action" == "append" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        newdir="$3"
+        if [ -z "$newdir" ]; then
+            echo "ERROR: Missing new directory parameter." >&2
+            return 1
+        fi
+        if [ -z "${!envname}" ]; then
+            export $envname="$newdir"
+        else
+            export $envname="${!envname}:$newdir"
+        fi
+        return 0
+    elif [ "$action" == "prepend" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        newdir="$3"
+        if [ -z "$newdir" ]; then
+            echo "ERROR: Missing new directory parameter." >&2
+            return 1
+        fi
+        if [ -z "${!envname}" ]; then
+            export $envname="$newdir"
+        else
+            export $envname="$newdir:${!envname}"
+        fi
+        return 0
+    elif [ "$action" == "remove" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        newdir="$3"
+        if [ -z "$newdir" ]; then
+            echo "ERROR: Missing directory to remove parameter." >&2
+            return 1
+        fi
+        tgtcnt="$4"
+        if [ -z "$tgtcnt" ]; then
+            let tgtcnt=999999
+        else
+            re='^[0-9]+$'
+            if [[ ! $tgtcnt =~ $re ]]; then
+                echo "ERROR: Count parameter must be positive integer." >&2
+                return 1
+            fi
+        fi
+        result=""
+        IFS=":"
+        let remcnt=0
+        for part in ${!envname}; do
+            if [ "$part" != "$newdir" ]; then
+                result="$result:$part"
+            else
+                if [ "$remcnt" -ge "$tgtcnt" ]; then
+                    result="$result:$part"
+                else
+                    let remcnt=$remcnt+1
+                fi
+            fi
+        done
+        result=${result:1}  # strip leading :
+        export $envname="$result"
+        return 0
+    elif [ "$action" == "dedup" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        result=""
+        IFS=":"
+        for part in ${!envname}; do
+            dupflag="n"
+            for subpart in $result; do
+                if [ "$part" == "$subpart" ]; then dupflag="y"; fi
+            done
+            if [ "$dupflag" == "n" ]; then
+                if [ -z "$result" ]; then
+                    result="$part"
+                else
+                    result="$result:$part"
+                fi
+            fi
+        done
+        export $envname="$result"
+        return 0
+    elif [ "$action" == "purge" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        result=""
+        IFS=":"
+        for part in ${!envname}; do
+            existsflag="n"
+            if [ -d "$part" ]; then
+                if [ -z "$result" ]; then
+                    result="$part"
+                else
+                    result="$result:$part"
+                fi
+            fi
+        done
+        export $envname="$result"
+        return 0
+    elif [ "$action" == "insert" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        newdir="$3"
+        if [ -z "$newdir" ]; then
+            echo "ERROR: Missing new directory parameter." >&2
+            return 1
+        fi
+        befaft="$4"
+        if [ -z "$befaft" ]; then
+            echo "ERROR: Missing before|after parameter." >&2
+            return 1
+        fi
+        befaft=${befaft,,}  # lowercase
+        if [ "$befaft" != "before" ]; then
+            if [ "$befaft" != "after" ]; then
+                echo "ERROR: before|after parameter not before or after."
+                return 1
+            fi
+        fi
+        olddir="$5"
+        if [ -z "$olddir" ]; then
+            echo "ERROR: Missing existing directory parameter." >&2
+            return 1
+        fi
+        insertedflag="n"
+        re='^[0-9]+$'
+        intflag="n"
+        if [[ $olddir =~ $re ]]; then
+            intflag="y"
+            tgtcnt="$olddir"
+        fi
+        result=""
+        IFS=":"
+        let cnt=0
+        for part in ${!envname}; do
+            let cnt=$cnt+1
+            if [ "$insertedflag" == "y" ]; then
+                result="$result:$part"
+            else
+                if [ "$intflag" == "y" ]; then
+                    if [ "$cnt" -gt "$tgtcnt" ]; then
+                        result="$result:$newdir:$part"
+                        insertedflag="y"
+                    elif [ "$cnt" -eq "$tgtcnt" ]; then
+                        if [ "$befaft" == "before" ]; then
+                            result="$result:$newdir:$part"
+                        else
+                            result="$result:$part:$newdir"
+                        fi
+                        insertedflag="y"
+                    else
+                        result="$result:$part"
+                    fi
+                else
+                    if [ "$part" == "$olddir" ]; then
+                        if [ "$befaft" == "before" ]; then
+                            result="$result:$newdir:$part"
+                        else
+                            result="$result:$part:$newdir"
+                        fi
+                        insertedflag="y"
+                    else
+                        result="$result:$part"
+                    fi
+                fi
+            fi
+        done
+        if [ "$insertedflag" == "n" ]; then result="$result:$newdir"; fi
+        if [ "${result:0:1}" == ":" ]; then result="${result:1}"; fi
+        export $envname="$result"
+        return 0
+    elif [ "$action" == "count" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        olddir="$3"   # optional
+        IFS=":"
+        let cnt=0
+        for part in ${!envname}; do
+            if [ -z "$olddir" ]; then
+                let cnt=$cnt+1
+            else
+                if [ "$part" == "$olddir" ]; then
+                    let cnt=$cnt+1
+                fi
+            fi
+        done
+        echo "$cnt"
+        return 0
+    elif [ "$action" == "find" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        olddir="$3"
+        if [ -z "$olddir" ]; then
+            echo "ERROR: Missing directory parameter." >&2
+            return 1
+        fi
+        IFS=":"
+        let cnt=0
+        let tgtcnt=0
+        for part in ${!envname}; do
+            let cnt=$cnt+1
+            if [ "$part" == "$olddir" ]; then
+                tgtcnt="$cnt"
+                break
+            fi
+        done
+        echo "$tgtcnt"
+        return 0
+    elif [ "$action" == "get" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        tgtcnt="$3"
+        if [ -z "$tgtcnt" ]; then
+            echo "ERROR: Missing position parameter." >&2
+            return 1
+        fi
+        re='^[0-9]+$'
+        if [[ $tgtcnt =~ $re ]]; then
+            intflag="y"
+        else
+            intflag="n"
+            echo "ERROR: Position parameter must be an integer." >&2
+            return 1
+        fi
+        IFS=":"
+        let cnt=0
+        for part in ${!envname}; do
+            let cnt=$cnt+1
+            if [ "$cnt" -eq "$tgtcnt" ]; then
+                echo "$part"
+                break
+            fi
+        done
+        return 0
+    elif [ "$action" == "reverse" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        result=""
+        IFS=":"
+        for part in ${!envname}; do
+            result="$part:$result"
+        done
+        if [ ! -z "$result" ]; then
+            result=${result::-1}  # trim trailing :
+            export $envname="$result"
+        fi
+        return 0
+    else
+        echo "ERROR: Unrecognized command line action specified ($action)." >&2
+        return 1
+    fi
+}
+#
+# Now invoke the main function
+#
+auxenv_main_func $@
+#
+# Now unset the function
+#
+unset auxenv_main_func
