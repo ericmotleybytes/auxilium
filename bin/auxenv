@@ -24,6 +24,8 @@ function auxenv_main_func() {
     local re
     local tgtcnt
     local remcnt
+    local workpath
+    local revflag
     local IFS
     #
     # get base script name
@@ -39,29 +41,40 @@ function auxenv_main_func() {
     # do appropriate action
     #
     if [ "$action" == "help" ]; then
+        if [ ! -z "$2" ]; then
+            echo "ERROR: Too many command line parameters." >&2
+            return 1
+        fi
         echo "Command:"
         echo "  $scriptname - A sourceable bash script to display/setup environment variables."
         echo "Syntax:"
-        echo "  $scriptname help                    # display script usage help."
-        echo "  $scriptname show    <envname>       # display environment var readably."
-        echo "  $scriptname prepend <envname> <dir> # prepend directory to env var."
-        echo "  $scriptname append  <envname> <dir> # prepend directory to env var."
-        echo "  $scriptname remove  <envname> <dir> [<n>] # remove directory up to n times."
-        echo "  $scriptname dedep   <envname>       # deduplicate entries."
-        echo "  $scriptname purge   <envname>       # purge directories that do not exist."
-        echo "  $scriptname insert  <envname> <dir> before <olddir> # add newdir before olddir."
-        echo "  $scriptname insert  <envname> <dir> after  <olddir> # add newdir after olddir."
-        echo "  $scriptname insert  <envname> <dir> before <pos>    # add newdir before position."
-        echo "  $scriptname insert  <envname> <dir> after  <pos>    # add newdir after position."
-        echo "  $scriptname count   <envname> [<dir>] # count all entries of occurances of dir."
-        echo "  $scriptname find    <envname> <dir>   # get position of directory."
-        echo "  $scriptname get     <envname> <pos>   # get entry at position."
-        echo "  $scriptname reverse <envname>         # reverse order of all entries."
+        echo "  $scriptname <command> [<option> [<option>] ...]"
+        echo "Commands:"
+        echo "  help                          # display script usage help."
+        echo "  show    <envname>             # display environment var readably."
+        echo "  dump    <envname>             # display environment var basically."
+        echo "  prepend <envname> <dir>       # prepend directory to env var."
+        echo "  append  <envname> <dir>       # prepend directory to env var."
+        echo "  remove  <envname> <dir> [<n>] # remove directory up to n times."
+        echo "  dedup   <envname> [<n>]       # deduplicate, n>=0 from top, n<0 from bottom."
+        echo "  weed    <envname>             # weed directories that do not exist."
+        echo "  insert  <envname> <dir> before <olddir> # add dir before olddir."
+        echo "  insert  <envname> <dir> after  <olddir> # add dir after olddir."
+        echo "  insert  <envname> <dir> before <pos>    # add dir before position."
+        echo "  insert  <envname> <dir> after  <pos>    # add dir after position."
+        echo "  count   <envname> [<dir>]     # count all entries of occurances of dir."
+        echo "  find    <envname> <dir>       # get position of directory."
+        echo "  get     <envname> <pos>       # get entry at position."
+        echo "  reverse <envname>             # reverse order of all entries."
         return 0
     elif [ "$action" == "show" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
             echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        if [ ! -z "$3" ]; then
+            echo "ERROR: Too many command line parameters." >&2
             return 1
         fi
         echo "**** $envname is set to:"
@@ -74,6 +87,23 @@ function auxenv_main_func() {
             echo "  $cnt=$part"
         done
         return 0
+    elif [ "$action" == "dump" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        if [ ! -z "$3" ]; then
+            echo "ERROR: Too many command line parameters." >&2
+            return 1
+        fi
+        IFS=":"
+        let cnt=0
+        for part in ${!envname}; do
+            let cnt=$cnt+1
+            echo "$part"
+        done
+        return 0
     elif [ "$action" == "append" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
@@ -83,6 +113,10 @@ function auxenv_main_func() {
         newdir="$3"
         if [ -z "$newdir" ]; then
             echo "ERROR: Missing new directory parameter." >&2
+            return 1
+        fi
+        if [ ! -z "$4" ]; then
+            echo "ERROR: Too many command line parameters." >&2
             return 1
         fi
         if [ -z "${!envname}" ]; then
@@ -100,6 +134,10 @@ function auxenv_main_func() {
         newdir="$3"
         if [ -z "$newdir" ]; then
             echo "ERROR: Missing new directory parameter." >&2
+            return 1
+        fi
+        if [ ! -z "$4" ]; then
+            echo "ERROR: Too many command line parameters." >&2
             return 1
         fi
         if [ -z "${!envname}" ]; then
@@ -129,6 +167,10 @@ function auxenv_main_func() {
                 return 1
             fi
         fi
+        if [ ! -z "$5" ]; then
+            echo "ERROR: Too many command line parameters." >&2
+            return 1
+        fi
         result=""
         IFS=":"
         let remcnt=0
@@ -152,27 +194,64 @@ function auxenv_main_func() {
             echo "ERROR: Missing environment variable name parameter." >&2
             return 1
         fi
+        tgtcnt="$3"
+        if [ -z "$tgtcnt" ]; then tgtcnt=1; fi    # default
+        re='^\-?[0-9]+$'
+        if [[ ! $tgtcnt =~ $re ]]; then
+            echo "ERROR: Missing n times parameter." >&2
+        fi
+        if [ "$tgtcnt" == "0" ]; then tgtcnt="1"; fi  # change zero to one
+        if [ ! -z "$4" ]; then
+            echo "ERROR: Too many command line parameters." >&2
+            return 1
+        fi
         result=""
         IFS=":"
-        for part in ${!envname}; do
+        revflag="n"
+        workpath=${!envname}
+        if [ "$tgtcnt" -lt "0" ]; then
+            revflag="y"
+            let tgtcnt=$tgtcnt*-1
+            workpath=""
+            for part in ${!envname}; do
+                # reverse order
+                workpath="$part:$workpath"
+            done
+            workpath=${workpath::-1}  # trim trailing :
+        fi
+        result=""
+        for part in ${workpath}; do
             dupflag="n"
             for subpart in $result; do
-                if [ "$part" == "$subpart" ]; then dupflag="y"; fi
+                if [ "$part" == "$subpart" ]; then
+                    dupflag="y"
+                    break
+                fi
             done
             if [ "$dupflag" == "n" ]; then
-                if [ -z "$result" ]; then
-                    result="$part"
-                else
-                    result="$result:$part"
-                fi
+                result="$result:$part"
             fi
         done
+        result=${result:1}  # strip leading :
+        if [ "$revflag" == "y" ]; then
+            # reverse back
+            workpath="$result"
+            result=""
+            for part in ${workpath}; do
+                result="$part:$result"
+            done
+            result=${result::-1}  # trim trailing :
+        fi
         export $envname="$result"
         return 0
-    elif [ "$action" == "purge" ]; then
+    elif [ "$action" == "weed" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
             echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        if [ ! -z "$3" ]; then
+            echo "ERROR: Too many command line parameters." >&2
             return 1
         fi
         result=""
@@ -215,6 +294,10 @@ function auxenv_main_func() {
         olddir="$5"
         if [ -z "$olddir" ]; then
             echo "ERROR: Missing existing directory parameter." >&2
+            return 1
+        fi
+        if [ ! -z "$6" ]; then
+            echo "ERROR: Too many command line parameters." >&2
             return 1
         fi
         insertedflag="n"
@@ -271,6 +354,10 @@ function auxenv_main_func() {
             return 1
         fi
         olddir="$3"   # optional
+        if [ ! -z "$4" ]; then
+            echo "ERROR: Too many command line parameters." >&2
+            return 1
+        fi
         IFS=":"
         let cnt=0
         for part in ${!envname}; do
@@ -295,6 +382,10 @@ function auxenv_main_func() {
             echo "ERROR: Missing directory parameter." >&2
             return 1
         fi
+        if [ ! -z "$4" ]; then
+            echo "ERROR: Too many command line parameters." >&2
+            return 1
+        fi
         IFS=":"
         let cnt=0
         let tgtcnt=0
@@ -316,6 +407,10 @@ function auxenv_main_func() {
         tgtcnt="$3"
         if [ -z "$tgtcnt" ]; then
             echo "ERROR: Missing position parameter." >&2
+            return 1
+        fi
+        if [ ! -z "$4" ]; then
+            echo "ERROR: Too many command line parameters." >&2
             return 1
         fi
         re='^[0-9]+$'
@@ -342,6 +437,10 @@ function auxenv_main_func() {
             echo "ERROR: Missing environment variable name parameter." >&2
             return 1
         fi
+        if [ ! -z "$3" ]; then
+            echo "ERROR: Too many command line parameters." >&2
+            return 1
+        fi
         result=""
         IFS=":"
         for part in ${!envname}; do
@@ -361,7 +460,10 @@ function auxenv_main_func() {
 # Now invoke the main function
 #
 auxenv_main_func $@
-#
-# Now unset the function
-#
-unset auxenv_main_func
+if [ "$?" == "0" ]; then
+    unset auxenv_main_func
+    return 0
+else
+    unset auxenv_main_func
+    return 1
+fi
