@@ -44,7 +44,7 @@ function auxenv_main_func() {
         return 0
     elif [ "$action" == "help" ]; then
         if [ ! -z "$2" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname too many command line parameters." >&2
             return 1
         fi
         echo "Command:"
@@ -71,15 +71,16 @@ function auxenv_main_func() {
         echo "  get     <envname> <pos>       # get entry at position."
         echo "  reverse <envname>             # reverse order of all entries."
         echo "  clean   <envname>             # does desym, dedup, and weed in one step."
+        echo "  cleanup <envname>             # does same thing as clean."
         return 0
     elif [ "$action" == "show" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname missing environment variable name parameter." >&2
             return 1
         fi
         if [ ! -z "$3" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname too many command line parameters." >&2
             return 1
         fi
         echo "**** $envname is set to:"
@@ -95,11 +96,11 @@ function auxenv_main_func() {
     elif [ "$action" == "dump" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname missing environment variable name parameter." >&2
             return 1
         fi
         if [ ! -z "$3" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname too many command line parameters." >&2
             return 1
         fi
         IFS=":"
@@ -112,16 +113,16 @@ function auxenv_main_func() {
     elif [ "$action" == "append" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname missing environment variable name parameter." >&2
             return 1
         fi
         newdir="$3"
         if [ -z "$newdir" ]; then
-            echo "ERROR: Missing new directory parameter." >&2
+            echo "ERROR: $scriptname missing new directory parameter." >&2
             return 1
         fi
         if [ ! -z "$4" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname too many command line parameters." >&2
             return 1
         fi
         if [ -z "${!envname}" ]; then
@@ -133,16 +134,16 @@ function auxenv_main_func() {
     elif [ "$action" == "prepend" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname missing environment variable name parameter." >&2
             return 1
         fi
         newdir="$3"
         if [ -z "$newdir" ]; then
-            echo "ERROR: Missing new directory parameter." >&2
+            echo "ERROR: $scriptname missing new directory parameter." >&2
             return 1
         fi
         if [ ! -z "$4" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname too many command line parameters." >&2
             return 1
         fi
         if [ -z "${!envname}" ]; then
@@ -154,12 +155,12 @@ function auxenv_main_func() {
     elif [ "$action" == "remove" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         newdir="$3"
         if [ -z "$newdir" ]; then
-            echo "ERROR: Missing directory to remove parameter." >&2
+            echo "ERROR: $scriptname Missing directory to remove parameter." >&2
             return 1
         fi
         tgtcnt="$4"
@@ -168,12 +169,12 @@ function auxenv_main_func() {
         else
             re='^[0-9]+$'
             if [[ ! $tgtcnt =~ $re ]]; then
-                echo "ERROR: Count parameter must be positive integer." >&2
+                echo "ERROR: $scriptname Count parameter must be positive integer." >&2
                 return 1
             fi
         fi
         if [ ! -z "$5" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
         result=""
@@ -196,18 +197,18 @@ function auxenv_main_func() {
     elif [ "$action" == "dedup" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         tgtcnt="$3"
         if [ -z "$tgtcnt" ]; then tgtcnt=1; fi    # default
         re='^\-?[0-9]+$'
         if [[ ! $tgtcnt =~ $re ]]; then
-            echo "ERROR: Missing n times parameter." >&2
+            echo "ERROR: $scriptname Missing n times parameter." >&2
         fi
         if [ "$tgtcnt" == "0" ]; then tgtcnt="1"; fi  # change zero to one
         if [ ! -z "$4" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
         result=""
@@ -252,11 +253,11 @@ function auxenv_main_func() {
     elif [ "$action" == "desym" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         if [ ! -z "$4" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
         cnt="0"
@@ -276,11 +277,11 @@ function auxenv_main_func() {
     elif [ "$action" == "weed" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         if [ ! -z "$3" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
         result=""
@@ -300,33 +301,33 @@ function auxenv_main_func() {
     elif [ "$action" == "insert" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         newdir="$3"
         if [ -z "$newdir" ]; then
-            echo "ERROR: Missing new directory parameter." >&2
+            echo "ERROR: $scriptname Missing new directory parameter." >&2
             return 1
         fi
         befaft="$4"
         if [ -z "$befaft" ]; then
-            echo "ERROR: Missing before|after parameter." >&2
+            echo "ERROR: $scriptname Missing before|after parameter." >&2
             return 1
         fi
         befaft=${befaft,,}  # lowercase
         if [ "$befaft" != "before" ]; then
             if [ "$befaft" != "after" ]; then
-                echo "ERROR: before|after parameter not before or after."
+                echo "ERROR: $scriptname before|after parameter not before or after."
                 return 1
             fi
         fi
         olddir="$5"
         if [ -z "$olddir" ]; then
-            echo "ERROR: Missing existing directory parameter." >&2
+            echo "ERROR: $scriptname Missing existing directory parameter." >&2
             return 1
         fi
         if [ ! -z "$6" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
         insertedflag="n"
@@ -379,12 +380,12 @@ function auxenv_main_func() {
     elif [ "$action" == "count" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         olddir="$3"   # optional
         if [ ! -z "$4" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
         IFS=":"
@@ -403,16 +404,16 @@ function auxenv_main_func() {
     elif [ "$action" == "find" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         olddir="$3"
         if [ -z "$olddir" ]; then
-            echo "ERROR: Missing directory parameter." >&2
+            echo "ERROR: $scriptname Missing directory parameter." >&2
             return 1
         fi
         if [ ! -z "$4" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
         IFS=":"
@@ -430,16 +431,16 @@ function auxenv_main_func() {
     elif [ "$action" == "get" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         tgtcnt="$3"
         if [ -z "$tgtcnt" ]; then
-            echo "ERROR: Missing position parameter." >&2
+            echo "ERROR: $scriptname Missing position parameter." >&2
             return 1
         fi
         if [ ! -z "$4" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
         re='^[0-9]+$'
@@ -447,7 +448,7 @@ function auxenv_main_func() {
             intflag="y"
         else
             intflag="n"
-            echo "ERROR: Position parameter must be an integer." >&2
+            echo "ERROR: $scriptname Position parameter must be an integer." >&2
             return 1
         fi
         IFS=":"
@@ -463,11 +464,11 @@ function auxenv_main_func() {
     elif [ "$action" == "reverse" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         if [ ! -z "$3" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
         result=""
@@ -480,23 +481,24 @@ function auxenv_main_func() {
             export $envname="$result"
         fi
         return 0
-    elif [ "$action" == "clean" ]; then
+    elif [ "$action" == "clean" -o "$action" == "cleanup" ]; then
         # does desym, dedup, and weed in one step."
         envname="$2"
         if [ -z "$envname" ]; then
-            echo "ERROR: Missing environment variable name parameter." >&2
+            echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
         if [ ! -z "$3" ]; then
-            echo "ERROR: Too many command line parameters." >&2
+            echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
+        set --  # clear positional parameters
         source "$scriptspec" desym $envname
         source "$scriptspec" dedup $envname
         source "$scriptspec" weed  $envname
         return 0
     else
-        echo "ERROR: Unrecognized command line action specified ($action)." >&2
+        echo "ERROR: $scriptname Unrecognized command line action specified ($action)." >&2
         return 1
     fi
 }

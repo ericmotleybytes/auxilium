@@ -43,14 +43,18 @@ function auxsource_main_func() {
         sourcefiledir="${sourcefile%/*}"
         if [ "$sourcefile" == "$sourcefiledir" ]; then sourcefiledir=""; fi
         if [ -z "$sourcefiledir" ]; then
+            # no directory part in command line file parameter
             if [ -z "$AUXSOURCE_PATH" ]; then
+                # auxsource env var not set
                 sourcepath=$(readlink -f ".")
+                sourcepath="$sourcepath:$scriptdir"
             else
+                # auxsource env var was set
                 sourcepath="$AUXSOURCE_PATH"
             fi
             sourcefound="n"
             IFS=":"
-            for sourcedir in "$sourcepath"; do
+            for sourcedir in $sourcepath; do
                 sourcecand="$sourcedir/$sourcefile"
                 if [ -e "$sourcecand" ]; then
                     sourcefound="y"
@@ -59,18 +63,17 @@ function auxsource_main_func() {
                 fi
             done
             if [ "$sourcefound" == "n" ]; then
-                echo "ERROR: could not locate $sourcefile." >&2
+                echo "ERROR: $scriptname could not locate $sourcefile." >&2
                 return 1
             fi
         else
             # directory specified in sourcefile
             sourcefile=$(readlink -f "$sourcefile")
-            echo "DEBUG: sourcefile=$sourcefile."
-            echo "DEBUG: sourceparams=$sourceparams."
             if [ -e "$sourcefile" ]; then
+                set --   # clear old positional parameters
                 source "$sourcefile" $sourceparams
             else
-                echo "ERROR: could not locate $sourcefile." >&2
+                echo "ERROR: $scriptname could not locate $sourcefile." >&2
                 return 1
             fi
         fi
