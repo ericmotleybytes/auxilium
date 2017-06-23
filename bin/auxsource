@@ -58,6 +58,7 @@ function auxsource_main_func() {
                 sourcecand="$sourcedir/$sourcefile"
                 if [ -e "$sourcecand" ]; then
                     sourcefound="y"
+                    set -- # clear positional parameters
                     source "$sourcecand" $sourceparams
                     break;
                 fi
