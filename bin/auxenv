@@ -1,13 +1,11 @@
-#!/usr/bin/bash
-#
-# auxenv - A "sourceable" bash script to show and setup environment variables.
-#
+# auxenv - A "sourceable" bash script to show and setup environment variables
 #
 # define all logic in a function to isolate local variables
 #
 function auxenv_main_func() {
     local action
     local scriptname
+    local scriptspec
     local envname
     local part
     local subpart
@@ -31,6 +29,7 @@ function auxenv_main_func() {
     # get base script name
     #
     scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
+    scriptspec=${BASH_SOURCE[0]}      # full spec
     #
     # look on command line for user selected action
     #
@@ -40,7 +39,10 @@ function auxenv_main_func() {
     #
     # do appropriate action
     #
-    if [ "$action" == "help" ]; then
+    if [ "$action" == "version" ]; then
+        echo "$scriptname version 1.5 (2017-06-22)"
+        return 0
+    elif [ "$action" == "help" ]; then
         if [ ! -z "$2" ]; then
             echo "ERROR: Too many command line parameters." >&2
             return 1
@@ -51,12 +53,14 @@ function auxenv_main_func() {
         echo "  $scriptname <command> [<option> [<option>] ...]"
         echo "Commands:"
         echo "  help                          # display script usage help."
+        echo "  version                       # display script version."
         echo "  show    <envname>             # display environment var readably."
         echo "  dump    <envname>             # display environment var basically."
         echo "  prepend <envname> <dir>       # prepend directory to env var."
         echo "  append  <envname> <dir>       # prepend directory to env var."
         echo "  remove  <envname> <dir> [<n>] # remove directory up to n times."
         echo "  dedup   <envname> [<n>]       # deduplicate, n>=0 from top, n<0 from bottom."
+        echo "  desym   <envname>             # dereference all symbolic links."
         echo "  weed    <envname>             # weed directories that do not exist."
         echo "  insert  <envname> <dir> before <olddir> # add dir before olddir."
         echo "  insert  <envname> <dir> after  <olddir> # add dir after olddir."
@@ -66,6 +70,7 @@ function auxenv_main_func() {
         echo "  find    <envname> <dir>       # get position of directory."
         echo "  get     <envname> <pos>       # get entry at position."
         echo "  reverse <envname>             # reverse order of all entries."
+        echo "  clean   <envname>             # does desym, dedup, and weed in one step."
         return 0
     elif [ "$action" == "show" ]; then
         envname="$2"
@@ -242,6 +247,30 @@ function auxenv_main_func() {
             done
             result=${result::-1}  # trim trailing :
         fi
+        export $envname="$result"
+        return 0
+    elif [ "$action" == "desym" ]; then
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        if [ ! -z "$4" ]; then
+            echo "ERROR: Too many command line parameters." >&2
+            return 1
+        fi
+        cnt="0"
+        result=""
+        workpath=${!envname}
+        IFS=":"
+        for part in ${workpath}; do
+            # try to dereference unless part is "." (current directory)
+            if [ "$part" != "." ]; then
+                part=$(readlink -f "$part")
+            fi
+            result="$result:$part"
+        done
+        result=${result:1}  # strip leading :
         export $envname="$result"
         return 0
     elif [ "$action" == "weed" ]; then
@@ -450,6 +479,21 @@ function auxenv_main_func() {
             result=${result::-1}  # trim trailing :
             export $envname="$result"
         fi
+        return 0
+    elif [ "$action" == "clean" ]; then
+        # does desym, dedup, and weed in one step."
+        envname="$2"
+        if [ -z "$envname" ]; then
+            echo "ERROR: Missing environment variable name parameter." >&2
+            return 1
+        fi
+        if [ ! -z "$3" ]; then
+            echo "ERROR: Too many command line parameters." >&2
+            return 1
+        fi
+        source "$scriptspec" desym $envname
+        source "$scriptspec" dedup $envname
+        source "$scriptspec" weed  $envname
         return 0
     else
         echo "ERROR: Unrecognized command line action specified ($action)." >&2

@@ -1,0 +1,90 @@
+# auxsource - A "sourceable" bash script to source a file somewhere in AUXSOURCE_PATH.
+#
+# Known limitations: Only up to 7 command line parameters can be passed to the sourced script.
+#
+# define all logic in a function to isolate local variables
+#
+function auxsource_main_func() {
+    local scriptspec
+    local scriptname
+    local scriptdir
+    local sourcefile
+    local sourcefiledir
+    local sourcepath
+    local sourcedir
+    local sourcecand
+    local sourceparams
+    local sourcefound
+    local IFS
+    scriptspec=$(readlink -f "${BASH_SOURCE[0]}")  # full spec
+    scriptname=$(basename "$scriptspec")           # basename part
+    scriptdir=$(dirname "$scriptspec")             # dirpart
+    if [ -z "$1" -o "$1" == "--help" ]; then
+        # display help
+        echo "Command:"
+        echo "  $scriptname <filename> [<opts...>] # source file where 1st found in AUXSOURCE_PATH."
+        echo "  $scriptname <dir/file> [<opts...>] # source the file in specified directory."
+        echo "  $scriptname --help                 # display help."
+        echo "  $scriptname --version              # display version."
+        return 0
+    elif [ "$1" == "--version" ]; then
+        echo "$scriptname version 1.0 (2017-06-22)"
+        return 0
+    else
+        sourcefile="$1"
+        sourceparams=""
+        if [ ! -z "$2" ]; then sourceparams="$2"; fi
+        if [ ! -z "$3" ]; then sourceparams="$sourceparams $3"; fi
+        if [ ! -z "$4" ]; then sourceparams="$sourceparams $4"; fi
+        if [ ! -z "$5" ]; then sourceparams="$sourceparams $5"; fi
+        if [ ! -z "$6" ]; then sourceparams="$sourceparams $6"; fi
+        if [ ! -z "$7" ]; then sourceparams="$sourceparams $7"; fi
+        if [ ! -z "$8" ]; then sourceparams="$sourceparams $8"; fi
+        sourcefiledir="${sourcefile%/*}"
+        if [ "$sourcefile" == "$sourcefiledir" ]; then sourcefiledir=""; fi
+        if [ -z "$sourcefiledir" ]; then
+            if [ -z "$AUXSOURCE_PATH" ]; then
+                sourcepath=$(readlink -f ".")
+            else
+                sourcepath="$AUXSOURCE_PATH"
+            fi
+            sourcefound="n"
+            IFS=":"
+            for sourcedir in "$sourcepath"; do
+                sourcecand="$sourcedir/$sourcefile"
+                if [ -e "$sourcecand" ]; then
+                    sourcefound="y"
+                    source "$sourcecand" $sourceparams
+                    break;
+                fi
+            done
+            if [ "$sourcefound" == "n" ]; then
+                echo "ERROR: could not locate $sourcefile." >&2
+                return 1
+            fi
+        else
+            # directory specified in sourcefile
+            sourcefile=$(readlink -f "$sourcefile")
+            echo "DEBUG: sourcefile=$sourcefile."
+            echo "DEBUG: sourceparams=$sourceparams."
+            if [ -e "$sourcefile" ]; then
+                source "$sourcefile" $sourceparams
+            else
+                echo "ERROR: could not locate $sourcefile." >&2
+                return 1
+            fi
+        fi
+    fi
+    return 0
+}
+#
+# Now invoke the main function
+#
+auxsource_main_func $@
+if [ "$?" == "0" ]; then
+    unset auxsource_main_func
+    return 0
+else
+    unset auxsource_main_func
+    return 1
+fi
