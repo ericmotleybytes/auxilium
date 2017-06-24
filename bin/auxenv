@@ -11,6 +11,7 @@ function auxenv_main_func() {
     local subpart
     local newdir
     local olddir
+    local altdir
     local result
     local cnt
     local dupflag
@@ -24,6 +25,7 @@ function auxenv_main_func() {
     local remcnt
     local workpath
     local revflag
+    local eraseflag
     local IFS
     #
     # get base script name
@@ -36,6 +38,14 @@ function auxenv_main_func() {
     action="$1"
     if [ -z "$action" ]; then action="help"; fi
     action=${action,,}   # lowercase action
+    #
+    # check for special "erase" option
+    #
+    eraseflag="n"
+    if [ "$action" == "erase" ]; then
+        action="remove"
+        eraseflag="y"
+    fi
     #
     # do appropriate action
     #
@@ -58,7 +68,8 @@ function auxenv_main_func() {
         echo "  dump    <envname>             # display environment var basically."
         echo "  prepend <envname> <dir>       # prepend directory to env var."
         echo "  append  <envname> <dir>       # prepend directory to env var."
-        echo "  remove  <envname> <dir> [<n>] # remove directory up to n times."
+        echo "  remove  <envname> <dir> [<n>] # remove dir and equiv up to n times."
+        echo "  erase   <envname> <dir> [<n>] # remove literal dir up to n times."
         echo "  dedup   <envname> [<n>]       # deduplicate, n>=0 from top, n<0 from bottom."
         echo "  desym   <envname>             # dereference all symbolic links."
         echo "  weed    <envname>             # weed directories that do not exist."
@@ -177,13 +188,25 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
+        if [ "$newdir" == "." ]; then
+            eraseflag="y"    # only do literal remove for "."
+        fi
+        if [ "$eraseflag" == "y" ]; then
+            # do literal remove only, do not look for cannonical equivalents
+            altdir="..." # should always be nonexistant
+        else
+            # remove literal and cannonical equivalent
+            altdir=$(readlink -f "$newdir")
+        fi
         result=""
         IFS=":"
         let remcnt=0
         for part in ${!envname}; do
-            if [ "$part" != "$newdir" ]; then
+            if [ "$part" != "$newdir" -a "$part" != "$altdir" ]; then
+                # no match, keep dir
                 result="$result:$part"
             else
+                # matched one or the other, skip unless count exceeded
                 if [ "$remcnt" -ge "$tgtcnt" ]; then
                     result="$result:$part"
                 else
