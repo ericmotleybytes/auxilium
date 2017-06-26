@@ -20,7 +20,7 @@ for file in bin/auxenv bin/auxsource; do
 done
 echo "INFO: All files copied."
 echo "INFO: Recommended additional lines to add to /etc/bashrc or ~/.bashrc follow:"
-echo "      alias auxenv=\"source $tgtdir/bin/auxenv\""
-echo "      alias auxsource=\"source $tgtdir/bin/auxsource\""
+echo "  alias auxenv=\"source $tgtdir/bin/auxenv\""
+echo "  alias auxsource=\"source $tgtdir/bin/auxsource\""
 echo "INFO: Completed auxilium installation."
 exit 0

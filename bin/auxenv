@@ -109,7 +109,7 @@ function auxenv_main_func() {
                 auxenv_badusage_func
                 return 1
             fi
-        elif [ "$switch" == "--unsetempty" [; then
+        elif [ "$switch" == "--unsetempty" ]; then
             unsetflag="y"
         elif [ "${switch:0:6}" == "--ifs=" ]; then
             envifs="${switch:6}"
@@ -275,6 +275,7 @@ function auxenv_main_func() {
         done
         result=${result:1}  # strip leading :
         export $envname="$result"
+        if [[ "$unsetflag" == "y" && -z ${!envname} ]]; then unset $envname; fi
         return 0
     elif [ "$action" == "dedup" ]; then
         envname="$2"
