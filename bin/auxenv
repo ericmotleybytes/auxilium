@@ -66,21 +66,21 @@ function auxenv_main_func() {
         echo "  version                       # display script version."
         echo "  show    <envname>             # display environment var readably."
         echo "  dump    <envname>             # display environment var basically."
+        echo "  count   <envname> [<dir>]     # count all entries of occurances of dir."
+        echo "  get     <envname> <pos>       # get entry at position."
+        echo "  find    <envname> <dir>       # get position of directory."
         echo "  prepend <envname> <dir>       # prepend directory to env var."
         echo "  append  <envname> <dir>       # prepend directory to env var."
-        echo "  remove  <envname> <dir> [<n>] # remove dir and equiv up to n times."
-        echo "  erase   <envname> <dir> [<n>] # remove literal dir up to n times."
-        echo "  dedup   <envname> [<n>]       # deduplicate, n>=0 from top, n<0 from bottom."
-        echo "  desym   <envname>             # dereference all symbolic links."
-        echo "  weed    <envname>             # weed directories that do not exist."
         echo "  insert  <envname> <dir> before <olddir> # add dir before olddir."
         echo "  insert  <envname> <dir> after  <olddir> # add dir after olddir."
         echo "  insert  <envname> <dir> before <pos>    # add dir before position."
         echo "  insert  <envname> <dir> after  <pos>    # add dir after position."
-        echo "  count   <envname> [<dir>]     # count all entries of occurances of dir."
-        echo "  find    <envname> <dir>       # get position of directory."
-        echo "  get     <envname> <pos>       # get entry at position."
+        echo "  remove  <envname> <dir> [<n>] # remove dir and equiv up to n times."
+        echo "  erase   <envname> <dir> [<n>] # remove literal dir up to n times."
         echo "  reverse <envname>             # reverse order of all entries."
+        echo "  dedup   <envname> [<n>]       # deduplicate, n>=0 from top, n<0 from bottom."
+        echo "  desym   <envname>             # dereference all symbolic links."
+        echo "  weed    <envname>             # weed directories that do not exist."
         echo "  clean   <envname>             # does desym, dedup, and weed in one step."
         echo "  cleanup <envname>             # does same thing as clean."
         return 0
@@ -441,7 +441,7 @@ function auxenv_main_func() {
         fi
         IFS=":"
         let cnt=0
-        let tgtcnt=0
+        tgtcnt=""
         for part in ${!envname}; do
             let cnt=$cnt+1
             if [ "$part" == "$olddir" ]; then

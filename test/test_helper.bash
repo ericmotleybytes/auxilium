@@ -1,5 +1,7 @@
 setup() {
-    bindir=$(readlink -f "../bin")
-    alias auxenv="source $bindir/auxenv"
-    alias auxsource="source $bindir/auxsource"
+    source ./setup_aliases.bash
+    oldIFS="$IFS"
+}
+teardown() {
+    IFS="$oldIFS"
 }
