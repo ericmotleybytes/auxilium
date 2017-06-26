@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 load test_helper
 @test "check auxenv version" {
-    stuff=`source ../bin/auxenv version`
+    stuff=`source ../bin/auxenv --version`
     lf=$'\x0a'    # hex code for line-feed character
     IFS="$lf"
     linecnt=0

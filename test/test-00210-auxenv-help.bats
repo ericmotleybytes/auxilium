@@ -1,8 +1,7 @@
 #!/usr/bin/env bats
 load test_helper
 @test "check auxenv help" {
-    auxenvcmd="${BASH_ALIASES[auxenv]}"
-    stuff=`$auxenvcmd help`
+    stuff=`source ../bin/auxenv --help`
     lf=$'\x0a'    # hex code for line-feed character
     IFS="$lf"
     linecnt=0
@@ -13,7 +12,7 @@ load test_helper
         let linecnt=$linecnt+1
         line=$(echo "$line" | xargs)   # trim leading and trailing spaces
         if [[ "$line" =~ ^auxenv\ \-\ .*$ ]]; then foundflag1="y"; fi
-        if [[ "$line" =~ ^help\ .*$ ]];       then foundflag2="y"; fi
+        if [[ "$line" =~ ^show\ .*$ ]];       then foundflag2="y"; fi
         if [[ "$line" =~ ^append\ .*$ ]];     then foundflag3="y"; fi
     done
     [ "$foundflag1" == "y" ]
@@ -33,7 +32,7 @@ load test_helper
         let linecnt=$linecnt+1
         line=$(echo "$line" | xargs)   # trim leading and trailing spaces
         if [[ "$line" =~ ^auxenv\ \-\ .*$ ]]; then foundflag1="y"; fi
-        if [[ "$line" =~ ^help\ .*$ ]];       then foundflag2="y"; fi
+        if [[ "$line" =~ ^show\ .*$ ]];       then foundflag2="y"; fi
         if [[ "$line" =~ ^append\ .*$ ]];     then foundflag3="y"; fi
     done
     [ "$foundflag1" == "y" ]

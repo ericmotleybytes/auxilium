@@ -1,11 +1,53 @@
 # auxenv - A "sourceable" bash script to show and setup environment variables
 #
-# define all logic in a function to isolate local variables
+# define all logic in functions to isolate local variables
 #
+function auxenv_version_func() {
+    local scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
+    echo "$scriptname version 2.0 (2017-06-26)"
+    return 0
+}
+function auxenv_help_func() {
+    echo "Command:"
+    echo "  $scriptname - A sourceable bash script to display/setup environment variables."
+    echo "Syntax:"
+    echo "  $scriptname --help     # display usage help"
+    echo "  $scriptname --version  # display version information"
+    echo "  $scriptname [<switch>...] <envname> <command> [<parameter>...]"
+    echo "Optional Switches:"
+    echo "  --unsetempty  # if final environment variable value is \"\", also unset it."
+    echo "  --ifs=\"char\"  # list separator to use when parsing path-like env var values."
+    echo "Commands and Parameters:"
+    echo "  show    <envname>             # display environment var readably."
+    echo "  dump    <envname>             # display environment var basically."
+    echo "  count   <envname> [<dir>]     # count all entries of occurances of dir."
+    echo "  get     <envname> <pos>       # get entry at position."
+    echo "  find    <envname> <dir>       # get position of directory."
+    echo "  prepend <envname> <dir>       # prepend directory to env var."
+    echo "  append  <envname> <dir>       # prepend directory to env var."
+    echo "  insert  <envname> <dir> before <olddir> # add dir before olddir."
+    echo "  insert  <envname> <dir> after  <olddir> # add dir after olddir."
+    echo "  insert  <envname> <dir> before <pos>    # add dir before position."
+    echo "  insert  <envname> <dir> after  <pos>    # add dir after position."
+    echo "  remove  <envname> <dir> [<n>] # remove dir and equiv up to n times."
+    echo "  erase   <envname> <dir> [<n>] # remove literal dir up to n times."
+    echo "  reverse <envname>             # reverse order of all entries."
+    echo "  dedup   <envname> [<n>]       # deduplicate, n>=0 from top, n<0 from bottom."
+    echo "  desym   <envname>             # dereference all symbolic links."
+    echo "  weed    <envname>             # weed directories that do not exist."
+    echo "  clean   <envname>             # does desym, dedup, and weed in one step."
+    echo "  cleanup <envname>             # does same thing as clean."
+    return 0
+}
+function auxenv_badusage_func() {
+    local scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
+    echo "ERROR: $scriptname command line usage error, try --help for syntax." >&2
+    return 1
+}
 function auxenv_main_func() {
-    local action
     local scriptname
     local scriptspec
+    local action
     local envname
     local part
     local subpart
@@ -25,16 +67,64 @@ function auxenv_main_func() {
     local remcnt
     local workpath
     local revflag
-    local eraseflag
-    local IFS
+    #
+    # initialize special vars IFS
+    #
+    local genifs=" " # space, such as between command line arguments
+    local envifs=":" # colon, such as between directories in PATH environment variable
+    local IFS="$genifs"
+    local unsetflag="n"
+    local eraseflag="n"
     #
     # get base script name
     #
     scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
     scriptspec=${BASH_SOURCE[0]}      # full spec
     #
-    # look on command line for user selected action
+    # provide help by default
     #
+    if [ "$#" == "0" ]; then
+        auxenv_help_func
+        return 0
+    fi
+    #
+    # look for optional initial switches (--ifs=":" ; --unsetempty; --version ; --help)
+    #
+    while [[ $# -gt 0 && "${1:0:2}" == "--" ]]; do
+        local switch="$1"
+        shift
+        if [ "$switch" == "--version" ]; then
+            if [ "$#" == "0" ]; then
+                auxenv_version_func
+                return 0
+            else
+                auxenv_badusage_func
+                return 1
+            fi
+        elif [ "$switch" == "--help" ]; then
+            if [ "$#" == "0" ]; then
+                auxenv_help_func
+                return 0
+            else
+                auxenv_badusage_func
+                return 1
+            fi
+        elif [ "$switch" == "--unsetempty" [; then
+            unsetflag="y"
+        elif [ "${switch:0:6}" == "--ifs=" ]; then
+            envifs="${switch:6}"
+        else
+            auxenv_badusage_func
+            return 1
+        fi
+    done
+    #
+    # parse what is left of positional parameters
+    #
+    if [ "$#" == "0" ]; then
+        auxenv_badusage_func
+        return 1
+    fi
     action="$1"
     if [ -z "$action" ]; then action="help"; fi
     action=${action,,}   # lowercase action
@@ -49,42 +139,7 @@ function auxenv_main_func() {
     #
     # do appropriate action
     #
-    if [ "$action" == "version" ]; then
-        echo "$scriptname version 1.5 (2017-06-22)"
-        return 0
-    elif [ "$action" == "help" ]; then
-        if [ ! -z "$2" ]; then
-            echo "ERROR: $scriptname too many command line parameters." >&2
-            return 1
-        fi
-        echo "Command:"
-        echo "  $scriptname - A sourceable bash script to display/setup environment variables."
-        echo "Syntax:"
-        echo "  $scriptname <command> [<option> [<option>] ...]"
-        echo "Commands:"
-        echo "  help                          # display script usage help."
-        echo "  version                       # display script version."
-        echo "  show    <envname>             # display environment var readably."
-        echo "  dump    <envname>             # display environment var basically."
-        echo "  count   <envname> [<dir>]     # count all entries of occurances of dir."
-        echo "  get     <envname> <pos>       # get entry at position."
-        echo "  find    <envname> <dir>       # get position of directory."
-        echo "  prepend <envname> <dir>       # prepend directory to env var."
-        echo "  append  <envname> <dir>       # prepend directory to env var."
-        echo "  insert  <envname> <dir> before <olddir> # add dir before olddir."
-        echo "  insert  <envname> <dir> after  <olddir> # add dir after olddir."
-        echo "  insert  <envname> <dir> before <pos>    # add dir before position."
-        echo "  insert  <envname> <dir> after  <pos>    # add dir after position."
-        echo "  remove  <envname> <dir> [<n>] # remove dir and equiv up to n times."
-        echo "  erase   <envname> <dir> [<n>] # remove literal dir up to n times."
-        echo "  reverse <envname>             # reverse order of all entries."
-        echo "  dedup   <envname> [<n>]       # deduplicate, n>=0 from top, n<0 from bottom."
-        echo "  desym   <envname>             # dereference all symbolic links."
-        echo "  weed    <envname>             # weed directories that do not exist."
-        echo "  clean   <envname>             # does desym, dedup, and weed in one step."
-        echo "  cleanup <envname>             # does same thing as clean."
-        return 0
-    elif [ "$action" == "show" ]; then
+    if [ "$action" == "show" ]; then
         envname="$2"
         if [ -z "$envname" ]; then
             echo "ERROR: $scriptname missing environment variable name parameter." >&2
@@ -97,7 +152,7 @@ function auxenv_main_func() {
         echo "**** $envname is set to:"
         echo "${!envname}"
         IFS=":"
-        let cnt=0
+        cnt="0"
         for part in ${!envname}; do
             let cnt=$cnt+1
             if [ "$cnt" == "1" ]; then echo "** Part breakdown:"; fi
@@ -115,7 +170,7 @@ function auxenv_main_func() {
             return 1
         fi
         IFS=":"
-        let cnt=0
+        cnt="0"
         for part in ${!envname}; do
             let cnt=$cnt+1
             echo "$part"
@@ -193,14 +248,18 @@ function auxenv_main_func() {
         fi
         if [ "$eraseflag" == "y" ]; then
             # do literal remove only, do not look for cannonical equivalents
-            altdir="..." # should always be nonexistant
+            altdir="" # should always not match
         else
-            # remove literal and cannonical equivalent
-            altdir=$(readlink -f "$newdir")
+            # remove literal and cannonical equivalent, if it exists
+            if [ -e "$newdir" ]; then
+                altdir=$(readlink -f "$newdir")
+            else
+                altdir="" # should always not match
+            fi
         fi
         result=""
         IFS=":"
-        let remcnt=0
+        remcnt="0"
         for part in ${!envname}; do
             if [ "$part" != "$newdir" -a "$part" != "$altdir" ]; then
                 # no match, keep dir
@@ -362,7 +421,7 @@ function auxenv_main_func() {
         fi
         result=""
         IFS=":"
-        let cnt=0
+        cnt="0"
         for part in ${!envname}; do
             let cnt=$cnt+1
             if [ "$insertedflag" == "y" ]; then
@@ -412,7 +471,7 @@ function auxenv_main_func() {
             return 1
         fi
         IFS=":"
-        let cnt=0
+        cnt="0"
         for part in ${!envname}; do
             if [ -z "$olddir" ]; then
                 let cnt=$cnt+1
@@ -440,7 +499,7 @@ function auxenv_main_func() {
             return 1
         fi
         IFS=":"
-        let cnt=0
+        cnt="0"
         tgtcnt=""
         for part in ${!envname}; do
             let cnt=$cnt+1
@@ -475,7 +534,7 @@ function auxenv_main_func() {
             return 1
         fi
         IFS=":"
-        let cnt=0
+        cnt="0"
         for part in ${!envname}; do
             let cnt=$cnt+1
             if [ "$cnt" -eq "$tgtcnt" ]; then
@@ -529,10 +588,7 @@ function auxenv_main_func() {
 # Now invoke the main function
 #
 auxenv_main_func $@
-if [ "$?" == "0" ]; then
-    unset auxenv_main_func
-    return 0
-else
-    unset auxenv_main_func
-    return 1
-fi
+unset auxenv_version_func
+unset auxenv_help_func
+unset auxenv_badusage_func
+unset auxenv_main_func
