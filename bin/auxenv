@@ -32,11 +32,10 @@ function auxenv_help_func() {
     echo "  remove  <envname> <dir> [<n>] # remove dir and equiv up to n times."
     echo "  erase   <envname> <dir> [<n>] # remove literal dir up to n times."
     echo "  reverse <envname>             # reverse order of all entries."
-    echo "  dedup   <envname> [<n>]       # deduplicate, n>=0 from top, n<0 from bottom."
+    echo "  dedup   <envname> [topdown|bottonup]    # deduplicate, topdown (D) or bottomup."
     echo "  desym   <envname>             # dereference all symbolic links."
     echo "  weed    <envname>             # weed directories that do not exist."
     echo "  clean   <envname>             # does desym, dedup, and weed in one step."
-    echo "  cleanup <envname>             # does same thing as clean."
     return 0
 }
 function auxenv_badusage_func() {
@@ -67,6 +66,7 @@ function auxenv_main_func() {
     local remcnt
     local workpath
     local revflag
+    local dupdir
     #
     # initialize special vars IFS
     #
@@ -283,13 +283,12 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
-        tgtcnt="$3"
-        if [ -z "$tgtcnt" ]; then tgtcnt=1; fi    # default
-        re='^\-?[0-9]+$'
-        if [[ ! $tgtcnt =~ $re ]]; then
-            echo "ERROR: $scriptname Missing n times parameter." >&2
+        dupdir="$3"
+        if [ -z "$dupdir" ]; then dupdir="topdown"; fi    # default
+        if [[ "$dupdir" != "topdown" && "$dupdir" != "bottomup" ]]; then
+            echo "ERROR: $scriptname Bad dup direction, must be 'topdown' or 'bottonup'." >&2
+            return 1
         fi
-        if [ "$tgtcnt" == "0" ]; then tgtcnt="1"; fi  # change zero to one
         if [ ! -z "$4" ]; then
             echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
@@ -298,9 +297,8 @@ function auxenv_main_func() {
         IFS=":"
         revflag="n"
         workpath=${!envname}
-        if [ "$tgtcnt" -lt "0" ]; then
+        if [ "$dupdir" == "bottomup" ]; then
             revflag="y"
-            let tgtcnt=$tgtcnt*-1
             workpath=""
             for part in ${!envname}; do
                 # reverse order
@@ -564,7 +562,7 @@ function auxenv_main_func() {
             export $envname="$result"
         fi
         return 0
-    elif [ "$action" == "clean" -o "$action" == "cleanup" ]; then
+    elif [ "$action" == "clean" ]; then
         # does desym, dedup, and weed in one step."
         envname="$2"
         if [ -z "$envname" ]; then
