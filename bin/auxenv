@@ -151,7 +151,7 @@ function auxenv_main_func() {
         fi
         echo "**** $envname is set to:"
         echo "${!envname}"
-        IFS=":"
+        IFS="$envifs"
         cnt="0"
         for part in ${!envname}; do
             let cnt=$cnt+1
@@ -169,7 +169,7 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname too many command line parameters." >&2
             return 1
         fi
-        IFS=":"
+        IFS="$envifs"
         cnt="0"
         for part in ${!envname}; do
             let cnt=$cnt+1
@@ -258,7 +258,7 @@ function auxenv_main_func() {
             fi
         fi
         result=""
-        IFS=":"
+        IFS="$envifs"
         remcnt="0"
         for part in ${!envname}; do
             if [ "$part" != "$newdir" -a "$part" != "$altdir" ]; then
@@ -294,7 +294,7 @@ function auxenv_main_func() {
             return 1
         fi
         result=""
-        IFS=":"
+        IFS="$envifs"
         revflag="n"
         workpath=${!envname}
         if [ "$dupdir" == "bottomup" ]; then
@@ -344,7 +344,7 @@ function auxenv_main_func() {
         cnt="0"
         result=""
         workpath=${!envname}
-        IFS=":"
+        IFS="$envifs"
         for part in ${workpath}; do
             # try to dereference unless part is "." (current directory)
             if [ "$part" != "." ]; then
@@ -366,7 +366,7 @@ function auxenv_main_func() {
             return 1
         fi
         result=""
-        IFS=":"
+        IFS="$envifs"
         for part in ${!envname}; do
             existsflag="n"
             if [ -d "$part" ]; then
@@ -419,7 +419,7 @@ function auxenv_main_func() {
             tgtcnt="$olddir"
         fi
         result=""
-        IFS=":"
+        IFS="$envifs"
         cnt="0"
         for part in ${!envname}; do
             let cnt=$cnt+1
@@ -469,7 +469,7 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
-        IFS=":"
+        IFS="$envifs"
         cnt="0"
         for part in ${!envname}; do
             if [ -z "$olddir" ]; then
@@ -497,7 +497,7 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
-        IFS=":"
+        IFS="$envifs"
         cnt="0"
         tgtcnt=""
         for part in ${!envname}; do
@@ -532,7 +532,7 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname Position parameter must be an integer." >&2
             return 1
         fi
-        IFS=":"
+        IFS="$envifs"
         cnt="0"
         for part in ${!envname}; do
             let cnt=$cnt+1
@@ -553,7 +553,7 @@ function auxenv_main_func() {
             return 1
         fi
         result=""
-        IFS=":"
+        IFS="$envifs"
         for part in ${!envname}; do
             result="$part:$result"
         done

@@ -3,15 +3,25 @@ PREFIX=<PREFIX>
 all : install
 
 .PHONY: install
-install : $(PREFIX)/bin/auxenv $(PREFIX)/bin/auxsource
+install : $(PREFIX)/bin/auxenv $(PREFIX)/bin/auxsource $(PREFIX)/bin/auxalias
 
 $(PREFIX)/bin/auxenv : bin/auxenv
 	cp $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
 
 $(PREFIX)/bin/auxsource : bin/auxsource
 	cp $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/bin/auxalias : bin/auxalias
+	cp $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
 
 .PHONY: uninstall
 uninstall :
 	rm -f $(PREFIX)/bin/auxenv
 	rm -f $(PREFIX)/bin/auxsource
+	rm -f $(PREFIX)/bin/auxalias

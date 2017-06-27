@@ -9,18 +9,17 @@ if [ -z "$1" ]; then
     exit 1
 fi
 tgtdir="$1"
-script=$(readlink -f ${BASH_SOURCE[0]})
+script=$(readlink -f "${BASH_SOURCE[0]}")
 auxdir=$(dirname "$script")
 mkdir -p "$tgtdir"/bin
-for file in bin/auxenv bin/auxsource; do
+fulltgtdir=$(readlink -f "$tgtdir")
+for file in bin/auxenv bin/auxsource bin/auxalias; do
     echo "INFO: Installing $auxdir/$file to $tgtdir/$file..."
     cp "$auxdir/$file" "$tgtdir/$file"
     chmod a+r "$tgtdir/$file"
     chmod a-x "$tgtdir/$file"
 done
 echo "INFO: All files copied."
-echo "INFO: Recommended additional lines to add to /etc/bashrc or ~/.bashrc follow:"
-echo "  alias auxenv=\"source $tgtdir/bin/auxenv\""
-echo "  alias auxsource=\"source $tgtdir/bin/auxsource\""
+echo "INFO: Recommended adding \"source $fulltgtdir/auxalias\" to /etc/bashrc or ~/.bashrc."
 echo "INFO: Completed auxilium installation."
 exit 0

@@ -1,0 +1,4 @@
+# source this file to setup auxilium aliases based on directory this file is in.
+scratch_auxilium_bin_dir=$(readlink -f ${BASH_SOURCE[0]%/*})
+alias auxenv="source \"$scratch_auxilium_bin_dir\"/auxenv"
+alias auxsource="source \"$scratch_auxilium_bin_dir\"/auxsource"
