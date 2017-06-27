@@ -2,8 +2,7 @@
 load test_helper
 @test "check auxenv show" {
     export MYTEST="/usr/local/bin:/usr/bin"
-    auxenvcmd="${BASH_ALIASES[auxenv]}"
-    stuff=`$auxenvcmd show MYTEST`
+    stuff=`source ../bin/auxenv show MYTEST`
     lf=$'\x0a'    # hex code for line-feed character
     IFS="$lf"
     linecnt=0

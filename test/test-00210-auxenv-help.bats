@@ -20,8 +20,7 @@ load test_helper
     [ "$foundflag3" == "y" ]
 }
 @test "check auxenv default help" {
-    auxenvcmd="${BASH_ALIASES[auxenv]}"
-    stuff=`$auxenvcmd`
+    stuff=`source ../bin/auxenv`
     lf=$'\x0a'    # hex code for line-feed character
     IFS="$lf"
     linecnt=0

@@ -16,7 +16,8 @@ function auxenv_help_func() {
     echo "  $scriptname [<switch>...] <envname> <command> [<parameter>...]"
     echo "Optional Switches:"
     echo "  --unsetempty  # if final environment variable value is \"\", also unset it."
-    echo "  --ifs=\"char\"  # list separator to use when parsing path-like env var values."
+    echo "  --ifs=\"<char>\" # list separator to use when parsing path-like env var values."
+    echo "  --ifs=x<hh>  # specify --ifs char in hex, e.g., \"--ifs=x20\" for space."
     echo "Commands and Parameters:"
     echo "  show    <envname>             # display environment var readably."
     echo "  dump    <envname>             # display environment var basically."
@@ -113,6 +114,14 @@ function auxenv_main_func() {
             unsetflag="y"
         elif [ "${switch:0:6}" == "--ifs=" ]; then
             envifs="${switch:6}"
+            if [[ "$envifs" =~ ^[Xx][0-9A-Fa-f]{2}$ ]]; then
+                envifs="${envifs:1:2}"
+                envifs="envifs=$'\\x${envifs}'"
+                eval $envifs
+            elif [ "${#envifs}" != "1" ]; then
+                echo "ERROR: Bad length; --ifs="c" must specify exactly one character." >&2
+                return 1
+            fi
         else
             auxenv_badusage_func
             return 1
@@ -194,7 +203,7 @@ function auxenv_main_func() {
         if [ -z "${!envname}" ]; then
             export $envname="$newdir"
         else
-            export $envname="${!envname}:$newdir"
+            export $envname="${!envname}${envifs}$newdir"
         fi
         return 0
     elif [ "$action" == "prepend" ]; then
@@ -215,7 +224,7 @@ function auxenv_main_func() {
         if [ -z "${!envname}" ]; then
             export $envname="$newdir"
         else
-            export $envname="$newdir:${!envname}"
+            export $envname="$newdir${envifs}${!envname}"
         fi
         return 0
     elif [ "$action" == "remove" ]; then
@@ -263,11 +272,11 @@ function auxenv_main_func() {
         for part in ${!envname}; do
             if [ "$part" != "$newdir" -a "$part" != "$altdir" ]; then
                 # no match, keep dir
-                result="$result:$part"
+                result="$result${envifs}$part"
             else
                 # matched one or the other, skip unless count exceeded
                 if [ "$remcnt" -ge "$tgtcnt" ]; then
-                    result="$result:$part"
+                    result="$result${envifs}$part"
                 else
                     let remcnt=$remcnt+1
                 fi
@@ -302,7 +311,7 @@ function auxenv_main_func() {
             workpath=""
             for part in ${!envname}; do
                 # reverse order
-                workpath="$part:$workpath"
+                workpath="$part${envifs}$workpath"
             done
             workpath=${workpath::-1}  # trim trailing :
         fi
@@ -316,7 +325,7 @@ function auxenv_main_func() {
                 fi
             done
             if [ "$dupflag" == "n" ]; then
-                result="$result:$part"
+                result="$result${envifs}$part"
             fi
         done
         result=${result:1}  # strip leading :
@@ -325,7 +334,7 @@ function auxenv_main_func() {
             workpath="$result"
             result=""
             for part in ${workpath}; do
-                result="$part:$result"
+                result="$part${envifs}$result"
             done
             result=${result::-1}  # trim trailing :
         fi
@@ -350,7 +359,7 @@ function auxenv_main_func() {
             if [ "$part" != "." ]; then
                 part=$(readlink -f "$part")
             fi
-            result="$result:$part"
+            result="$result${envifs}$part"
         done
         result=${result:1}  # strip leading :
         export $envname="$result"
@@ -373,7 +382,7 @@ function auxenv_main_func() {
                 if [ -z "$result" ]; then
                     result="$part"
                 else
-                    result="$result:$part"
+                    result="$result${envifs}$part"
                 fi
             fi
         done
@@ -424,38 +433,38 @@ function auxenv_main_func() {
         for part in ${!envname}; do
             let cnt=$cnt+1
             if [ "$insertedflag" == "y" ]; then
-                result="$result:$part"
+                result="$result${envifs}$part"
             else
                 if [ "$intflag" == "y" ]; then
                     if [ "$cnt" -gt "$tgtcnt" ]; then
-                        result="$result:$newdir:$part"
+                        result="$result${envifs}$newdir${envifs}$part"
                         insertedflag="y"
                     elif [ "$cnt" -eq "$tgtcnt" ]; then
                         if [ "$befaft" == "before" ]; then
-                            result="$result:$newdir:$part"
+                            result="$result${envifs}$newdir${envifs}$part"
                         else
-                            result="$result:$part:$newdir"
+                            result="$result${envifs}$part${envifs}$newdir"
                         fi
                         insertedflag="y"
                     else
-                        result="$result:$part"
+                        result="$result${envifs}$part"
                     fi
                 else
                     if [ "$part" == "$olddir" ]; then
                         if [ "$befaft" == "before" ]; then
-                            result="$result:$newdir:$part"
+                            result="$result${envifs}$newdir${envifs}$part"
                         else
-                            result="$result:$part:$newdir"
+                            result="$result${envifs}$part${envifs}$newdir"
                         fi
                         insertedflag="y"
                     else
-                        result="$result:$part"
+                        result="$result${envifs}$part"
                     fi
                 fi
             fi
         done
-        if [ "$insertedflag" == "n" ]; then result="$result:$newdir"; fi
-        if [ "${result:0:1}" == ":" ]; then result="${result:1}"; fi
+        if [ "$insertedflag" == "n" ]; then result="$result${envifs}$newdir"; fi
+        if [ "${result:0:1}" == "$envifs" ]; then result="${result:1}"; fi
         export $envname="$result"
         return 0
     elif [ "$action" == "count" ]; then
@@ -555,7 +564,7 @@ function auxenv_main_func() {
         result=""
         IFS="$envifs"
         for part in ${!envname}; do
-            result="$part:$result"
+            result="$part${envifs}$result"
         done
         if [ ! -z "$result" ]; then
             result=${result::-1}  # trim trailing :
