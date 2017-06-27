@@ -15,6 +15,7 @@ function auxsource_main_func() {
     local sourcecand
     local sourceparams
     local sourcefound
+    local idx
     local IFS
     scriptspec=$(readlink -f "${BASH_SOURCE[0]}")  # full spec
     scriptname=$(basename "$scriptspec")           # basename part
@@ -22,24 +23,26 @@ function auxsource_main_func() {
     if [ -z "$1" -o "$1" == "--help" ]; then
         # display help
         echo "Command:"
-        echo "  $scriptname <filename> [<opts...>] # source file where 1st found in AUXSOURCE_PATH."
-        echo "  $scriptname <dir/file> [<opts...>] # source the file in specified directory."
-        echo "  $scriptname --help                 # display help."
-        echo "  $scriptname --version              # display version."
+        echo "  $scriptname <filename> [<param> ...] # source file where 1st found in AUXSOURCE_PATH."
+        echo "  $scriptname <dir/spec> [<param> ...] # source the file in specified directory."
+        echo "  $scriptname --help                   # display help."
+        echo "  $scriptname --version                # display version."
         return 0
     elif [ "$1" == "--version" ]; then
-        echo "$scriptname version 1.0 (2017-06-22)"
+        echo "$scriptname version 1.1 (2017-06-26)"
         return 0
     else
         sourcefile="$1"
+        shift
+        IFS=" "
+        #sourceparams="$@"
         sourceparams=""
-        if [ ! -z "$2" ]; then sourceparams="$2"; fi
-        if [ ! -z "$3" ]; then sourceparams="$sourceparams $3"; fi
-        if [ ! -z "$4" ]; then sourceparams="$sourceparams $4"; fi
-        if [ ! -z "$5" ]; then sourceparams="$sourceparams $5"; fi
-        if [ ! -z "$6" ]; then sourceparams="$sourceparams $6"; fi
-        if [ ! -z "$7" ]; then sourceparams="$sourceparams $7"; fi
-        if [ ! -z "$8" ]; then sourceparams="$sourceparams $8"; fi
+        idx="0"
+        while [ "$#" != "0" ]; do
+            if [ ! -z "$sourceparams" ]; then sourceparams="$sourceparams "; fi
+            sourceparams="${sourceparams}\"$1\""
+            shift
+        done
         sourcefiledir="${sourcefile%/*}"
         if [ "$sourcefile" == "$sourcefiledir" ]; then sourcefiledir=""; fi
         if [ -z "$sourcefiledir" ]; then
@@ -59,7 +62,7 @@ function auxsource_main_func() {
                 if [ -e "$sourcecand" ]; then
                     sourcefound="y"
                     set -- # clear positional parameters
-                    source "$sourcecand" $sourceparams
+                    eval source "$sourcecand" $sourceparams
                     break;
                 fi
             done
@@ -72,7 +75,7 @@ function auxsource_main_func() {
             sourcefile=$(readlink -f "$sourcefile")
             if [ -e "$sourcefile" ]; then
                 set --   # clear old positional parameters
-                source "$sourcefile" $sourceparams
+                eval source "$sourcefile" $sourceparams
             else
                 echo "ERROR: $scriptname could not locate $sourcefile." >&2
                 return 1
@@ -85,10 +88,4 @@ function auxsource_main_func() {
 # Now invoke the main function
 #
 auxsource_main_func $@
-if [ "$?" == "0" ]; then
-    unset auxsource_main_func
-    return 0
-else
-    unset auxsource_main_func
-    return 1
-fi
+unset auxsource_main_func
