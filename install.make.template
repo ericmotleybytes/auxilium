@@ -1,0 +1,17 @@
+PREFIX=<PREFIX>
+
+all : install
+
+.PHONY: install
+install : $(PREFIX)/bin/auxenv $(PREFIX)/bin/auxsource
+
+$(PREFIX)/bin/auxenv : bin/auxenv
+	cp $< $@
+
+$(PREFIX)/bin/auxsource : bin/auxsource
+	cp $< $@
+
+.PHONY: uninstall
+uninstall :
+	rm -f $(PREFIX)/bin/auxenv
+	rm -f $(PREFIX)/bin/auxsource

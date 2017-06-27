@@ -4,7 +4,7 @@
 #
 function auxenv_version_func() {
     local scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
-    echo "$scriptname version 2.0 (2017-06-26)"
+    echo "$scriptname version 2.1 (2017-06-27)"
     return 0
 }
 function auxenv_help_func() {
