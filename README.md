@@ -2,7 +2,7 @@
 
 Auxilium is designed to provide a way to easily and flexibly manage and manipulate
 directory list environment variables such as PATH, MANPATH, LD_LIBRARY_PATH, and so
-forth. Directories can easily be addeded and removed in whatever order is appropriate.
+forth. Directories can easily be added and removed in whatever order is appropriate.
 Optionally, duplicate and non-existent directories can also be purged from the list,
 thereby helping performance and maintainability.
 

@@ -2,26 +2,58 @@ PREFIX=<PREFIX>
 
 all : install
 
+#### install stuff ####
+
 .PHONY: install
-install : $(PREFIX)/bin/auxenv $(PREFIX)/bin/auxsource $(PREFIX)/bin/auxalias
+install : $(PREFIX)/bin \
+  $(PREFIX)/bin/auxenv \
+  $(PREFIX)/bin/auxsource \
+  $(PREFIX)/bin/auxalias \
+  $(PREFIX)/share/man/man1 \
+  $(PREFIX)/share/man/man1/auxenv.1 \
+  $(PREFIX)/share/html/man/man1 \
+  $(PREFIX)/share/html/man/man1/auxenv.1.html
+
+$(PREFIX)/bin:
+	mkdir -p $@
 
 $(PREFIX)/bin/auxenv : bin/auxenv
-	cp $< $@
+	cp -a $< $@
 	chmod a+r "$@"
 	chmod a-x "$@"
 
 $(PREFIX)/bin/auxsource : bin/auxsource
-	cp $< $@
+	cp -a $< $@
 	chmod a+r "$@"
 	chmod a-x "$@"
 
 $(PREFIX)/bin/auxalias : bin/auxalias
-	cp $< $@
+	cp -a $< $@
 	chmod a+r "$@"
 	chmod a-x "$@"
+
+$(PREFIX)/share/man/man1:
+	mkdir -p $@
+
+$(PREFIX)/share/man/man1/auxenv.1: man/auxenv.1
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/html/man/man1:
+	mkdir -p $@
+
+$(PREFIX)/share/html/man/man1/auxenv.1.html: man/auxenv.1.html
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+#### Uninstall stuff ####
 
 .PHONY: uninstall
 uninstall :
 	rm -f $(PREFIX)/bin/auxenv
 	rm -f $(PREFIX)/bin/auxsource
 	rm -f $(PREFIX)/bin/auxalias
+	rm -f $(PREFIX)/share/man/man1/auxenv.1
+	rm -f $(PREFIX)/share/html/man/man1/auxenv.1
