@@ -32,7 +32,8 @@ build: docs
 .PHONY: docs
 docs: man/auxenv.1 man/auxenv.1.html \
   man/auxsource.1 man/auxsource.1.html \
-  man/auxalias.1 man/auxalias.1.html
+  man/auxalias.1 man/auxalias.1.html \
+  man/auxchecktap.1 man/auxchecktap.1.html
 
 man/auxenv.1 : man/auxenv.1.ronn
 	cd man ; ronn --roff auxenv.1.ronn
@@ -44,13 +45,19 @@ man/auxsource.1 : man/auxsource.1.ronn
 	cd man ; ronn --roff auxsource.1.ronn
 
 man/auxsource.1.html : man/auxsource.1.ronn
-	cd man ; ronn --html auxauorce.1.ronn
+	cd man ; ronn --html auxsource.1.ronn
 
 man/auxalias.1 : man/auxalias.1.ronn
 	cd man ; ronn --roff auxalias.1.ronn
 
 man/auxalias.1.html : man/auxalias.1.ronn
 	cd man ; ronn --html auxalias.1.ronn
+
+man/auxchecktap.1 : man/auxchecktap.1.ronn
+	cd man ; ronn --roff auxchecktap.1.ronn
+
+man/auxchecktap.1.html : man/auxchecktap.1.ronn
+	cd man ; ronn --html auxchecktap.1.ronn
 
 #### Cleaning built stuff ####
 
@@ -62,6 +69,8 @@ cleandocs:
 	rm -f man/auxsource.1.html
 	rm -f man/auxalias.1
 	rm -f man/auxalias.1.html
+	rm -f man/auxchecktap.1
+	rm -f man/auxchecktap.1.html
 
 #### Testing stuff ####
 

@@ -13,10 +13,12 @@ install : $(PREFIX)/bin \
   $(PREFIX)/share/man/man1/auxenv.1 \
   $(PREFIX)/share/man/man1/auxsource.1 \
   $(PREFIX)/share/man/man1/auxalias.1 \
+  $(PREFIX)/share/man/man1/auxchecktap.1 \
   $(PREFIX)/share/html/man/man1 \
   $(PREFIX)/share/html/man/man1/auxenv.1.html \
   $(PREFIX)/share/html/man/man1/auxsource.1.html \
-  $(PREFIX)/share/html/man/man1/auxalias.1.html
+  $(PREFIX)/share/html/man/man1/auxalias.1.html \
+  $(PREFIX)/share/html/man/man1/auxchecktap.1.html
 
 $(PREFIX)/bin:
 	mkdir -p $@
@@ -54,6 +56,11 @@ $(PREFIX)/share/man/man1/auxalias.1: man/auxalias.1
 	chmod a+r "$@"
 	chmod a-x "$@"
 
+$(PREFIX)/share/man/man1/auxchecktap.1: man/auxchecktap.1
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
 $(PREFIX)/share/html/man/man1:
 	mkdir -p $@
 
@@ -68,6 +75,11 @@ $(PREFIX)/share/html/man/man1/auxsource.1.html: man/auxsource.1.html
 	chmod a-x "$@"
 
 $(PREFIX)/share/html/man/man1/auxalias.1.html: man/auxalias.1.html
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/html/man/man1/auxchecktap.1.html: man/auxchecktap.1.html
 	cp -a $< $@
 	chmod a+r "$@"
 	chmod a-x "$@"
