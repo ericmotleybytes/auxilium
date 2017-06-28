@@ -1,0 +1,41 @@
+auxenv(1) -- Auxiliary manipulation of path-like environment variables
+======================================================================
+
+## SYNOPSIS
+
+As alias...
+
+`auxenv --help`<br>
+`auxenv --version`<br>
+`auxenv [<option>...] <command> <envname> [<arg>...]`<br>
+
+As non-alias...
+
+`source <dir>/auxenv --help`<br>
+`source <dir>/auxenv --version`<br>
+`source <dir>/auxenv [<option>...] <command> <envname> [<arg>...]`<br>
+
+## DESCRIPTION
+
+TBD
+
+## COMMANDS
+
+TBD
+
+## OPTIONS
+
+TBD
+
+## EXIT STATUS
+
+'auxenv' completes with an exit status of 0 on success or with an
+exit status of 1 if an error was detected.
+
+## COPYRIGHT
+
+Copyright (C) 2017 Eric Alan Christiansen.
+
+## SEE ALSO
+
+auxsource(1), auxalias(1)
