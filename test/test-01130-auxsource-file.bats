@@ -22,4 +22,7 @@ load test_helper
     [ "$MYTEST1" == "xxx" ]
     [ "$MYTEST2" == "42"  ]
 }
+#@test "dummy fail" {
+#    [ "a" == "b" ]
+#}
 # all done

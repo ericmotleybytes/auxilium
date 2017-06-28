@@ -3,7 +3,7 @@ DEFAULT_FINAL_PREFIX=/usr/local
 DEFAULT_DEVEL_PREFIX=$(HOME)/local
 
 .PHONY: all
-all : help
+all : build
 
 #### Help stuff ####
 
@@ -26,8 +26,13 @@ help:
 
 #### Building stuff #####
 
+.PHONY: build
+build: docs
+
 .PHONY: docs
-docs: man/auxenv.1 man/auxenv.1.html
+docs: man/auxenv.1 man/auxenv.1.html \
+  man/auxsource.1 man/auxsource.1.html \
+  man/auxalias.1 man/auxalias.1.html
 
 man/auxenv.1 : man/auxenv.1.ronn
 	cd man ; ronn --roff auxenv.1.ronn
@@ -35,28 +40,43 @@ man/auxenv.1 : man/auxenv.1.ronn
 man/auxenv.1.html : man/auxenv.1.ronn
 	cd man ; ronn --html auxenv.1.ronn
 
+man/auxsource.1 : man/auxsource.1.ronn
+	cd man ; ronn --roff auxsource.1.ronn
+
+man/auxsource.1.html : man/auxsource.1.ronn
+	cd man ; ronn --html auxauorce.1.ronn
+
+man/auxalias.1 : man/auxalias.1.ronn
+	cd man ; ronn --roff auxalias.1.ronn
+
+man/auxalias.1.html : man/auxalias.1.ronn
+	cd man ; ronn --html auxalias.1.ronn
+
 #### Cleaning built stuff ####
 
 .PHONY: cleandocs
 cleandocs:
 	rm -f man/auxenv.1
 	rm -f man/auxenv.1.html
+	rm -f man/auxsource.1
+	rm -f man/auxsource.1.html
+	rm -f man/auxalias.1
+	rm -f man/auxalias.1.html
 
 #### Testing stuff ####
 
 .PHONY: test
 test: test/test.log test/tap.log
 
-test/test.log : bin/auxenv bin/auxsource
+test/test.log : bin/auxenv bin/auxsource $(wildcard test/*.bash) $(wildcard test/*.bats)
 	cd test; bats -p . | tee test.log
 
-test/tap.log : bin/auxenv bin/auxsource
+test/tap.log : bin/auxenv bin/auxsource $(wildcard test/*.bash) $(wildcard test/*.bats)
 	cd test; bats -t . | tee tap.log
 
 .PHONY: checktest
 checktest:
 	@tail -n 1 test/test.log
-
 
 #### Cleaning test logs ####
 

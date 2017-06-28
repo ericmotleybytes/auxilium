@@ -1,0 +1,223 @@
+#!/usr/bin/env bash
+#
+# usage:
+#     auxchecktap [options] [filespec...]
+# options:
+#     --version
+#     --help
+#     --verbose
+#     --brief (d)
+#     --quiet
+#     --silent
+#     --strict (d)
+#     --nostrict
+#
+cmdfile=$(readlink -f "$0")
+cmdname="${cmdfile##*/}"
+version="$cmdname version 1.0 (2017-06-28)"
+filespecs=()
+outputmode="brief"
+curexptestcnt=$((0))    # current file expected test count
+curtestcnt=$((0))       # current file test count (pass or fail)
+curfailcnt=$((0))       # current file fail count
+curlinecnt=$((0))       # current file line count
+curxlinecnt=$((0))      # current file xtra (comment) line count
+curblinecnt=$((0))      # current file blank line count
+totstdincnt=$((0))      # total standard in count (0 or 1)
+totfilecnt=$((0))       # total file count (including standard in)
+totlinecnt=$((0))       # total line count
+totxlinecnt=$((0))      # total xtra line count
+totblinecnt=$((0))      # total blank line count
+totexptestcnt=$((0))    # total expected test count
+tottestcnt=$((0))       # total actual test count
+totfailcnt=$((0))       # total fail count
+totfilefailcnt=$((0))   # total file fail count
+totparamcnt=$((0))      # total number of command line arguments
+versionflag="n"         # "y" if --version specified else "n"
+helpflag="n"            # "y" if --help specified else "n"
+strictflag="y"          # "y" unless --nostrict specified (then "n")
+tabchr=$'\x09'          # ascii tab character
+spcchr=" "              # space character
+
+while [ $# -gt 0 ]; do
+    totparamcnt=$(($totparamcnt+1))
+    param="$1"
+    shift
+    if [ "$param" == "--version" ]; then
+        versionflag="y"
+    elif [ "$param" == "--help" ]; then
+        helpflag="y"
+    elif [ "$param" == "--verbose" ]; then
+        outputmode="verbose"
+    elif [ "$param" == "--brief" ]; then
+        outputmode="brief"
+    elif [ "$param" == "--curt" ]; then
+        outputmode="curt"
+    elif [ "$param" == "--quiet" ]; then
+        outputmode="quiet"
+    elif [ "$param" == "--silent" ]; then
+        outputmode="silent"
+    elif [ "$param" == "--strict" ]; then
+        strictflag="y"
+    elif [ "$param" == "--nostrict" ]; then
+        strictflag="n"
+    elif [ "${param:0:2}" == "--" ]; then
+        echo "ERROR: bad command line option ($param)." >&2
+        exit 1
+    else
+        # assume a file
+        if [ ! -e "$param" ]; then
+            echo "ERROR: file not found ($param)." >&2
+            exit 1
+        fi
+        filespec=$(readlink -f "$param")    # full cannonical filespec
+        filespecs+=("$filespec")
+        totfilecnt=$(($totfilecnt+1))
+    fi
+done
+#
+# show version if it was requested
+#
+if [ "$versionflag" == "y" ]; then
+    echo "$version"
+fi
+#
+# show help if it was requested
+#
+if [ "$helpflag" == "y" ]; then
+    echo "Command:"
+    echo "  $cmdname - Check TAP compliant unit test result output"
+    echo "Syntax:"
+    echo "  $cmdname --help     # display this help text."
+    echo "  $cmdname --version  # display program version information."
+    echo "  $cmdname [<outoption>]               # read from standard input."
+    echo "  $cmdname [<outoption>] <filespec>... # read from specified file(s)."
+    echo "Options:"
+    echo "  --verbose   # Somewhat verbose final summary."
+    echo "  --brief     # Brief summary, one line per file plus one line overall (default)."
+    echo "  --curt      # One overall summary line."
+    echo "  --quiet     # one line summaries per file only if failures found."
+    echo "  --silent    # No output, even with failures, but exit status set."
+    echo "  --strict    # Use strict TAP parsing rules (default)."
+    echo "  --nostrict  # DO not use strict TAP parsing rules."
+fi
+#
+# if --help or --version and no files specified, assume we are done.
+#
+if [[ "$versionflag" == "y" || "$helpflag" == "y" ]]; then
+    if [ "$totfilecnt" == "0" ]; then
+        exit 0
+    fi
+fi
+#
+# if no files specified then assume reading from stdin
+#
+if [ $totfilecnt -eq 0 ]; then
+    filespecs+=("/dev/stdin")
+    totfilecnt=$(($totfilecnt+1))
+    totstdincnt=$(($totstdincnt+1))
+fi
+#
+# now loop through and read all the files on the filespecs list
+#
+idx=$((0))
+while [ $idx -lt ${#filespecs[*]} ]; do
+    filespec="${filespecs[$idx]}"
+    idx=$(($idx+1))
+    curtestcnt=$((0))
+    curfailcnt=$((0))
+    curlinecnt=$((0))
+    curxlinecnt=$((0))
+    curblinecnt=$((0))
+    curexptestcnt=$((0))
+    curfirstexptestnum=""
+    curlastexptestnum=""
+    curfirstacttestnum=""
+    curlastacttestnum=""
+    while read line; do
+        line="${line/$tabchr/$spcchr}"   # replace tabs with spaces
+        line="${line##*( )}"             # trim leading spaces
+        line="${line%%*( )}"             # trim trailing spaces
+        curlinecnt=$((curlinecnt+1))
+        totlinecnt=$((totlinecnt+1))
+        if [[ "$line" =~ ^[0-9]+\.\.[0-9]+$ ]]; then
+            if [ "$strictmode" == "y" -a "$curfirstexptestnum" != "" ]; then
+                echo "ERROR: xtra tests expected line; file=$filespec line=$curlinecnt." >&2
+                exit 1
+            fi
+            curfirstexptestnum="${line%%\.\.*}"
+            curlastexptestnum="${line##*\.\.}"
+            curexptestcnt=$(($curlastexptestnum-$curfirstexptestnum))
+            curexptestcnt=$(($curexptestcnt+1))
+        elif [ "${line:0:3}" == "ok " ]; then
+            # pass report
+            rest="${line:3}"
+            rest="${rest##*( )}"             # trim leading spaces
+            tstnum="${rest%% *}"
+            if [ "$curfirstacttestnum" == "" ]; then
+                curfirstacttestnum="$tstnum"
+            fi
+            curlastacttestnum="$tstnum"
+            curtestcnt=$(($curtestcnt+1))
+            tottestcnt=$(($tottestcnt+1))
+        elif [ "${line:0:7}" == "not ok " ]; then
+            # fail report
+            rest="${line:7}"
+            rest="${rest##*( )}"             # trim leading spaces
+            tstnum="${rest%% *}"
+            if [ "$curfirstacttestnum" == "" ]; then
+                curfirstacttestnum="$tstnum"
+            fi
+            curlastacttestnum="$tstnum"
+            curtestcnt=$(($curtestcnt+1))
+            curfailcnt=$(($curfailcnt+1))
+            tottestcnt=$(($tottestcnt+1))
+            totfailcnt=$(($totfailcnt+1))
+        elif [ "${line:0:1}" == "#" ]; then
+            # strictly valid extra comment
+            curxlinecnt=$(($curxlinecnt+1))
+            totxlinecnt=$(($totxlinecnt+1))
+        elif [ "$line" eq "" ]; then
+            # blank line, ok even in strict
+            curblinecnt=$(($curblinecnt+1))
+            totblinecnt=$(($totblinecnt+1))
+        else
+            # not a strictly formatted line
+            if [ "$strictflag" == "y" ]; then
+                echo "ERROR: xtra misc line; file=$filespec line=$curlinecnt." >&2
+                exit 1
+            else
+                curxlinecnt=$(($curxlinecnt+1))
+                totxlinecnt=$(($totxlinecnt+1))
+            fi
+        fi
+    done < "$filespec"
+    totexptestcnt=$(($totexptestcnt+$curexptestcnt))
+    if [ "$curfailcnt" != "0" ]; then
+        totfilefailcnt=$(($totfilefailcnt+1))
+    fi
+    if [ "$outputmode" == "verbose" ]; then
+        echo "File=$filespec"
+        echo "  FileTestCount=$curtestcnt"
+        echo "  FileFailCount=$curfailcnt"
+        echo "  FileExpectedTestCount=$curexptestcnt"
+        echo "  FileLineCount=$curlinecnt"
+        echo "  FileXtraLineCount=$curxlinecnt"
+        echo "  FileBlankLineCount=$curblinecnt"
+    elif [ "$outputmode" == "brief" ]; then
+        echo "TBD"
+    fi
+done
+#
+if [ "$outputmode" == "verbose" ]; then
+    echo "TotalFileCount=$totfilecnt"
+    echo "  TotalFileFailCount=$totfilefailcnt"
+    echo "  TotalTestCount=$tottestcnt"
+    echo "  TotalFailCount=$totfailcnt"
+    echo "  TotalExpectedTestCount=$totexptestcnt"
+    echo "  TotalLineCount=$totlinecnt"
+    echo "  TotalXtraLineCount=$totxlinecnt"
+    echo "  TotalBlankLineCount=$totblinecnt"
+elif [ "$outputmode" == "brief" ]; then
+    echo "TBD"
+fi

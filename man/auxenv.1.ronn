@@ -7,13 +7,13 @@ As alias...
 
 `auxenv --help`<br>
 `auxenv --version`<br>
-`auxenv [<option>...] <command> <envname> [<arg>...]`<br>
+`auxenv [<option>...] <command> <envname> [<arg>...]`
 
 As non-alias...
 
 `source <dir>/auxenv --help`<br>
 `source <dir>/auxenv --version`<br>
-`source <dir>/auxenv [<option>...] <command> <envname> [<arg>...]`<br>
+`source <dir>/auxenv [<option>...] <command> <envname> [<arg>...]`
 
 ## DESCRIPTION
 
