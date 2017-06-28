@@ -29,13 +29,25 @@ In some environments it is helpful to find trhe custom configuration scripts bas
 a list of directories to search through. The auxilium sourceable script "auxsource"
 does this based on a list of directories in the "AUXSOURCE_PATH" envirnment variable.
 
+## Supported Systems
+
+At the moment, auxilium is only tested on Linux systems.
+
 ## Credits
 
-The run-time auxilium scripts (auxenv and auxsource) are written in 100% bash scripting
-language. All that is needed to run them is a standard bash shell.
+The run-time auxilium scripts are written purely in the bash scripting
+language. All that is needed to run them is a standard (relatively recent) bash shell.
 
-Development unit testing (not required for end-users) is performed using "Bats" (Bash
-Automated Testing System) available at https://github.com/sstephenson/bats .
+Running the auxilium unit tests is not required for end-users. However, for developers or
+others who want to run these unit tests the "Bats" (Bash Automated Testing System) is
+required. "Bats" is available at https://github.com/sstephenson/bats .
 
-Conversion of markoff files to html documentation and man pages (also not required
-for end-users) is performed via "Ronn" system available at https://github.com/rtomayko/ronn .
+Conversion of markoff files to html and man formatted documentation is also not usually
+required for end-users because the generated documentation is generally included in
+auxilium distributions. However, for those who wish to be able to regenerate the (possibly
+revised) documentation, the "Ronn" markdown to man/html system is required. "Ronn" is
+available at https://github.com/rtomayko/ronn .
+
+The auxchecktap utility will use "uuidgen" if it is available, but will work even if uuidgen
+is not available. The uuidgen program is part of the util-linux package and is availble
+from https://www.kernel.org/pub/linux/utils/util-linux/ .
