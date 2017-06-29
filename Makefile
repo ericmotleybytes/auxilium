@@ -1,6 +1,7 @@
 # Development Makefile for auxilium
-DEFAULT_FINAL_PREFIX=/usr/local
-DEFAULT_DEVEL_PREFIX=$(HOME)/local
+SYS_PREFIX=/usr/local
+DEV_PREFIX=$(HOME)/local
+THISFILE:=$(lastword $(MAKEFILE_LIST))
 
 .PHONY: all
 all : build
@@ -13,16 +14,18 @@ help:
 	@echo "  make docs          # gen man and html documentation."
 	@echo "  make test          # run tests and save result to logs."
 	@echo "  make checktest     # check results in test logs."
-	@echo "Common installing usage:"
-	@echo "  make devinstall    # copy files to personal install area."
-	@echo "  make install       # copy files to system dirs as root."
-	@echo "Common cleanup usage:"
+	@echo "Common build cleanup usage:"
 	@echo "  make cleantest     # copy test log files."
 	@echo "  make cleandocs     # delete working copy of gen'd docs."
-	@echo "  make cleanprefix   # delete saved prefix choices."
+	@echo "  make clean         # clean tests and docs."
+	@echo "Common installing usage:"
+	@echo "  make devinstall    # copy files to under $(DEV_PREFIX)."
+	@echo "  make sysinstall    # copy files to under $(SYS_PREFIX) as root."
+	@echo "  make install PREFIX=<prefix> # custom copy files."
 	@echo "Common uninstalling usage:"
-	@echo "  make devuninstall  # delete files installed by devinstall."
-	@echo "  make uninstall     # delete files installed by install as root."
+	@echo "  make devuninstall  # delete files installed under $(DEV_PREFIX)."
+	@echo "  make sysuninstall  # delete files installed under $(SYS_PREFIX) as root."
+	@echo "  make uninstall PREFIX=<prefix> # custom uninstall files."
 
 #### Building stuff #####
 
@@ -74,77 +77,162 @@ cleandocs:
 
 #### Testing stuff ####
 
-.PHONY: test
-test: test/test.log test/tap.log
+#.PHONY: test
+test: test/tap.log test/tap.chk
 
-test/test.log : bin/auxenv bin/auxsource $(wildcard test/*.bash) $(wildcard test/*.bats)
-	cd test; bats -p . | tee test.log
-
-test/tap.log : bin/auxenv bin/auxsource $(wildcard test/*.bash) $(wildcard test/*.bats)
+test/tap.log : bin/auxenv bin/auxsource bin/auxchecktap $(wildcard test/*.bash) $(wildcard test/*.bats)
 	cd test; bats -t . | tee tap.log
 
+test/tap.chk : test/tap.log
+	head -2 test/tap.log >  test/tap.chk
+	tail -2 test/tap.log >> test/tap.chk
+
 .PHONY: checktest
-checktest:
-	@tail -n 1 test/test.log
+checktest: test/tap.chk
+	cat test/tap.chk
 
 #### Cleaning test logs ####
 
 .PHONY: cleantest
 cleantest:
-	rm -f test/test.log
 	rm -f test/tap.log
+	rm -f test/tap.chk
 
-#### Installing stuff #####
-
-devel.prefix :
-	@def="$(DEFAULT_DEVEL_PREFIX)" ; \
-         read -p "Enter development install prefix [$$def]: " prefix ; \
-         prefix="$${prefix:-$$def}" ; \
-         echo "$$prefix" > devel.prefix
-
-devel.install.make : install.make.template devel.prefix
-	prefix=`cat devel.prefix` ; \
-         cat install.make.template | sed -e "s:<PREFIX>:$$prefix:g" > $@
+#### install stuff ####
 
 .PHONY: devinstall
-devinstall : devel.prefix devel.install.make
-	make -f devel.install.make install
+devinstall:
+	@$(MAKE) $(THISFILE) doinstall PREFIX=$(DEV_PREFIX)
 
-final.prefix :
-	@def="$(DEFAULT_FINAL_PREFIX)" ; \
-         read -p "Enter production install prefix [$$def]: " prefix ; \
-         prefix="$${prefix:-$$def}" ; \
-         echo "$$prefix" > final.prefix
-
-final.install.make : install.make.template final.prefix
-	prefix=`cat final.prefix` ; \
-         cat install.make.template | sed -e "s:<PREFIX>:$$prefix:g" > $@
+.PHONY: sysinstall
+sysinstall:
+	@sudo $(MAKE) $(THISFILE) doinstall PREFIX=$(SYS_PREFIX)
 
 .PHONY: install
-install : final.prefix final.install.make
-	sudo make -f final.install.make install
+install :
+	@if [ -z "$(PREFIX)" ]; then echo "ERROR: No PREFIX variable defined."; exit 1; fi
+	@$(MAKE) $(THISFILE) doinstall PREFIX=$(PREFIX)
 
-#### Uninstalling stuff #####
+.PHONY: doinstall
+doinstall : doinstallinfo \
+  $(PREFIX)/bin \
+  $(PREFIX)/bin/auxenv \
+  $(PREFIX)/bin/auxsource \
+  $(PREFIX)/bin/auxalias \
+  $(PREFIX)/share/man/man1 \
+  $(PREFIX)/share/man/man1/auxenv.1 \
+  $(PREFIX)/share/man/man1/auxsource.1 \
+  $(PREFIX)/share/man/man1/auxalias.1 \
+  $(PREFIX)/share/man/man1/auxchecktap.1 \
+  $(PREFIX)/share/html/man/man1 \
+  $(PREFIX)/share/html/man/man1/auxenv.1.html \
+  $(PREFIX)/share/html/man/man1/auxsource.1.html \
+  $(PREFIX)/share/html/man/man1/auxalias.1.html \
+  $(PREFIX)/share/html/man/man1/auxchecktap.1.html
+
+.PHONY: doinstallinfo
+doinstallinfo:
+	@echo "INFO: doing install to $(PREFIX) as user $$(whoami)."
+
+$(PREFIX)/bin:
+	mkdir -p $@
+
+$(PREFIX)/bin/auxenv : bin/auxenv
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/bin/auxsource : bin/auxsource
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/bin/auxalias : bin/auxalias
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/man/man1:
+	mkdir -p $@
+
+$(PREFIX)/share/man/man1/auxenv.1: man/auxenv.1
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/man/man1/auxsource.1: man/auxsource.1
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/man/man1/auxalias.1: man/auxalias.1
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/man/man1/auxchecktap.1: man/auxchecktap.1
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/html/man/man1:
+	mkdir -p $@
+
+$(PREFIX)/share/html/man/man1/auxenv.1.html: man/auxenv.1.html
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/html/man/man1/auxsource.1.html: man/auxsource.1.html
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/html/man/man1/auxalias.1.html: man/auxalias.1.html
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/html/man/man1/auxchecktap.1.html: man/auxchecktap.1.html
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+#### uninstall stuff ####
 
 .PHONY: devuninstall
-devuninstall : devel.prefix devel.install.make
-	make -f devel.install.make uninstall
+devuninstall:
+	@$(MAKE) $(THISFILE) douninstall PREFIX=$(DEV_PREFIX)
+
+.PHONY: sysuninstall
+sysuninstall:
+	@sudo $(MAKE) $(THISFILE) douninstall PREFIX=$(SYS_PREFIX)
 
 .PHONY: uninstall
-uninstall : final.prefix final.install.make
-	sudo make -f final.install.make uninstall
+uninstall:
+	@if [ -z "$(PREFIX)" ]; then echo "ERROR: No PREFIX variable defined."; exit 1; fi
+	@$(MAKE) $(THISFILE) douninstall PREFIX=$(PREFIX)
 
-.PHONY: cleanprefix
-cleanprefix:
-	rm -f devel.prefix
-	rm -f final.prefix
-	rm -f devel.install.make
-	rm -f final.install.make
+.PHONY: douninstall
+douninstall:
+	@echo "INFO: doing uninstall from $(PREFIX) as user $$(whoami)."
+	rm -f $(PREFIX)/bin/auxenv
+	rm -f $(PREFIX)/bin/auxsource
+	rm -f $(PREFIX)/bin/auxalias
+	rm -f $(PREFIX)/bin/auxchecktap
+	rm -f $(PREFIX)/share/man/man1/auxenv.1
+	rm -f $(PREFIX)/share/man/man1/auxsource.1
+	rm -f $(PREFIX)/share/man/man1/auxalias.1
+	rm -f $(PREFIX)/share/man/man1/auxchecktap.1
+	rm -f $(PREFIX)/share/html/man/man1/auxenv.1
+	rm -f $(PREFIX)/share/html/man/man1/auxsource.1
+	rm -f $(PREFIX)/share/html/man/man1/auxalias.1
+	rm -f $(PREFIX)/share/html/man/man1/auxchecktap.1
 
 #### Aggregate stuff ####
 
 .PHONY: clean
-clean: cleanprefix cleantest cleandocs
+clean: cleantest cleandocs
 
 #### git stuff ####
 

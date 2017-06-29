@@ -1,0 +1,90 @@
+auxchecktap(1) -- Check TAP compliant unit test results
+=======================================================
+
+## SYNOPSIS
+
+`auxtapcheck --help`<br>
+`auxtapcheck --version`<br>
+`auxtapcheck [<option>...]`<br>
+`auxtapcheck [<option>...] <filespec>...`
+
+Syntax:
+  auxchecktap --help     # display this help text.
+  auxchecktap --version  # display program version information.
+  auxchecktap [<outoption>]               # read from standard input.
+  auxchecktap [<outoption>] <filespec>... # read from specified file(s).
+Options:
+
+
+`auxsource --help`<br>
+`auxsource --version`<br>
+`auxsource <filename> [<arg>...]`<br>
+`auxsource <dir>/<filename> [<arg>...]`
+
+As non-alias...
+
+`source <dir>/auxsource --help`<br>
+`source <dir>/auxsource --version`<br>
+`source <dir>/auxsource <filename> [<arg>...]`<br>
+`source <dir>/auxsource <dir>/<filename> [<arg>...]`
+
+## DESCRIPTION
+
+TBD
+
+## COMMANDS
+
+TBD
+
+## OPTIONS
+
+--verbose
+
+  Somewhat verbose final summary.
+
+--brief
+
+Brief summary, one line per file plus one line overall (default).
+
+--curt
+
+One overall summary line.
+
+--quiet
+
+one line summaries per file only if failures found.
+
+--silent
+
+No output, even with failures, but exit status set.
+
+--json
+
+Use JSON format output.
+
+--nojson
+
+DO not use JSON format output.
+
+--strict
+
+Use strict TAP parsing rules (default).
+
+--nostrict
+
+DO not use strict TAP parsing rules.
+
+
+## EXIT STATUS
+
+'auxsource' completes with an exit status determined by the execution of the
+target sourced file.
+
+## COPYRIGHT
+
+Copyright (C) 2017 Eric Alan Christiansen.
+
+## SEE ALSO
+
+https://testanything.org/ - The Test Anything Protocol (TAP).<br>
+http://www.json.org/ - The JavaScript Object Notation (JSON).

@@ -36,6 +36,7 @@ totparamcnt=$((0))      # total number of command line arguments
 versionflag="n"         # "y" if --version specified else "n"
 helpflag="n"            # "y" if --help specified else "n"
 strictflag="y"          # "y" unless --nostrict specified (then "n")
+jsonflag="n"            # "y" if --json specified else "n"
 tabchr=$'\x09'          # ascii tab character
 spcchr=" "              # space character
 
@@ -57,6 +58,10 @@ while [ $# -gt 0 ]; do
         outputmode="quiet"
     elif [ "$param" == "--silent" ]; then
         outputmode="silent"
+    elif [ "$param" == "--json" ]; then
+        jsonflag="y"
+    elif [ "$param" == "--nojson" ]; then
+        jsonflag="n"
     elif [ "$param" == "--strict" ]; then
         strictflag="y"
     elif [ "$param" == "--nostrict" ]; then
@@ -86,18 +91,20 @@ fi
 #
 if [ "$helpflag" == "y" ]; then
     echo "Command:"
-    echo "  $cmdname - Check TAP compliant unit test result output"
+    echo "  $cmdname - Check TAP compliant unit test results"
     echo "Syntax:"
     echo "  $cmdname --help     # display this help text."
     echo "  $cmdname --version  # display program version information."
-    echo "  $cmdname [<outoption>]               # read from standard input."
-    echo "  $cmdname [<outoption>] <filespec>... # read from specified file(s)."
+    echo "  $cmdname [<option>...]               # read from standard input."
+    echo "  $cmdname [<option>...] <filespec>... # read from specified file(s)."
     echo "Options:"
     echo "  --verbose   # Somewhat verbose final summary."
     echo "  --brief     # Brief summary, one line per file plus one line overall (default)."
     echo "  --curt      # One overall summary line."
     echo "  --quiet     # one line summaries per file only if failures found."
     echo "  --silent    # No output, even with failures, but exit status set."
+    echo "  --json      # output summary in JSON format."
+    echo "  --nojson    # output summary in human readable format (default)."
     echo "  --strict    # Use strict TAP parsing rules (default)."
     echo "  --nostrict  # DO not use strict TAP parsing rules."
 fi
