@@ -2,6 +2,9 @@
 SYS_PREFIX=/usr/local
 DEV_PREFIX=$(HOME)/local
 THISFILE:=$(lastword $(MAKEFILE_LIST))
+ifndef VERBOSE
+MAKEFLAGS += --no-print-directory
+endif
 
 .PHONY: all
 all : build
@@ -128,11 +131,21 @@ doinstall : doinstallinfo \
   $(PREFIX)/share/html/man/man1/auxenv.1.html \
   $(PREFIX)/share/html/man/man1/auxsource.1.html \
   $(PREFIX)/share/html/man/man1/auxalias.1.html \
-  $(PREFIX)/share/html/man/man1/auxchecktap.1.html
+  $(PREFIX)/share/html/man/man1/auxchecktap.1.html \
+  doinstallinfo2
 
 .PHONY: doinstallinfo
 doinstallinfo:
-	@echo "INFO: doing install to $(PREFIX) as user $$(whoami)."
+	@echo "INFO: doing auxilium install under $(PREFIX) as user $$(whoami)."
+
+.PHONY: doinstallinfo2
+doinstallinfo2:
+	@echo "INFO: Auxilium installed under $(PREFIX) as user $$(whoami)."
+	@fullprefix=$$(readlink -f $(PREFIX)) ; \
+  curuser=$$(whoami) ; \
+  rcfile=~/.bashrc; \
+  if [ "$$curuser" == "root" ]; then rcfile=/etc/bashrc; fi ; \
+  echo "NOTE: We recommended adding \"source $$fullprefix/bin/auxalias\" to $$rcfile."
 
 $(PREFIX)/bin:
 	mkdir -p $@
