@@ -1,0 +1,69 @@
+1..68
+ok 1 test shell addition
+ok 2 test shell subtraction
+ok 3 test shell multiplication
+ok 4 test shell division
+ok 5 check auxenv alias
+ok 6 check auxsource alias
+ok 7 check auxenv help
+ok 8 check auxenv default help
+ok 9 check auxenv version
+ok 10 check auxenv show
+ok 11 check auxenv dump
+ok 12 check auxenv count
+ok 13 check auxenv count empty
+ok 14 check auxenv count unset
+ok 15 check auxenv get
+ok 16 check auxenv get empty
+ok 17 check auxenv get unset
+ok 18 check auxenv find
+ok 19 check auxenv find empty
+ok 20 check auxenv find unset
+ok 21 check auxenv prepend
+ok 22 check auxenv prepend to empty
+ok 23 check auxenv prepend to unset
+ok 24 check auxenv append
+ok 25 check auxenv append to empty
+ok 26 check auxenv append to unset
+ok 27 check auxenv insert before dir
+ok 28 check auxenv insert after dir
+ok 29 check auxenv insert before pos
+ok 30 check auxenv insert after pos
+ok 31 check auxenv remove
+ok 32 check auxenv remove symlink
+ok 33 check auxenv erase
+ok 34 check auxenv erase symlink
+ok 35 check auxenv reverse
+ok 36 check auxenv dedup
+ok 37 check auxenv dedup topdown
+ok 38 check auxenv dedup bottomup
+ok 39 check auxenv dedup empty/unset lists
+ok 40 check auxenv desym
+ok 41 check auxenv desym empty/unset lists
+ok 42 check auxenv weed
+ok 43 check auxenv weed empty/unset lists
+ok 44 check auxenv clean
+ok 45 check auxenv clean empty/unset lists
+ok 46 check auxenv show --ifs=c
+ok 47 check auxenv dump --ifs=c
+ok 48 check auxenv count --ifs=c
+ok 49 check auxenv get --ifs=c
+ok 50 check auxenv find --ifs-c
+ok 51 check auxenv prepend --ifs=c
+ok 52 check auxenv append --ifs=c
+ok 53 check auxenv insert before dir --ifs=c
+ok 54 check auxenv remove --ifs=c
+ok 55 check auxenv reverse --ifs=c
+ok 56 check auxenv dedup --ifs=c
+ok 57 check auxsource help
+ok 58 check auxsource default help
+ok 59 check auxsource version
+ok 60 check auxsource path file
+ok 61 check auxsource spec file
+ok 62 check auxguidish help
+ok 63 check auxguidish version
+ok 64 check auxguidish guid generation lower
+ok 65 check auxguidish guid generation upper
+ok 66 check auxguidish guid generation warn
+ok 67 check auxguidish guid generation debug
+ok 68 check auxguidish guid generation uuidgen

@@ -3,27 +3,38 @@
 # usage:
 #     auxchecktap [options] [filespec...]
 # options:
-#     --version
-#     --help
-#     --verbose
-#     --brief (d)
-#     --json
-#     --quiet
-#     --silent
-#     --strict (d)
-#     --nostrict
+#     --version    -v
+#     --help       -h
+#     --strict     -s (D)
+#     --nostrict   -n
+#     --brief      -b
+#     --debug      -d
+#
+# define functions
+#
+function ct_debug() {
+    if [ "$debugflag" == "y" ]; then
+        echo "DEBUG: $1" >&2
+    fi
+    return 0
+}
+#
+# begin main program
 #
 cmdfile=$(readlink -f "$0")
 cmdname="${cmdfile##*/}"
 version="$cmdname version 1.0 (2017-06-28)"
 filespecs=()
-outputmode="brief"
 curexptestcnt=$((0))    # current file expected test count
 curtestcnt=$((0))       # current file test count (pass or fail)
 curfailcnt=$((0))       # current file fail count
 curlinecnt=$((0))       # current file line count
 curxlinecnt=$((0))      # current file xtra (comment) line count
 curblinecnt=$((0))      # current file blank line count
+curfirstexptestnum=""   # current file first expected test number
+curlastexptestnum=""    # current file last expected test number
+curfirstacttestnum=""   # current file first actual test number
+curlastacttestnum=""    # current file last actual test number
 totstdincnt=$((0))      # total standard in count (0 or 1)
 totfilecnt=$((0))       # total file count (including standard in)
 totlinecnt=$((0))       # total line count
@@ -37,51 +48,38 @@ totparamcnt=$((0))      # total number of command line arguments
 versionflag="n"         # "y" if --version specified else "n"
 helpflag="n"            # "y" if --help specified else "n"
 strictflag="y"          # "y" unless --nostrict specified (then "n")
+debugflag="n"           # "n" unless --debug specified (then "y")
+briefflag="n"           # "n" unless --brief specified (then "y")
 tabchr=$'\x09'          # ascii tab character
 spcchr=" "              # space character
-uuidgenvers=$(uuidgen --version 2>/dev/null)
-if [ -z "uuidgenvers" ]; then
-    uuidgenflag="n"
-else
-    uuidgenflag="y"
-    sessionuuid=$(uuidgen)
-    sessionuuid=$(sessionuuid//-/)    # strip out dashes
-fi
-
+sessionbegstamp=$(date +%FT%T%z)  # session begin timestamp
+sessionbegepoch=$(date +%s)       # session begin epoch seconds
 
 while [ $# -gt 0 ]; do
     totparamcnt=$(($totparamcnt+1))
     param="$1"
     shift
-    if [ "$param" == "--version" ]; then
+    if [[ "$param" == "--version"    || "$param" == "-v" ]]; then
         versionflag="y"
-    elif [ "$param" == "--help" ]; then
+    elif [[ "$param" == "--help"     || "$param" == "-h" ]]; then
         helpflag="y"
-    elif [ "$param" == "--verbose" ]; then
-        outputmode="verbose"
-    elif [ "$param" == "--brief" ]; then
-        outputmode="brief"
-    elif [ "$param" == "--curt" ]; then
-        outputmode="curt"
-    elif [ "$param" == "--quiet" ]; then
-        outputmode="quiet"
-    elif [ "$param" == "--silent" ]; then
-        outputmode="silent"
-    elif [ "$param" == "--json" ]; then
-        outputmode="json"
-    elif [ "$param" == "--strict" ]; then
+    elif [[ "$param" == "--debug"    || "$param" == "-d" ]]; then
+        debugflag="y"
+    elif [[ "$param" == "--brief"    || "$param" == "-b" ]]; then
+        briefflag="y"
+    elif [[ "$param" == "--strict"   || "$param" == "-s" ]]; then
         strictflag="y"
-    elif [ "$param" == "--nostrict" ]; then
+    elif [[ "$param" == "--nostrict" || "$param" == "-n" ]]; then
         strictflag="n"
-    elif [ "${param:0:2}" == "--" ]; then
+    elif [[ "${param:0:2}" == "--"   || "${param:0:1}" == "-" ]]; then
         echo "ERROR: bad command line option ($param)." >&2
         exit 1
     else
         # assume a file
-        if [ ! -e "$param" ]; then
-            echo "ERROR: file not found ($param)." >&2
-            exit 1
-        fi
+        #if [ ! -e "$param" ]; then
+        #    echo "ERROR: file not found ($param)." >&2
+        #    exit 1
+        #fi
         filespec=$(readlink -f "$param")    # full cannonical filespec
         filespecs+=("$filespec")
         totfilecnt=$(($totfilecnt+1))
@@ -105,14 +103,12 @@ if [ "$helpflag" == "y" ]; then
     echo "  $cmdname [<option>...]               # read from standard input."
     echo "  $cmdname [<option>...] <filespec>... # read from specified file(s)."
     echo "Options:"
-    echo "  --verbose   # Somewhat verbose final summary."
-    echo "  --brief     # Brief summary, one line per file plus one line overall (default)."
-    echo "  --curt      # One overall summary line."
-    echo "  --quiet     # one line summaries per file only if failures found."
-    echo "  --silent    # No output, even with failures, but exit status set."
-    echo "  --json      # output details in JSON format."
-    echo "  --strict    # Use strict TAP parsing rules (default)."
-    echo "  --nostrict  # DO not use strict TAP parsing rules."
+    echo "  --help     | -h   Display this help."
+    echo "  --version  | -v   Display version information."
+    echo "  --strict   | -s   Use strict TAP parsing rules (default)."
+    echo "  --nostrict | -n   Do not use strict TAP parsing rules."
+    echo "  --brief    | -b   Do not display # error comment lines."
+    echo "  --debug    | -d   Display debug info to stderr."
 fi
 #
 # if --help or --version and no files specified, assume we are done.
@@ -131,12 +127,18 @@ if [ $totfilecnt -eq 0 ]; then
     totstdincnt=$(($totstdincnt+1))
 fi
 #
+# output initial expected file count line
+#
+echo "1..$totfilecnt"
+#
 # now loop through and read all the files on the filespecs list
 #
+exitstatus="0"
 idx=$((0))
 while [ $idx -lt ${#filespecs[*]} ]; do
     filespec="${filespecs[$idx]}"
-    idx=$(($idx+1))
+    idx=$(($idx+1)) 
+    taperrs=()
     curtestcnt=$((0))
     curfailcnt=$((0))
     curlinecnt=$((0))
@@ -147,90 +149,179 @@ while [ $idx -lt ${#filespecs[*]} ]; do
     curlastexptestnum=""
     curfirstacttestnum=""
     curlastacttestnum=""
-    while read line; do
-        line="${line/$tabchr/$spcchr}"   # replace tabs with spaces
-        line="${line##*( )}"             # trim leading spaces
-        line="${line%%*( )}"             # trim trailing spaces
-        curlinecnt=$((curlinecnt+1))
-        totlinecnt=$((totlinecnt+1))
-        if [[ "$line" =~ ^[0-9]+\.\.[0-9]+$ ]]; then
-            if [ "$strictmode" == "y" -a "$curfirstexptestnum" != "" ]; then
-                echo "ERROR: xtra tests expected line; file=$filespec line=$curlinecnt." >&2
-                exit 1
-            fi
-            curfirstexptestnum="${line%%\.\.*}"
-            curlastexptestnum="${line##*\.\.}"
-            curexptestcnt=$(($curlastexptestnum-$curfirstexptestnum))
-            curexptestcnt=$(($curexptestcnt+1))
-        elif [ "${line:0:3}" == "ok " ]; then
-            # pass report
-            rest="${line:3}"
-            rest="${rest##*( )}"             # trim leading spaces
-            tstnum="${rest%% *}"
-            if [ "$curfirstacttestnum" == "" ]; then
-                curfirstacttestnum="$tstnum"
-            fi
-            curlastacttestnum="$tstnum"
-            curtestcnt=$(($curtestcnt+1))
-            tottestcnt=$(($tottestcnt+1))
-        elif [ "${line:0:7}" == "not ok " ]; then
-            # fail report
-            rest="${line:7}"
-            rest="${rest##*( )}"             # trim leading spaces
-            tstnum="${rest%% *}"
-            if [ "$curfirstacttestnum" == "" ]; then
-                curfirstacttestnum="$tstnum"
-            fi
-            curlastacttestnum="$tstnum"
-            curtestcnt=$(($curtestcnt+1))
-            curfailcnt=$(($curfailcnt+1))
-            tottestcnt=$(($tottestcnt+1))
-            totfailcnt=$(($totfailcnt+1))
-        elif [ "${line:0:1}" == "#" ]; then
-            # strictly valid extra comment
-            curxlinecnt=$(($curxlinecnt+1))
-            totxlinecnt=$(($totxlinecnt+1))
-        elif [ "$line" eq "" ]; then
-            # blank line, ok even in strict
-            curblinecnt=$(($curblinecnt+1))
-            totblinecnt=$(($totblinecnt+1))
-        else
-            # not a strictly formatted line
-            if [ "$strictflag" == "y" ]; then
-                echo "ERROR: xtra misc line; file=$filespec line=$curlinecnt." >&2
-                exit 1
-            else
+    toomanyexpectsflag="n"
+    toomanyweirdlinesflag="n"
+    outofsequenceflag="n"
+    if [ ! -e "$filespec" ]; then
+        taperrs+=("# File not found.")
+    else
+        prevtstnum=""
+        while read line; do
+            line="${line/$tabchr/$spcchr}"   # replace tabs with spaces
+            line="${line##*( )}"             # trim leading spaces
+            line="${line%%*( )}"             # trim trailing spaces
+            curlinecnt=$((curlinecnt+1))
+            totlinecnt=$((totlinecnt+1))
+            if [[ "$line" =~ ^[0-9]+\.\.[0-9]+$ ]]; then
+                if [ "$strictmode" == "y" -a "$curfirstexptestnum" != "" ]; then
+                    ct_debug "$filespec line $curlinecnt: extra expected testcount line."
+                    if [ "$toomanyexpectsflag" == "n" ]; then
+                        toomanyexpectsflag="y"
+                        taperrs+=("# Found too many expected testcount lines.")
+                    fi
+                fi
+                curfirstexptestnum="${line%%\.\.*}"
+                curlastexptestnum="${line##*\.\.}"
+                curexptestcnt=$(($curlastexptestnum-$curfirstexptestnum))
+                curexptestcnt=$(($curexptestcnt+1))
+            elif [ "${line:0:3}" == "ok " ]; then
+                # pass report
+                rest="${line:3}"
+                rest="${rest##*( )}"             # trim leading spaces
+                tstnum="${rest%% *}"
+                if [ "$curfirstacttestnum" == "" ]; then
+                    curfirstacttestnum="$tstnum"
+                fi
+                curlastacttestnum="$tstnum"
+                curtestcnt=$(($curtestcnt+1))
+                tottestcnt=$(($tottestcnt+1))
+                if [[ "$prevtstnum" != "" && "$strictflag" == "y" ]]; then
+                    tstnumincr=$(($tstnum-$prevtstnum))
+                    if [[ $tstnumincr -ne 1 ]]; then
+                        if [ "$outofsequenceflag" == "n" ]; then
+                            taperrs+=("Found out of sequence test numbers (e.g. $tstnum).")
+                            outofsequenceflag="y"
+                        fi
+                        ct_debug "Test $tstnum is out of sequence."
+                    fi
+                fi
+                prevtstnum="$tstnum"   # save previous test number
+            elif [ "${line:0:7}" == "not ok " ]; then
+                # fail report
+                rest="${line:7}"
+                rest="${rest##*( )}"             # trim leading spaces
+                tstnum="${rest%% *}"
+                if [ "$curfirstacttestnum" == "" ]; then
+                    curfirstacttestnum="$tstnum"
+                fi
+                curlastacttestnum="$tstnum"
+                curtestcnt=$(($curtestcnt+1))
+                curfailcnt=$(($curfailcnt+1))
+                tottestcnt=$(($tottestcnt+1))
+                totfailcnt=$(($totfailcnt+1))
+                if [[ "$prevtstnum" != "" && "$strictflag" == "y" ]]; then
+                    tstnumincr=$(($tstnum-$prevtstnum))
+                    if [[ $tstnumincr -ne 1 ]]; then
+                        if [ "$outofsequenceflag" == "n" ]; then
+                            taperrs+=("Found out of sequence test numbers (e.g. $tstnum).")
+                            outofsequenceflag="y"
+                        fi
+                        ct_debug "Test $tstnum is out of sequence."
+                    fi
+                fi
+                prevtstnum="$tstnum"   # save previous test number
+            elif [ "${line:0:1}" == "#" ]; then
+                # strictly valid extra comment
                 curxlinecnt=$(($curxlinecnt+1))
                 totxlinecnt=$(($totxlinecnt+1))
+            elif [ "$line" eq "" ]; then
+                # blank line, ok even in strict
+                curblinecnt=$(($curblinecnt+1))
+                totblinecnt=$(($totblinecnt+1))
+            else
+                # not a strictly formatted line
+                if [ "$strictflag" == "y" ]; then
+                    ct_debug "$filespec line $curlinecnt: not strictly TAP formatted line."
+                    if [ "$toomanyweirdlinesflag" == "n" ]; then
+                        toomanyweirdlinesflag="y"
+                        taperrs+=("Found not strictly TAP format lines (e.g. line $curlinecnt).")
+                    fi
+                else
+                    curxlinecnt=$(($curxlinecnt+1))
+                    totxlinecnt=$(($totxlinecnt+1))
+                fi
+            fi
+        done < "$filespec"
+    fi
+    totexptestcnt=$(($totexptestcnt+$curexptestcnt))
+    ct_debug "File=$filespec"
+    ct_debug "  FileTestCount=$curtestcnt"
+    ct_debug "  FileFailCount=$curfailcnt"
+    ct_debug "  FileExpectedTestCount=$curexptestcnt"
+    ct_debug "  FileExpectedFirstTestNumber=$curfirstexptestnum"
+    ct_debug "  FileExpectedLastTestNumber=$curlastexptestnum"
+    ct_debug "  FileActualFirstTestNumber=$curfirstacttestnum"
+    ct_debug "  FileActualLastTestNumber=$curlastacttestnum"
+    ct_debug "  FileLineCount=$curlinecnt"
+    ct_debug "  FileXtraLineCount=$curxlinecnt"
+    ct_debug "  FileBlankLineCount=$curblinecnt"
+    if [[ $curtestcnt -le 0 ]]; then
+        taperrs+=("# No test reports found.")
+    else
+        if [[ $curfailcnt -gt 0 ]]; then
+            if [[ $curfailcnt -eq 1 ]]; then
+                taperrs+=("# Found $curfailcnt failed test.")
+            else
+                taperrs+=("# Found $curfailcnt failed tests.")
             fi
         fi
-    done < "$filespec"
-    totexptestcnt=$(($totexptestcnt+$curexptestcnt))
-    if [ "$curfailcnt" != "0" ]; then
-        totfilefailcnt=$(($totfilefailcnt+1))
+        if [[ $curtestcnt -lt $curexptestcnt ]]; then
+            tapmisscnt=$(($curexptestcnt-$curtestcnt))
+            if [[ $tapmisscnt -eq 1 ]]; then
+                taperrs+=("# Missing $tapmisscnt test.")
+            else
+                taperrs+=("# Missing $tapmisscnt tests.")
+            fi
+        elif [[ $curtestcnt -lt $curexptestcnt ]]; then
+            tapxtracnt=$(($curtestcnt-$curexptestcnt))
+            if [[ $tapxtracnt -eq 1 ]]; then
+                taperrs+=("# Found $tapmisscnt extra unexpected test.")
+            else
+                taperrs+=("# Found $tapmisscnt extra unexpected tests.")
+            fi
+        fi
     fi
-    if [ "$outputmode" == "verbose" ]; then
-        echo "File=$filespec"
-        echo "  FileTestCount=$curtestcnt"
-        echo "  FileFailCount=$curfailcnt"
-        echo "  FileExpectedTestCount=$curexptestcnt"
-        echo "  FileLineCount=$curlinecnt"
-        echo "  FileXtraLineCount=$curxlinecnt"
-        echo "  FileBlankLineCount=$curblinecnt"
-    elif [ "$outputmode" == "brief" ]; then
-        echo "TBD"
+    #
+    # do actual TAP report output
+    #
+    if [[ ${#taperrs[@]} -eq 0 ]]; then 
+        tapprefix="ok"
+    else
+        exitstatus="1"
+        tapprefix="not ok"
+    fi
+    if [[ $curtestcnt -eq 1 ]]; then
+        taptestword="test"
+    else
+        taptestword="tests"
+    fi
+    echo "$tapprefix $idx $filespec: $curtestcnt $taptestword."
+    #
+    # output commented error descriptions if any, unless in brief mode
+    #
+    if [ "$briefflag" == "n" ]; then
+        erridx=0
+        while [ $erridx -lt ${#taperrs[@]} ]; do
+            echo "${taperrs[$erridx]}"
+            erridx=$(($erridx+1))
+        done
     fi
 done
 #
-if [ "$outputmode" == "verbose" ]; then
-    echo "TotalFileCount=$totfilecnt"
-    echo "  TotalFileFailCount=$totfilefailcnt"
-    echo "  TotalTestCount=$tottestcnt"
-    echo "  TotalFailCount=$totfailcnt"
-    echo "  TotalExpectedTestCount=$totexptestcnt"
-    echo "  TotalLineCount=$totlinecnt"
-    echo "  TotalXtraLineCount=$totxlinecnt"
-    echo "  TotalBlankLineCount=$totblinecnt"
-elif [ "$outputmode" == "brief" ]; then
-    echo "TBD"
-fi
+sessionendstamp=$(date +%FT%T%z)
+sessionendepoch=$(date +%s)
+sessiondeltaepoch=$((($sessionendepoch-$sessionbegepoch)+1))
+ct_debug "TotalFileCount=$totfilecnt"
+ct_debug "TotalFileFailCount=$totfilefailcnt"
+ct_debug "TotalTestCount=$tottestcnt"
+ct_debug "TotalFailCount=$totfailcnt"
+ct_debug "TotalExpectedTestCount=$totexptestcnt"
+ct_debug "TotalLineCount=$totlinecnt"
+ct_debug "TotalXtraLineCount=$totxlinecnt"
+ct_debug "TotalBlankLineCount=$totblinecnt"
+ct_debug "SessionBeginTimestamp=$sessionbegstamp"
+ct_debug "SessionEndTimestamp=$sessionendstamp"
+ct_debug "AppoximateRuntimeSeconds=$sessiondeltaepoch"
+ct_debug "final exit status will be $exitstatus."
+ct_debug "Finished scanning at $sessionendstamp."
+exit $exitstatus

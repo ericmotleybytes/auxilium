@@ -98,26 +98,25 @@ cleandocs:
 #### Testing stuff ####
 
 #.PHONY: test
-test: test/tap.log test/tap.chk
+test: test/auxilium.taplog test/auxilium.tapchk
 
-test/tap.log : bin/auxenv bin/auxsource bin/auxchecktap bin/auxguidish \
+test/auxilium.taplog : bin/auxenv bin/auxsource bin/auxalias bin/auxchecktap bin/auxguidish \
   $(wildcard test/*.bash) $(wildcard test/*.bats)
-	cd test; bats -t . | tee tap.log
+	cd test; bats -t . | tee auxilium.taplog
 
-test/tap.chk : test/tap.log
-	head -2 test/tap.log >  test/tap.chk
-	tail -2 test/tap.log >> test/tap.chk
+test/auxilium.tapchk : test/auxilium.taplog
+	auxchecktap $< > $@
 
 .PHONY: checktest
-checktest: test/tap.chk
-	@cat test/tap.chk
+checktest: test/auxilium.tapchk
+	auxchecktap $<
 
 #### Cleaning test logs ####
 
 .PHONY: cleantest
 cleantest:
-	rm -f test/tap.log
-	rm -f test/tap.chk
+	rm -f test/auxilium.taplog
+	rm -f test/auxilium.tapchk
 
 #### install stuff ####
 

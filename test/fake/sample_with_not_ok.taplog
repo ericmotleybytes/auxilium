@@ -1,0 +1,6 @@
+1..3
+ok 1 check auxsource path file
+ok 2 check auxsource spec file
+not ok 3 dummy fail
+# (in test file test-01130-auxsource-file.bats, line 26)
+#   `[ "a" == "b" ]' failed
