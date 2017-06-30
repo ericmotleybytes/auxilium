@@ -36,7 +36,8 @@ At the moment, auxilium is only tested on Linux systems.
 ## Credits
 
 The run-time auxilium scripts are written purely in the bash scripting
-language. All that is needed to run them is a standard (relatively recent) bash shell.
+language. All that is needed to run them is a standard bash shell
+version 4 or higher.
 
 Running the auxilium unit tests is not required for end-users. However, for developers or
 others who want to run these unit tests the "Bats" (Bash Automated Testing System) is

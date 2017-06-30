@@ -14,9 +14,10 @@ all : build
 .PHONY: help
 help:
 	@echo "Common building usage:"
+	@echo "  make               # gen man and html documentation."
 	@echo "  make docs          # gen man and html documentation."
 	@echo "  make test          # run tests and save result to logs."
-	@echo "  make checktest     # check results in test logs."
+	@echo "  make checktest     # summary check of test logs."
 	@echo "Common build cleanup usage:"
 	@echo "  make cleantest     # copy test log files."
 	@echo "  make cleandocs     # delete working copy of gen'd docs."
@@ -39,7 +40,8 @@ build: docs
 docs: man/auxenv.1 man/auxenv.1.html \
   man/auxsource.1 man/auxsource.1.html \
   man/auxalias.1 man/auxalias.1.html \
-  man/auxchecktap.1 man/auxchecktap.1.html
+  man/auxchecktap.1 man/auxchecktap.1.html \
+  man/auxguidish.1 man/auxguidish.1.html
 
 man/auxenv.1 : man/auxenv.1.ronn
 	cd man ; ronn --roff auxenv.1.ronn
@@ -65,6 +67,12 @@ man/auxchecktap.1 : man/auxchecktap.1.ronn
 man/auxchecktap.1.html : man/auxchecktap.1.ronn
 	cd man ; ronn --html auxchecktap.1.ronn
 
+man/auxguidish.1 : man/auxguidish.1.ronn
+	cd man ; ronn --roff auxguidish.1.ronn
+
+man/auxguidish.1.html : man/auxguidish.1.ronn
+	cd man ; ronn --html auxguidish.1.ronn
+
 #### Cleaning built stuff ####
 
 .PHONY: cleandocs
@@ -77,13 +85,16 @@ cleandocs:
 	rm -f man/auxalias.1.html
 	rm -f man/auxchecktap.1
 	rm -f man/auxchecktap.1.html
+	rm -f man/auxguidish.1
+	rm -f man/auxguidish.1.html
 
 #### Testing stuff ####
 
 #.PHONY: test
 test: test/tap.log test/tap.chk
 
-test/tap.log : bin/auxenv bin/auxsource bin/auxchecktap $(wildcard test/*.bash) $(wildcard test/*.bats)
+test/tap.log : bin/auxenv bin/auxsource bin/auxchecktap bin/auxguidish \
+  $(wildcard test/*.bash) $(wildcard test/*.bats)
 	cd test; bats -t . | tee tap.log
 
 test/tap.chk : test/tap.log
@@ -127,11 +138,13 @@ doinstall : doinstallinfo \
   $(PREFIX)/share/man/man1/auxsource.1 \
   $(PREFIX)/share/man/man1/auxalias.1 \
   $(PREFIX)/share/man/man1/auxchecktap.1 \
+  $(PREFIX)/share/man/man1/auxguidish.1 \
   $(PREFIX)/share/html/man/man1 \
   $(PREFIX)/share/html/man/man1/auxenv.1.html \
   $(PREFIX)/share/html/man/man1/auxsource.1.html \
   $(PREFIX)/share/html/man/man1/auxalias.1.html \
   $(PREFIX)/share/html/man/man1/auxchecktap.1.html \
+  $(PREFIX)/share/html/man/man1/auxguidish.1.html \
   doinstallinfo2
 
 .PHONY: doinstallinfo
@@ -188,6 +201,11 @@ $(PREFIX)/share/man/man1/auxchecktap.1: man/auxchecktap.1
 	chmod a+r "$@"
 	chmod a-x "$@"
 
+$(PREFIX)/share/man/man1/auxguidish.1: man/auxguidish.1
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
 $(PREFIX)/share/html/man/man1:
 	mkdir -p $@
 
@@ -207,6 +225,11 @@ $(PREFIX)/share/html/man/man1/auxalias.1.html: man/auxalias.1.html
 	chmod a-x "$@"
 
 $(PREFIX)/share/html/man/man1/auxchecktap.1.html: man/auxchecktap.1.html
+	cp -a $< $@
+	chmod a+r "$@"
+	chmod a-x "$@"
+
+$(PREFIX)/share/html/man/man1/auxguidish.1.html: man/auxguidish.1.html
 	cp -a $< $@
 	chmod a+r "$@"
 	chmod a-x "$@"
@@ -233,14 +256,17 @@ douninstall:
 	rm -f $(PREFIX)/bin/auxsource
 	rm -f $(PREFIX)/bin/auxalias
 	rm -f $(PREFIX)/bin/auxchecktap
+	rm -f $(PREFIX)/bin/auxguidish
 	rm -f $(PREFIX)/share/man/man1/auxenv.1
 	rm -f $(PREFIX)/share/man/man1/auxsource.1
 	rm -f $(PREFIX)/share/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/man/man1/auxchecktap.1
+	rm -f $(PREFIX)/share/man/man1/auxguidish.1
 	rm -f $(PREFIX)/share/html/man/man1/auxenv.1
 	rm -f $(PREFIX)/share/html/man/man1/auxsource.1
 	rm -f $(PREFIX)/share/html/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/html/man/man1/auxchecktap.1
+	rm -f $(PREFIX)/share/html/man/man1/auxguidish.1
 
 #### Aggregate stuff ####
 

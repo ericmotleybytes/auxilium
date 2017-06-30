@@ -1,0 +1,46 @@
+auxguidish(1) -- Generate pseudo GUID/UUID ids
+==============================================
+
+## SYNOPSIS
+
+`auxguidish --help`<br>
+`auxguidish --version`<br>
+`auxguidish [<option>...]`<br>
+
+
+## DESCRIPTION
+
+TBD
+
+## COMMANDS
+
+`auxguidish --help`         Display help.<br>
+`auxguidish --version       Display version information.`<br>
+`auxguidish [<option>...]   Generate pseudo GUID/UUID`.<br>
+
+## OPTIONS
+
+`-l --lower    # use lowercase hex digits.`<br>
+`-u --upper    # use uppercase hex digits.`<br>
+`-w --warn     # output non-fatal warnings to stderr.`<br>
+`-d --debug    # output debug info to stderr.`<br>
+`--uuidgen     # use uuidgen command if available.<br>
+
+## EXIT STATUS
+
+'auxguidish' completes with an exit status of 0 if a pseudo GUID/UUID was generated, otherwise
+it exits with a non-zero status.
+
+### PREREQUISITES
+
+'auxguidish' requires bash 4.0 or higher. It has only been tested on Linux systems, so Linux might
+also be needed. Optionally the "uuidgen" program from the common util-linux package can be used if
+available, but this is not required.
+
+## COPYRIGHT
+
+Copyright (C) 2017 Eric Alan Christiansen.
+
+## SEE ALSO
+
+https://www.kernel.org/pub/linux/utils/util-linux/

@@ -1,0 +1,209 @@
+#!/usr/bin/env bash
+#
+# usage:
+#     auxguidish [options]
+# options:
+#     -v --version
+#     -h --help
+#     -l --lower
+#     -u --upper
+#     -w --warn
+#     -d --debug
+#     --uuidgen
+#
+# define functions
+#
+function aux_debug() {
+    if [ "$debugflag" == "y" ]; then
+        echo "$1 (D)" >&2
+    fi
+    return 0
+}
+function aux_warn() {
+    if [ "$warnflag" == "y" ]; then
+        echo "WARNING: $1" >&2
+    fi
+    return 0
+}
+function aux_rev() {
+    forward="$1"
+    reverse=$(echo "$1" | rev 2>/dev/null)
+    if [ "$?" == "0" ]; then
+        echo "$reverse"
+    else
+        aux_warn "no rev command installed on system."
+        echo "forward"  # unchanged original if no rev command
+    fi
+    return 0
+}
+#
+# begin main program
+#
+cmdfile=$(readlink -f "$0")
+cmdname="${cmdfile##*/}"
+version="$cmdname version 1.0 (2017-06-29)"
+versionflag="n"
+helpflag="n"
+lowerflag="y"
+warnflag="n"
+debugflag="n"
+uuidgenflag="n"
+while [ $# -gt 0 ]; do
+    param="$1"
+    shift
+    if [[ "$param" == "--version" || "$param" == "-v" ]]; then
+        versionflag="y"
+    elif [[ "$param" == "--help"  || "$param" == "-h" ]]; then
+        helpflag="y"
+    elif [[ "$param" == "--lower" || "$param" == "-l" ]]; then
+        lowerflag="y"
+    elif [[ "$param" == "--upper" || "$param" == "-u" ]]; then
+        lowerflag="n"
+    elif [[ "$param" == "--warn"  || "$param" == "-w" ]]; then
+        warnflag="y"
+    elif [[ "$param" == "--debug" || "$param" == "-d" ]]; then
+        debugflag="y"
+        warnflag="y"
+    elif [[ "$param" == "--uuidgen" ]]; then
+        uuidgenflag="y"
+    else
+        echo "ERROR: bad command line option ($param)." >&2
+        exit 1
+    fi
+done
+#
+# show version if it was requested
+#
+if [ "$versionflag" == "y" ]; then
+    echo "$version"
+fi
+#
+# show help if it was requested
+#
+if [ "$helpflag" == "y" ]; then
+    echo "Command:"
+    echo "  $cmdname - Generate a pseudo GUID-ish id"
+    echo "Syntax:"
+    echo "  $cmdname -h | --help     # display this help text."
+    echo "  $cmdname -v | --version  # display program version information."
+    echo "  $cmdname [<option>...]   # output 32 hex char pseudo UUID."
+    echo "Options:"
+    echo "  -l --lower    # use lowercase hex digits."
+    echo "  -u --upper    # use uppercase hex digits."
+    echo "  -w --warn     # output non-fatal warnings to stderr."
+    echo "  -d --debug    # output debug info to stderr."
+    echo "  --uuidgen     # use uuidgen command if available."
+fi
+#
+# if --help or --version and no files specified, assume we are done.
+#
+if [[ "$versionflag" == "y" || "$helpflag" == "y" ]]; then
+    exit 0
+fi
+#
+# generate pseudo UUID
+#
+# initialize results
+#
+result=""
+#
+# try using uuidgen if requested
+#
+if [ "$uuidgenflag" == "y" ]; then
+    uuidgen=$(uuidgen 2>/dev/null)
+    if [ "$?" == "0" ]; then
+        uuidgen=${uuidgen//-/}  # remove dashes
+        result="${result}${uuidgen}"
+        aux_debug "$result (+uuidgen)"
+    else
+        aux_warn "uuidgen command not found."
+    fi
+fi
+if [[ ${#result} -lt 32 ]]; then
+    random="$RANDOM"
+    hexrandom=$(echo "obase=16; $random" | bc)
+    result="${result}${hexrandom}"
+    aux_debug "$result (+random)"
+fi
+if [[ ${#result} -lt 32 ]]; then
+    epoch=$(date +%s 2>/dev/null)
+    if [ "$?" == "0" ]; then
+        hexepoch=$(echo "obase=16; $epoch" | bc)
+        result="${result}${hexepoch}"
+        aux_debug "$result (+epoch)"
+    else
+        aux_warn "date command did not return epoch seconds."
+    fi
+fi
+if [[ ${#result} -lt 32 ]]; then
+    nano=$(date +%N 2>/dev/null)
+    if [ "$?" == "0" ]; then
+        hexnano=$(echo "obase=16; $nano" | bc)
+        result="${result}${hexnano}"
+        aux_debug "$result (+nano)"
+    else
+        aux_warn "date command did not return nanosecond part."
+    fi
+fi
+if [[ ${#result} -lt 32 ]]; then
+    pid="$$"
+    hexpid=$(echo "obase=16; $pid" | bc)
+    result="${result}${hexpid}"
+    aux_debug "$result (+pid)"
+fi
+if [[ ${#result} -lt 32 ]]; then
+    uid="$UID"         # bash internal user id
+    hexuid=$(echo "obase=16; $uid" | bc)
+    result="${result}${hexuid}"
+    aux_debug "$result (+uid)"
+fi
+if [[ ${#result} -lt 32 ]]; then
+    lineno="$LINENO"   # bash internal line number
+    hexlineno=$(echo "obase=16; $lineno" | bc)
+    result="${result}${hexlineno}"
+    aux_debug "$result (+lineno)"
+fi
+if [[ ${#result} -lt 32 ]]; then
+    ip=$(hostname --ip-address 2>/dev/null)
+    if [ "$?" == "0" ]; then
+        if [[ "$ip" =~ ^.*\:.*$ ]]; then
+            # has colons, assume hex IPv6 address
+            ip="${ip//:/}"           # remove colons
+            ip=$(aux_rev "$ip")
+            result="${result}${ip}"
+        elif [[ "$ip" =~ ^.*\..*$ ]]; then
+            # has dots, assume IPv4 decimal address
+            ip="${ip//./}"               # remove dots
+            ip=$(aux_rev "$ip")
+            hexip=$(echo "obase=16; $ip" | bc)
+            result="${result}${hexip}"
+        else
+            # unexpected IP format, fake something short
+            result="${result}E1"
+            aux_warn "unexpected IP format."
+        fi
+        aux_debug "$result (+ip)"
+    elif [ "$warnflag" == "y" ]; then
+        aux_warn "hostname did not return ip address."
+    fi
+fi
+if [[ ${#result} -lt 32 ]]; then
+    padchar="9"
+    while [[ ${#result} -lt 32 ]]; do
+        result="${result}${padchar}"
+    done
+    aux_debug "$result (+pad)"
+fi
+if [[ ${#result} -gt 32 ]]; then
+    result="${result:0:32}"              # truncate to 32 chars
+    aux_debug "$result (+truncate)"
+fi
+if [ "$lowerflag" == "y" ]; then
+    result="${result,,}"
+    aux_debug "$result (->lower)"
+else
+    result="${result^^}"
+    aux_debug "$result (->upper)"
+fi
+echo "$result"
+exit 0

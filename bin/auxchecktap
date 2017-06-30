@@ -7,6 +7,7 @@
 #     --help
 #     --verbose
 #     --brief (d)
+#     --json
 #     --quiet
 #     --silent
 #     --strict (d)
@@ -36,9 +37,17 @@ totparamcnt=$((0))      # total number of command line arguments
 versionflag="n"         # "y" if --version specified else "n"
 helpflag="n"            # "y" if --help specified else "n"
 strictflag="y"          # "y" unless --nostrict specified (then "n")
-jsonflag="n"            # "y" if --json specified else "n"
 tabchr=$'\x09'          # ascii tab character
 spcchr=" "              # space character
+uuidgenvers=$(uuidgen --version 2>/dev/null)
+if [ -z "uuidgenvers" ]; then
+    uuidgenflag="n"
+else
+    uuidgenflag="y"
+    sessionuuid=$(uuidgen)
+    sessionuuid=$(sessionuuid//-/)    # strip out dashes
+fi
+
 
 while [ $# -gt 0 ]; do
     totparamcnt=$(($totparamcnt+1))
@@ -59,9 +68,7 @@ while [ $# -gt 0 ]; do
     elif [ "$param" == "--silent" ]; then
         outputmode="silent"
     elif [ "$param" == "--json" ]; then
-        jsonflag="y"
-    elif [ "$param" == "--nojson" ]; then
-        jsonflag="n"
+        outputmode="json"
     elif [ "$param" == "--strict" ]; then
         strictflag="y"
     elif [ "$param" == "--nostrict" ]; then
@@ -103,8 +110,7 @@ if [ "$helpflag" == "y" ]; then
     echo "  --curt      # One overall summary line."
     echo "  --quiet     # one line summaries per file only if failures found."
     echo "  --silent    # No output, even with failures, but exit status set."
-    echo "  --json      # output summary in JSON format."
-    echo "  --nojson    # output summary in human readable format (default)."
+    echo "  --json      # output details in JSON format."
     echo "  --strict    # Use strict TAP parsing rules (default)."
     echo "  --nostrict  # DO not use strict TAP parsing rules."
 fi

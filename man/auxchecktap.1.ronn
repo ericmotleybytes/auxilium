@@ -3,10 +3,10 @@ auxchecktap(1) -- Check TAP compliant unit test results
 
 ## SYNOPSIS
 
-`auxtapcheck --help`<br>
-`auxtapcheck --version`<br>
-`auxtapcheck [<option>...]`<br>
-`auxtapcheck [<option>...] <filespec>...`
+`auxchecktap --help`<br>
+`auxchecktap --version`<br>
+`auxchecktap [<option>...]`<br>
+`auxchecktap [<option>...] <filespec>...`
 
 Syntax:
   auxchecktap --help     # display this help text.
