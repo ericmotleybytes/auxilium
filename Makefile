@@ -37,56 +37,63 @@ help:
 build: docs
 
 .PHONY: docs
-docs: man/auxenv.1 man/auxenv.1.html \
-  man/auxsource.1 man/auxsource.1.html \
-  man/auxalias.1 man/auxalias.1.html \
-  man/auxchecktap.1 man/auxchecktap.1.html \
-  man/auxguidish.1 man/auxguidish.1.html
+docs: share/man/man1           share/html/man/man1 \
+  share/man/man1/auxenv.1      share/html/man/man1/auxenv.1.html \
+  share/man/man1/auxsource.1   share/html/man/man1/auxsource.1.html \
+  share/man/man1/auxalias.1    share/html/man/man1/auxalias.1.html \
+  share/man/man1/auxchecktap.1 share/html/man/man1/auxchecktap.1.html \
+  share/man/man1/auxguidish.1  share/html/man/man1/auxguidish.1.html
 
-man/auxenv.1 : man/auxenv.1.ronn
-	cd man ; ronn --roff auxenv.1.ronn
+share/man/man1 :
+	mkdir -p $@
 
-man/auxenv.1.html : man/auxenv.1.ronn
-	cd man ; ronn --html auxenv.1.ronn
+share/html/man/man1 :
+	mkdir -p $@
 
-man/auxsource.1 : man/auxsource.1.ronn
-	cd man ; ronn --roff auxsource.1.ronn
+share/man/man1/auxenv.1 : man/auxenv.1.ronn
+	ronn < $< > $@
 
-man/auxsource.1.html : man/auxsource.1.ronn
-	cd man ; ronn --html auxsource.1.ronn
+share/html/man/man1/auxenv.1.html : man/auxenv.1.ronn
+	ronn --html < $< > $@
 
-man/auxalias.1 : man/auxalias.1.ronn
-	cd man ; ronn --roff auxalias.1.ronn
+share/man/man1/auxsource.1 : man/auxsource.1.ronn
+	ronn < $< > $@
 
-man/auxalias.1.html : man/auxalias.1.ronn
-	cd man ; ronn --html auxalias.1.ronn
+share/html/man/man1/auxsource.1.html : man/auxsource.1.ronn
+	ronn --html < $< > $@
 
-man/auxchecktap.1 : man/auxchecktap.1.ronn
-	cd man ; ronn --roff auxchecktap.1.ronn
+share/man/man1/auxalias.1 : man/auxalias.1.ronn
+	ronn < $< > $@
 
-man/auxchecktap.1.html : man/auxchecktap.1.ronn
-	cd man ; ronn --html auxchecktap.1.ronn
+share/html/man/man1/auxalias.1.html : man/auxalias.1.ronn
+	ronn --html < $< > $@
 
-man/auxguidish.1 : man/auxguidish.1.ronn
-	cd man ; ronn --roff auxguidish.1.ronn
+share/man/man1/auxchecktap.1 : man/auxchecktap.1.ronn
+	ronn < $< > $@
 
-man/auxguidish.1.html : man/auxguidish.1.ronn
-	cd man ; ronn --html auxguidish.1.ronn
+share/html/man/man1/auxchecktap.1.html : man/auxchecktap.1.ronn
+	ronn --html < $< > $@
+
+share/man/man1/auxguidish.1 : man/auxguidish.1.ronn
+	ronn < $< > $@
+
+share/html/man/man1/auxguidish.1.html : man/auxguidish.1.ronn
+	ronn --html < $< > $@
 
 #### Cleaning built stuff ####
 
 .PHONY: cleandocs
 cleandocs:
-	rm -f man/auxenv.1
-	rm -f man/auxenv.1.html
-	rm -f man/auxsource.1
-	rm -f man/auxsource.1.html
-	rm -f man/auxalias.1
-	rm -f man/auxalias.1.html
-	rm -f man/auxchecktap.1
-	rm -f man/auxchecktap.1.html
-	rm -f man/auxguidish.1
-	rm -f man/auxguidish.1.html
+	rm -f share/man/man1/auxenv.1
+	rm -f share/html/man/man1/auxenv.1.html
+	rm -f share/man/man1/auxsource.1
+	rm -f share/html/man/man1/auxsource.1.html
+	rm -f share/man/man1/auxalias.1
+	rm -f share/html/man/man1/auxalias.1.html
+	rm -f share/man/man1/auxchecktap.1
+	rm -f share/html/man/man1/auxchecktap.1.html
+	rm -f share/man/man1/auxguidish.1
+	rm -f share/html/man/man1/auxguidish.1.html
 
 #### Testing stuff ####
 
@@ -103,7 +110,7 @@ test/tap.chk : test/tap.log
 
 .PHONY: checktest
 checktest: test/tap.chk
-	cat test/tap.chk
+	@cat test/tap.chk
 
 #### Cleaning test logs ####
 
@@ -133,6 +140,8 @@ doinstall : doinstallinfo \
   $(PREFIX)/bin/auxenv \
   $(PREFIX)/bin/auxsource \
   $(PREFIX)/bin/auxalias \
+  $(PREFIX)/bin/auxchecktap \
+  $(PREFIX)/bin/auxguidish \
   $(PREFIX)/share/man/man1 \
   $(PREFIX)/share/man/man1/auxenv.1 \
   $(PREFIX)/share/man/man1/auxsource.1 \
@@ -165,74 +174,70 @@ $(PREFIX)/bin:
 
 $(PREFIX)/bin/auxenv : bin/auxenv
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
 $(PREFIX)/bin/auxsource : bin/auxsource
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
 $(PREFIX)/bin/auxalias : bin/auxalias
 	cp -a $< $@
+	chmod a+r-x "$@"
+
+$(PREFIX)/bin/auxchecktap : bin/auxchecktap
+	cp -a $< $@
 	chmod a+r "$@"
 	chmod a-x "$@"
+
+$(PREFIX)/bin/auxguidish : bin/auxguidish
+	cp -a $< $@
+	chmod a+r+x "$@"
 
 $(PREFIX)/share/man/man1:
 	mkdir -p $@
 
-$(PREFIX)/share/man/man1/auxenv.1: man/auxenv.1
+$(PREFIX)/share/man/man1/auxenv.1: share/man/man1/auxenv.1
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
-$(PREFIX)/share/man/man1/auxsource.1: man/auxsource.1
+$(PREFIX)/share/man/man1/auxsource.1: share/man/man1/auxsource.1
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
-$(PREFIX)/share/man/man1/auxalias.1: man/auxalias.1
+$(PREFIX)/share/man/man1/auxalias.1: share/man/man1/auxalias.1
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
-$(PREFIX)/share/man/man1/auxchecktap.1: man/auxchecktap.1
+$(PREFIX)/share/man/man1/auxchecktap.1: share/man/man1/auxchecktap.1
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
-$(PREFIX)/share/man/man1/auxguidish.1: man/auxguidish.1
+$(PREFIX)/share/man/man1/auxguidish.1: share/man/man1/auxguidish.1
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
 $(PREFIX)/share/html/man/man1:
 	mkdir -p $@
 
-$(PREFIX)/share/html/man/man1/auxenv.1.html: man/auxenv.1.html
+$(PREFIX)/share/html/man/man1/auxenv.1.html: share/html/man/man1/auxenv.1.html
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
-$(PREFIX)/share/html/man/man1/auxsource.1.html: man/auxsource.1.html
+$(PREFIX)/share/html/man/man1/auxsource.1.html: share/html/man/man1/auxsource.1.html
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
-$(PREFIX)/share/html/man/man1/auxalias.1.html: man/auxalias.1.html
+$(PREFIX)/share/html/man/man1/auxalias.1.html: share/html/man/man1/auxalias.1.html
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
-$(PREFIX)/share/html/man/man1/auxchecktap.1.html: man/auxchecktap.1.html
+$(PREFIX)/share/html/man/man1/auxchecktap.1.html: share/html/man/man1/auxchecktap.1.html
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
-$(PREFIX)/share/html/man/man1/auxguidish.1.html: man/auxguidish.1.html
+$(PREFIX)/share/html/man/man1/auxguidish.1.html: share/html/man/man1/auxguidish.1.html
 	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	chmod a+r-x "$@"
 
 #### uninstall stuff ####
 
