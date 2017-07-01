@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # usage:
-#     auxguidish [options]
+#     auxguid [options]
 # options:
 #     -v --version
 #     -h --help

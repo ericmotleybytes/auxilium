@@ -9,7 +9,7 @@ setup() {
     # make sure aliases point to dev programs being tested (for auxenv, auxsource, and auxalias)
     set --
     source "$bindir/auxalias"
-    # make sure dev bin directory first on PATH search (for auxguidish, and auxchecktap)
+    # make sure dev bin directory first on PATH search (for auxguid, and auxchecktap)
     export PATH="$bindir:$PATH"
 }
 teardown() {

@@ -42,7 +42,7 @@ docs: share/man/man1           share/html/man/man1 \
   share/man/man1/auxsource.1   share/html/man/man1/auxsource.1.html \
   share/man/man1/auxalias.1    share/html/man/man1/auxalias.1.html \
   share/man/man1/auxchecktap.1 share/html/man/man1/auxchecktap.1.html \
-  share/man/man1/auxguidish.1  share/html/man/man1/auxguidish.1.html \
+  share/man/man1/auxguid.1     share/html/man/man1/auxguid.1.html \
   share/html/auxilium.README.md.html
 
 share/man/man1 :
@@ -75,10 +75,10 @@ share/man/man1/auxchecktap.1 : man/auxchecktap.1.ronn
 share/html/man/man1/auxchecktap.1.html : man/auxchecktap.1.ronn
 	ronn --html < $< > $@
 
-share/man/man1/auxguidish.1 : man/auxguidish.1.ronn
+share/man/man1/auxguid.1 : man/auxguid.1.ronn
 	ronn < $< > $@
 
-share/html/man/man1/auxguidish.1.html : man/auxguidish.1.ronn
+share/html/man/man1/auxguid.1.html : man/auxguid.1.ronn
 	ronn --html < $< > $@
 
 share/html/auxilium.README.md.html : README.md
@@ -96,8 +96,8 @@ cleandocs:
 	rm -f share/html/man/man1/auxalias.1.html
 	rm -f share/man/man1/auxchecktap.1
 	rm -f share/html/man/man1/auxchecktap.1.html
-	rm -f share/man/man1/auxguidish.1
-	rm -f share/html/man/man1/auxguidish.1.html
+	rm -f share/man/man1/auxguid.1
+	rm -f share/html/man/man1/auxguid.1.html
 	rm -f share/html/auxilium.README.md.html
 
 #### Testing stuff ####
@@ -105,7 +105,7 @@ cleandocs:
 #.PHONY: test
 test: test/auxilium.taplog test/auxilium.tapchk
 
-test/auxilium.taplog : bin/auxenv bin/auxsource bin/auxalias bin/auxchecktap bin/auxguidish \
+test/auxilium.taplog : bin/auxenv bin/auxsource bin/auxalias bin/auxchecktap bin/auxguid \
   $(wildcard test/*.bash) $(wildcard test/*.bats)
 	cd test; bats -t . | tee auxilium.taplog
 
@@ -145,20 +145,20 @@ doinstall : doinstallinfo \
   $(PREFIX)/bin/auxsource \
   $(PREFIX)/bin/auxalias \
   $(PREFIX)/bin/auxchecktap \
-  $(PREFIX)/bin/auxguidish \
+  $(PREFIX)/bin/auxguid \
   $(PREFIX)/share/man/man1 \
   $(PREFIX)/share/man/man1/auxenv.1 \
   $(PREFIX)/share/man/man1/auxsource.1 \
   $(PREFIX)/share/man/man1/auxalias.1 \
   $(PREFIX)/share/man/man1/auxchecktap.1 \
-  $(PREFIX)/share/man/man1/auxguidish.1 \
+  $(PREFIX)/share/man/man1/auxguid.1 \
   $(PREFIX)/share/html/man/man1 \
   $(PREFIX)/share/html/man/man1/auxenv.1.html \
   $(PREFIX)/share/html/man/man1/auxsource.1.html \
   $(PREFIX)/share/html/man/man1/auxalias.1.html \
   $(PREFIX)/share/html/man/man1/auxchecktap.1.html \
-  $(PREFIX)/share/html/man/man1/auxguidish.1.html \
-  doinstallinfo2
+  $(PREFIX)/share/html/man/man1/auxguid.1.html \
+  doinstallprotect doinstallinfo2
 
 .PHONY: doinstallinfo
 doinstallinfo:
@@ -173,8 +173,13 @@ doinstallinfo2:
   if [ "$$curuser" == "root" ]; then rcfile=/etc/bashrc; fi ; \
   echo "NOTE: We recommended adding \"source $$fullprefix/bin/auxalias\" to $$rcfile."
 
+.PHONY: doinstallprotect
+doinstallprotect:
+	chmod -R a+r $(PREFIX)/share
+
 $(PREFIX)/bin:
 	mkdir -p $@
+	chmod a+r $@
 
 $(PREFIX)/bin/auxenv : bin/auxenv
 	cp -a $< $@
@@ -189,16 +194,16 @@ $(PREFIX)/bin/auxalias : bin/auxalias
 	chmod a+r-x "$@"
 
 $(PREFIX)/bin/auxchecktap : bin/auxchecktap
-	cp -a $< $@
-	chmod a+r "$@"
-	chmod a-x "$@"
+	cp -a $< "$@"
+	chmod a+r+x "$@"
 
-$(PREFIX)/bin/auxguidish : bin/auxguidish
+$(PREFIX)/bin/auxguid : bin/auxguid
 	cp -a $< $@
 	chmod a+r+x "$@"
 
 $(PREFIX)/share/man/man1:
 	mkdir -p $@
+	chmod a+r $@
 
 $(PREFIX)/share/man/man1/auxenv.1: share/man/man1/auxenv.1
 	cp -a $< $@
@@ -216,12 +221,13 @@ $(PREFIX)/share/man/man1/auxchecktap.1: share/man/man1/auxchecktap.1
 	cp -a $< $@
 	chmod a+r-x "$@"
 
-$(PREFIX)/share/man/man1/auxguidish.1: share/man/man1/auxguidish.1
+$(PREFIX)/share/man/man1/auxguid.1: share/man/man1/auxguid.1
 	cp -a $< $@
 	chmod a+r-x "$@"
 
 $(PREFIX)/share/html/man/man1:
 	mkdir -p $@
+	chmod a+r $@
 
 $(PREFIX)/share/html/man/man1/auxenv.1.html: share/html/man/man1/auxenv.1.html
 	cp -a $< $@
@@ -239,7 +245,7 @@ $(PREFIX)/share/html/man/man1/auxchecktap.1.html: share/html/man/man1/auxcheckta
 	cp -a $< $@
 	chmod a+r-x "$@"
 
-$(PREFIX)/share/html/man/man1/auxguidish.1.html: share/html/man/man1/auxguidish.1.html
+$(PREFIX)/share/html/man/man1/auxguid.1.html: share/html/man/man1/auxguid.1.html
 	cp -a $< $@
 	chmod a+r-x "$@"
 
@@ -265,17 +271,17 @@ douninstall:
 	rm -f $(PREFIX)/bin/auxsource
 	rm -f $(PREFIX)/bin/auxalias
 	rm -f $(PREFIX)/bin/auxchecktap
-	rm -f $(PREFIX)/bin/auxguidish
+	rm -f $(PREFIX)/bin/auxguid
 	rm -f $(PREFIX)/share/man/man1/auxenv.1
 	rm -f $(PREFIX)/share/man/man1/auxsource.1
 	rm -f $(PREFIX)/share/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/man/man1/auxchecktap.1
-	rm -f $(PREFIX)/share/man/man1/auxguidish.1
+	rm -f $(PREFIX)/share/man/man1/auxguid.1
 	rm -f $(PREFIX)/share/html/man/man1/auxenv.1
 	rm -f $(PREFIX)/share/html/man/man1/auxsource.1
 	rm -f $(PREFIX)/share/html/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/html/man/man1/auxchecktap.1
-	rm -f $(PREFIX)/share/html/man/man1/auxguidish.1
+	rm -f $(PREFIX)/share/html/man/man1/auxguid.1
 
 #### Aggregate stuff ####
 
