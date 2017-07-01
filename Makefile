@@ -42,7 +42,8 @@ docs: share/man/man1           share/html/man/man1 \
   share/man/man1/auxsource.1   share/html/man/man1/auxsource.1.html \
   share/man/man1/auxalias.1    share/html/man/man1/auxalias.1.html \
   share/man/man1/auxchecktap.1 share/html/man/man1/auxchecktap.1.html \
-  share/man/man1/auxguidish.1  share/html/man/man1/auxguidish.1.html
+  share/man/man1/auxguidish.1  share/html/man/man1/auxguidish.1.html \
+  share/html/auxilium.README.md.html
 
 share/man/man1 :
 	mkdir -p $@
@@ -80,6 +81,9 @@ share/man/man1/auxguidish.1 : man/auxguidish.1.ronn
 share/html/man/man1/auxguidish.1.html : man/auxguidish.1.ronn
 	ronn --html < $< > $@
 
+share/html/auxilium.README.md.html : README.md
+	grip $< --export $@
+
 #### Cleaning built stuff ####
 
 .PHONY: cleandocs
@@ -94,6 +98,7 @@ cleandocs:
 	rm -f share/html/man/man1/auxchecktap.1.html
 	rm -f share/man/man1/auxguidish.1
 	rm -f share/html/man/man1/auxguidish.1.html
+	rm -f share/html/auxilium.README.md.html
 
 #### Testing stuff ####
 
