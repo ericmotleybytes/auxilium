@@ -118,7 +118,7 @@ dist/$(RUNTIME).tar.gz : dist \
 	cd dist ; tar -cvzf $@ $(RUNTIME)
 
 dist :
-     mkdir -p dist
+	mkdir -p dist
 
 .PHONY: list-runtime-dist
 list-runtime-dist:

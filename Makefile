@@ -118,7 +118,7 @@ test/auxilium.taplog : bin/auxenv bin/auxsource bin/auxalias bin/auxchecktap bin
 	cd test; bats -t . | tee auxilium.taplog
 
 test/auxilium.tapchk : test/auxilium.taplog
-	auxchecktap $< > $@
+	auxchecktap $< $@
 
 .PHONY: checktest
 checktest: test/auxilium.tapchk
