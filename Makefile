@@ -1,4 +1,6 @@
-# Development Makefile for auxilium
+###
+# Development Sources Makefile for auxilium
+###
 SYS_PREFIX=/usr/local
 DEV_PREFIX=$(HOME)/local
 THISFILE:=$(lastword $(MAKEFILE_LIST))
@@ -7,12 +9,18 @@ MAKEFLAGS += --no-print-directory
 endif
 
 .PHONY: all
-all : build
+all : help
 
 #### Help stuff ####
 
 .PHONY: help
 help:
+	@echo "Available help topics:"
+	@echo "  make helpbuild     # help building sources."
+	@echo "  make helpgit       # help common git tasks."
+
+.PHONY: helpbuild
+helpbuild:
 	@echo "Common building usage:"
 	@echo "  make               # gen man and html documentation."
 	@echo "  make docs          # gen man and html documentation."
@@ -30,6 +38,14 @@ help:
 	@echo "  make devuninstall  # delete files installed under $(DEV_PREFIX)."
 	@echo "  make sysuninstall  # delete files installed under $(SYS_PREFIX) as root."
 	@echo "  make uninstall PREFIX=<prefix> # custom uninstall files."
+
+.PHONY: helpgit
+helpgit:
+	@echo "Common git actions:"
+	@echo "  make push    # git push origin master"
+	@echo "  make pull    # git pull origin master"
+	@echo "  make gitstat # git status --short --branch"
+	@echo "  make taglist # git tag --list"
 
 #### Building stuff #####
 
@@ -290,6 +306,23 @@ douninstall:
 	rm -f $(PREFIX)/share/html/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/html/man/man1/auxchecktap.1
 	rm -f $(PREFIX)/share/html/man/man1/auxguid.1
+
+#### Git stuff ####
+.PHONY: push
+push:
+	git push origin master
+
+.PHONY: pull
+pull:
+	git pull origin master
+
+.PHONY: gitstat
+gitstat:
+	git status --porcelain --branch
+
+.PHONY: taglist
+taglist:
+	git tag --list
 
 #### Aggregate stuff ####
 

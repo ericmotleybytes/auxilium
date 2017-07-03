@@ -1,3 +1,4 @@
 *.tmp
+*.2017*
 share/*
 dist/*

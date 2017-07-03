@@ -10,6 +10,19 @@ all: help
 
 .PHONY: help
 help:
+	@echo "Help for using this file [$(THISFILE)]:"
+	@echo "  make -f $(THIDFILE) show-next-release        # version being built to be released next."
+	@echo "  make -f $(THISFILE) show-remote-release-tags # release tags on GitHub server."
+	@echo "  make -f $(THISFILE) show-local-release-tags  # release tags on local server."
+	@echo "  make -f $(THISFILE) clean-runtime-dist       # clean distribution area."
+	@echo "  make -f $(THISFILE) runtime-dist             # create distribution and tarball."
+	@echo "  make -f $(THISFILE) list-runtime-dist        # list contents of dist tarball."
+	@echo "  make -f $(THISFILE) local-release-tag        # tag files locally."
+	@echo "  make -f $(THISFILE) push-release-tag         # tag files on remote."
+	@echo "  make -f $(THISFILE) helprelease              # see a release checklist."
+
+.PHONY: helprelease
+helprelease:
 	@echo "Before releasing checklist:"
 	@echo "  make build     # make sure all software docs built."
 	@echo "  make checktest # make sure all unit tests pass."
