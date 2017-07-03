@@ -37,13 +37,21 @@ help:
 build: docs
 
 .PHONY: docs
-docs: share/man/man1           share/html/man/man1 \
+docs: doc/README.md \
+  share/man/man1           share/html/man/man1 \
   share/man/man1/auxenv.1      share/html/man/man1/auxenv.1.html \
   share/man/man1/auxsource.1   share/html/man/man1/auxsource.1.html \
   share/man/man1/auxalias.1    share/html/man/man1/auxalias.1.html \
   share/man/man1/auxchecktap.1 share/html/man/man1/auxchecktap.1.html \
   share/man/man1/auxguid.1     share/html/man/man1/auxguid.1.html \
   share/html/auxilium.README.md.html
+
+doc/README.md : doc/README.mdpp \
+  doc/auxilium-general.mdpp \
+  doc/install.mdpp doc \
+  doc/install-runtime.mdpp \
+  doc/install-sources.mdpp
+	cd doc ; markdown-pp README.mdpp -o README.md
 
 share/man/man1 :
 	mkdir -p $@

@@ -1,0 +1,9 @@
+# Auxilium - bash tools to help solve common problems
+
+Auxilium provides a set of bash utility scripts which help solve some common
+problems such as:
+
+* Viewing and manipulating settings of list environment variables like PATH.
+* Checking and managing TAP-compliant unit test results.
+* Being able to generate a GUID/UUID without an additional programming language.
+* Controlling bash "source" file selection with a path-like environment variable.
