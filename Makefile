@@ -4,7 +4,7 @@
 SYS_PREFIX=/usr/local
 DEV_PREFIX=$(HOME)/local
 NEXTREL=0.1.2
-RUNTIME=auxilium-runtime-$(NEXTREL)
+RUNTIME=auxilium-run-$(NEXTREL)
 RUNTIMEDIR=dist/$(RUNTIME)
 THISFILE:=$(lastword $(MAKEFILE_LIST))
 ifndef VERBOSE
