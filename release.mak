@@ -95,6 +95,8 @@ clean-runtime-dist:
 runtime-dist: $(RUNTIMEDIR)/bin \
   $(RUNTIMEDIR)/share/man/man1 \
   $(RUNTIMEDIR)/share/html/man/man1 \
+  $(RUNTIMEDIR)/README.md \
+  $(RUNTIMEDIR)/LICENSE \
   dist/$(RUNTIME).tar.gz
 
 $(RUNTIMEDIR)/bin: bin
@@ -112,11 +114,17 @@ $(RUNTIMEDIR)/share/html/man/man1: share/html/man/man1
 	rm -f $@/*.html
 	cp -a $</*.html $@/
 
+$(RUNTIMEDIR)/README.md : README.md
+	cp -a $< $@
+
+$(RUNTIMEDIR)/LICENSE : LICENSE
+	cp -a $< $@
+
 dist/$(RUNTIME).tar.gz : dist \
   $(RUNTIMEDIR)/bin \
   $(RUNTIMEDIR)/share/man/man1 \
   $(RUNTIMEDIR)/share/html/man/man1
-	cd dist ; tar -cvzf $@ $(RUNTIME)
+	cd dist ; tar -cvzf $(RUNTIME).tar.gz $(RUNTIME)
 
 dist :
 	mkdir -p dist
