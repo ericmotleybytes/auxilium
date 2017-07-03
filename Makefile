@@ -49,11 +49,12 @@ helpbuild:
 .PHONY: helpgit
 helpgit:
 	@echo "Common git actions:"
-	@echo "  make helpgit # display this screen."
-	@echo "  make push    # git push origin master"
-	@echo "  make pull    # git pull origin master"
-	@echo "  make gitstat # git status --short --branch"
-	@echo "  make taglist # git tag --list"
+	@echo "  make helpgit     # display this screen."
+	@echo "  make push        # git push origin master"
+	@echo "  make pull        # git pull origin master"
+	@echo "  make gitstat     # git status --porcelain --branch"
+	@echo "  make taglist     # git tag --list"
+	@echo "  make show-branch # show git branch"
 
 .PHONY: helprel
 helprel:
@@ -123,6 +124,7 @@ helprelcheck:
 
 .PHONY: build
 build: docs
+	@echo "[build complete]"
 
 .PHONY: docs
 docs: doc/README.md \
@@ -395,6 +397,10 @@ gitstat:
 .PHONY: taglist
 taglist:
 	git tag --list
+
+.PHONY: show-branch
+show-branch:
+	@git status | head -1 | sed 's/#\ On\ branch\ //'
 
 #### GitHub Release Stuff
 .PHONY: show-next-release

@@ -82,7 +82,7 @@ fi
 #
 if [ "$helpflag" == "y" ]; then
     echo "Command:"
-    echo "  $cmdname - Generate a pseudo GUID-ish id"
+    echo "  $cmdname - Generate a GUID/UUID"
     echo "Syntax:"
     echo "  $cmdname -h | --help     # display this help text."
     echo "  $cmdname -v | --version  # display program version information."

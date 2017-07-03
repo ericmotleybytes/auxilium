@@ -1,0 +1,214 @@
+#!/usr/bin/env bash
+#
+# This script is for auxium source developers only. It facilitates making a new GitHub release.
+#
+# usage:
+#     do-release [options]
+# options:
+#     -v --version # display version info
+#     -h --help    # display help info
+#     -n --dry-run # just dry run as far as possible
+#     -w --warn    # display warning messages to stderr
+#     -b --verbose # display additional information
+#     -d --debug   # display debug messages to stderr
+#
+# define functions
+#
+function aux_debug() {
+    if [ "$debugflag" == "y" ]; then
+        echo "DEBUG: $1" >&2
+    fi
+    return 0
+}
+function aux_checkpass() {
+    checkcnt=$(($checkcnt+1))
+    if [ "$verboseflag" == "y" ]; then
+        echo "OK $checkcnt CHECK: $1"
+    fi
+    return 0
+}
+function aux_checkfail() {
+    checkcnt=$(($checkcnt+1))
+    checkcnt=$(($checkcnt+1))
+    echo "NOT OK $checkcnt CHECK: $1"
+    return 0
+}
+function aux_warn() {
+    warncnt=$(($warncnt+1))
+    if [ "$warnflag" == "y" ]; then
+        echo "WARNING: ($warncnt) $1" >&2
+    fi
+    return 0
+}
+function aux_error() {
+    errorcnt=$(($errorcnt+1))
+    echo "ERROR: ($errorcnt) $1" >&2
+    return 0
+}
+function aux_info() {
+    echo "INFO: $1"
+    return 0
+}
+#
+# begin main program
+#
+cmdfile=$(readlink -f "$0")
+cmddir=$(dirname "$cmdfile")
+reporoot=$(readlink -f "$cmddir/..")
+cmdname="${cmdfile##*/}"
+version="$cmdname version 1.0 (2017-07-03)"
+versionflag="n"
+helpflag="n"
+checkcnt=$((0))
+checkfail=$((0))
+warnflag="n"
+warncnt=$((0))
+debugflag="n"
+errorcnt=$((0))
+dryrunflag="n"
+dryrunflag="y"   # TBD
+verboseflag="n"
+while [ $# -gt 0 ]; do
+    param="$1"
+    shift
+    if [[ "$param"   == "--version" || "$param" == "-v" ]]; then
+        versionflag="y"
+    elif [[ "$param" == "--help"    || "$param" == "-h" ]]; then
+        helpflag="y"
+    elif [[ "$param" == "--lower"   || "$param" == "-l" ]]; then
+        lowerflag="y"
+    elif [[ "$param" == "--warn"    || "$param" == "-w" ]]; then
+        warnflag="y"
+    elif [[ "$param" == "--debug"   || "$param" == "-d" ]]; then
+        debugflag="y"
+        warnflag="y"
+    elif [[ "$param" == "--dry-run" || "$param" == "-n" ]]; then
+        dryrunflag="y"
+    elif [[ "$param" == "--verbose" || "$param" == "-b" ]]; then
+        verboseflag="y"
+    else
+        echo "ERROR: bad command line option ($param)." >&2
+        exit 1
+    fi
+done
+#
+# show version if it was requested
+#
+if [ "$versionflag" == "y" ]; then
+    echo "$version"
+fi
+#
+# show help if it was requested
+#
+if [ "$helpflag" == "y" ]; then
+    echo "Command:"
+    echo "  $cmdname - Make a new GitHub release"
+    echo "Syntax:"
+    echo "  $cmdname -h | --help     # display this help text."
+    echo "  $cmdname -v | --version  # display program version information."
+    echo "  $cmdname [<option>...]   # do a GitHub release (or dryrun)."
+    echo "Options:"
+    echo "  -b --verbose  # display extra info."
+    echo "  -w --warn     # output non-fatal warnings to stderr."
+    echo "  -d --debug    # output debug info to stderr."
+    echo "  -n --dry-run  # use uuidgen command if available."
+fi
+#
+# if --help or --version and no files specified, assume we are done.
+#
+if [[ "$versionflag" == "y" || "$helpflag" == "y" ]]; then
+    exit 0
+fi
+#
+# do release (or a dry run)
+#
+aux_debug "cmdfile=$cmdfile."
+aux_debug "cmddir=$cmddir."
+aux_debug "reporoot=$reporoot."
+aux_debug "cmdname=$cmdname."
+# make sure we are on master branch
+branch=$(git status --porcelain --branch | grep -e '^##\ ' | head -1)
+branch="${branch:3}"
+branch="${branch%%\ *}"
+aux_debug "branch=$branch."
+if [ "$branch" != "master...origin/master" ]; then
+    aux_error "Unexpected branch ($branch)."
+fi
+aux_info "$branch is the current git branch."
+# make sure makefile exists
+makefile="$reporoot/Makefile"
+aux_debug "makefile=$makefile."
+if [ ! -e "$makefile" ]; then
+   aux_error "Makefile ($makefile) not found."
+   exit 1
+fi
+aux_checkpass "Makefile ($makefile) found."
+# make sure NEXTREL only defined once in Makefile
+tmpcnt=$(grep -E '^NEXTREL=' "$makefile" | wc -l)
+if [ "$tmpcnt" == "0" ]; then
+    aux_error "NEXTREL=<relver> not found in $makefile."
+    exit 1
+elif [ "$tmpcnt" != "1" ]; then
+    aux_error "NEXTREL=<relver> not too many ($tmpcnt) times in $makefile."
+    exit 1
+fi
+# get the next release number
+nextrel=$(grep -E '^NEXTREL=' "$makefile")
+nextrel="${nextrel##NEXTREL=}"
+aux_info "$nextrel is the next release (to be built)."
+# get the last existing local release number
+lastlocalrel=$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$$' | sort -V | tail -1)
+aux_info "$lastlocalrel is the last local release tag found."
+if [ "$nextrel" == "lastlocalrel" ]; then
+    aux_error "Next release tag ($nextrel) already used locally."
+    exit 1
+fi
+# get the last existing remote release number
+tmpvar=$(git ls-remote --tags origin)
+tmpvar=$(echo "$tmpvar" | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$')
+tmpvar=$(echo "$tmpvar" | sed 's#^.*refs/tags/##')
+tmpvar=$(echo "$tmpvar" | sort -V)
+tmpvar=$(echo "$tmpvar" | tail -1)
+lastremoterel="$tmpvar"
+aux_info "$lastremoterel is the last remote release tag found."
+if [ "$nextrel" == "lastremoterel" ]; then
+    aux_error "Next release tag ($nextrel) already used remotely."
+    exit 1
+fi
+# make sure we built everything ok
+cd "$reporoot"
+tmpvar=$(make build)
+if [ "$?" != "0" ]; then
+    aux_error "There was a problem doing 'make build'."
+    exit 1
+fi
+tmpvar=$(echo "$tmpvar" | tail -1)
+if [ "$tmpvar" != "[build complete]" ]; then
+    aux_error "Unexpected final build message ($tmpvar)."
+    exit 1
+fi
+aux_info "build appears to be successful."
+# make sure tests ok
+cd "$reporoot"
+tmpvar=$(make checktest | tail -1)
+if [ "$?" != "0" ]; then
+    aux_error "There was a problem doing 'make checktest'."
+    exit 1
+fi
+if [ "${tmpvar:0:3}" != "ok " ]; then
+    aux_error "Unexpected final checktest message ($tmpvar)."
+    exit 1
+fi
+aux_info "test appears to be successful."
+# look for clean git status
+tmpvar=$(git status --porcelain)
+tmpvar2=$(echo $tmpvar | wc -l)
+if [ "$tmpvar2" != "0" ]; then
+    aux_error "Git status not clean, 'git add' or 'git commit' required."
+    if [ "$verboseflag" == "y" ]; then
+        git status
+    fi
+    exit 1
+fi
+aux_info "git status appear to be clean (for now)."
+exit 0
