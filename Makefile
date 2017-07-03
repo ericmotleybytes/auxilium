@@ -296,8 +296,3 @@ douninstall:
 .PHONY: clean
 clean: cleantest cleandocs
 
-#### git stuff ####
-
-.PHONY: gitpush
-gitpush:
-	git push origin master
