@@ -68,22 +68,6 @@ helprelease:
 	@echo "      # Upload the runtime tarbar dist/$(RUNTIME).tar.gz."
 	@echo "      # Publish the release."
 
-.PHONY: push
-push:
-	git push origin master
-
-.PHONY: pull
-pull:
-	git pull origin master
-
-.PHONY: status
-status:
-	git status --short --branch
-
-.PHONY: list
-list:
-	git tag --list
-
 .PHONY: show-next-release
 show-next-release:
 	@nr=`grep -E '^NEXTREL=' $(THISFILE)`; echo "$${nr##NEXTREL=}"
