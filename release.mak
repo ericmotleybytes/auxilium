@@ -134,8 +134,9 @@ list-runtime-dist:
 	tar -tvzf dist/$(RUNTIME).tar.gz
 
 .PHONY: local-release-tag
-tag-local:
+local-release-tag:
 	git tag $(NEXTREL)
 
 .PHONY: push-release-tag
+push-release-tag:
 	git push origin $(NEXTREL)
