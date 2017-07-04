@@ -266,12 +266,13 @@ fi
 aux_info "git status appear to be clean, for now."
 # try a git pull and check it
 gitpullout=$(git pull origin master)
-gitpulllastline=$(echo "$gitpulloutput" | tail -1)
+gitpulllastline=$(echo "$gitpullout" | tail -1)
 if [ "$gitpulllastline" != "Already up-to-date." ]; then
     aux_error "git pull indicates some possible issues."
     exit 1
 fi
 aux_info "git pull did not reveal any new issues."
+exit 1 # TBD
 # push changes if needed
 $gitstatout=$(git status)
 $grepout=$(echo "$gitstatout: | grep "use" | grep "git push" | grep "publish" | grep "local commits")
