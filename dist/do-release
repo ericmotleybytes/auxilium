@@ -209,7 +209,11 @@ cd "$reporoot"
 keeplooping="y"
 while [ "$keeplooping" == "y" ]; do
     tmpvar=$(git status --porcelain)
-    tmpvar2=$(echo $tmpvar | wc -l)
+    if [ -z "$tmpvar" ]; then
+        tmpvar2="0"
+    else
+        tmpvar2=$(echo $tmpvar | wc -l)
+    fi
     aux_debug "$tmpvar2 git status lines found."
     isclean="y"
     if [ "$tmpvar2" != "0" ]; then
