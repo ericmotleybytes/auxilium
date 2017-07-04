@@ -1,0 +1,54 @@
+###
+# Makefile for auxilium run-time distribution
+###
+# define default target installation prefix for shared system installation.
+SYS_PREFIX=/usr/local
+# define default target installation prefix for single user installation.
+PER_PREFIX=$(HOME)/local
+# figure out the name of this makefile
+THISFILE:=$(lastword $(MAKEFILE_LIST))
+# Define a default for PREFIX.
+# This can be overridden (if needed) on the command line.
+PREFIX=$(PER_PREFIX)
+# other defs
+BINMODE=a+r+x
+SRCMODE=a+r-x
+DIRMODE=a+r+x
+#
+# dependencies and processing
+#
+.PHONY: all
+all: help
+
+.PHONY: help
+help:
+	@echo "Usage of this file:"
+	@echo "  make"
+	@echo "  make help"
+	@echo "    # Displays this help screen."
+	@echo "  make install"
+	@echo "    # Installs auxilium in your own personal directory tree"
+	@echo "    # under the '$(PER_PREFIX)' prefix."
+	@echo "  make install PREFIX=<prefix>"
+	@echo "    # Installs auxilium anywhere you like."
+	@echo "    # If root priviledge needed, do 'sudo make install PREFIX=<prefix>'."
+	@echo "  make sys-install"
+	@echo "    # Installs auxilium to standard shared system-wide directory tree"
+	@echo "    # under the '$(SYS_PREFIX)' prefix as root."
+	@echo "    # Installation occurs as root under \"sudo\" control, so you must"
+	@echo "    # be authorized to use \"sudo\" to use this option."
+	@echo "  make uninstall"
+	@echo "    # Uninstalls auxilium from your own personal directory tree"
+	@echo "    # under the '$(PER_PREFIX)' prefix."
+	@echo "  make uninstall PREFIX=<prefix>"
+	@echo "    # Uninstalls auxilium from wherever."
+	@echo "    # If root priviledge needed, do 'sudo make uninstall PREFIX=<prefix>'."
+	@echo "  make sys-ininstall"
+	@echo "    # Uninstalls auxilium from standard shared system-wide directory tree"
+	@echo "    # under the '$(SYS_PREFIX)' prefix."
+	@echo "    # Uninstall occurs as root under \"sudo\" control, so you must"
+	@echo "    # be authorized to use \"sudo\" to use this option."
+	@echo "PREFIX=$(PREFIX)."
+	@echo "MAKE=$(MAKE)."
+
+include Makefile.install.mak
