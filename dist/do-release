@@ -215,7 +215,7 @@ while [ "$keeplooping" == "y" ]; do
     if [ "$tmpvar2" != "0" ]; then
         aux_debug "unclean!"
         if [[ "$debugflag" == "y" ]]; then
-            echo "$tmpvar"
+            echo ".${tmpvar}."
         fi
         isclean="n"
         #if [[ $- == *i* ]]; then
