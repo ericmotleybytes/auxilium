@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# This script is for auxium source developers only. It facilitates making a new GitHub release.
+# This script is for auxium source developers only.
+# It facilitates making a new GitHub release.
 #
 # usage:
 #     do-release [options]
@@ -389,4 +390,39 @@ else
     exit 1
 fi
 aux_info "Local files tagged with '$nextrel'."
+# now make the run-time distribution tar file
+cd "$reporoot"
+make clean-runtime-dist
+if [ "$?" != "0" ]; then
+    aux_error "make clean-runtime-dist completion status was not 0."
+    exit 1
+fi
+make runtime-dist
+if [ "$?" != "0" ]; then
+    aux_error "make runtime-dist completion status was not 0."
+    exit 1
+fi
+tarfile="${reporoot}/dist/auxilium-run-${nextrel}.tar.gz"
+if [ ! -e  "$tarfile" ]; then
+    aux_error "File not found ($tarfile)."
+    exit 1
+fi
+aux_info "Run-tine distribution tar file created ($tarfile)."
+# now push the tag to the remote git server
+exit 2 # TBD
+git push origin $nextrel
+if [ "$?" != "0" ]; then
+    aux_error "git push origin $nextrel completion status was not 0."
+    exit 1
+fi
+#
+aux_notice "Looks like this script finished nicely, congratulations."
+aux_notice "You still need to:"
+aux_notice "  - Log onto the GitHub web site."
+aux_notice "  - Create the release from the now-existing tag."
+aux_notice "  - Upload the run time tar file ($tarfile) "
+aux_notice "      to the release binart attachment area."
+aux_notice "  - Edit the online release notes for the release."
+aux_notice "  - Check the 'pre-release' box if applicable."
+aux_notice "Good luck!"
 exit 0
