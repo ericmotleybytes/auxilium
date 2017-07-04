@@ -289,7 +289,11 @@ if [ ! -z "$grepout" ]; then
     aux_debug "$grepout"
     aux_notice "Looks like some local changes need to be pushed to remote origin."
     aux_notice "Pushing changes to remote origin..."
-    git push origin master
+    git push origin master 2>/dev/null
+    if [ "$?" != "0" ]; then
+        aux_error "git push completion status problem."
+        exit 1
+    fi
     gitstatout=$(git status)
     grepout=$(echo "$gitstatout" | grep "use" | grep "git push" | grep "publish" | grep "local commits")
     if [ ! -z "$grepout" ]; then
