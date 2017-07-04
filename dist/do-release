@@ -72,6 +72,12 @@ errorcnt=$((0))
 dryrunflag="n"
 dryrunflag="y"   # TBD
 verboseflag="n"
+# check if running interactively
+if [[ -t "0" || -p /dev/stdin ]]; then
+    interactiveflag="y"
+else
+    interactiveflag="n"
+fi
 while [ $# -gt 0 ]; do
     param="$1"
     shift
@@ -229,7 +235,7 @@ while [ "$keeplooping" == "y" ]; do
         fi
         isclean="n"
         #if [[ $- == *i* ]]; then
-        if [[ -t "0" || -p /dev/stdin ]]; then
+        if [[ "$interactiveflag"=="y" ]]; then
             # running interactively
             aux_debug "Interactive!?!?"
             aux_notice "Git status not clean!"
@@ -302,4 +308,28 @@ if [ ! -z "$grepout" ]; then
     fi
 fi
 aux_info "Local git appears to be in sync with remote git."
+# tag local files
+dotag="y"
+if [ "interactiveflag" == "y" ]; then
+    dotag="n"
+    while true; do
+        read -p "Do you want to tag local files with '$nextrel' [yN]? " answer
+        case $answer in
+            [Yy]* ) dotag="y"; break;;
+            [Nn]* ) dotag="n"; break;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+fi
+if [ "$dotag" == "y" ]; then
+    git tag $nextrel
+    if [ "$?" != "0" ]; then
+        aux_error "git tag completion status problem."
+        exit 1
+    fi
+else
+    aux_error "exiting early (at local tag phase) by user selection."
+    exit 1
+fi
+aux_info "Local files tagged with '$nextrel'."
 exit 0
