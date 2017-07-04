@@ -273,16 +273,16 @@ if [ "$gitpulllastline" != "Already up-to-date." ]; then
 fi
 aux_info "git pull did not reveal any new issues."
 # push changes if needed
-$gitstatout=$(git status)
-$grepout=$(echo "$gitstatout: | grep "use" | grep "git push" | grep "publish" | grep "local commits")
+gitstatout=$(git status)
+grepout=$(echo "$gitstatout: | grep "use" | grep "git push" | grep "publish" | grep "local commits")
 if [ ! -z "$grepout" ]; then
     aux_debug "$grepout"
     aux_notice "Looks like some local changes need to be pushed to remote origin."
     aux_notice "Pushing changes to remote origin..."
     exit 1 # TBD
     git push origin master
-    $gitstatout=$(git status)
-    $grepout=$(echo "$gitstatout: | grep "use" | grep "git push" | grep "publish" | grep "local commits")
+    gitstatout=$(git status)
+    grepout=$(echo "$gitstatout: | grep "use" | grep "git push" | grep "publish" | grep "local commits")
     if [ ! -z "$grepout" ]; then
         aux_error "Unable to get in sync with remote origin, see git status."
         exit 1
