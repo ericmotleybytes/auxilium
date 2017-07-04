@@ -56,6 +56,8 @@ function aux_notice() {
 #
 # begin main program
 #
+ifsorg="$IFS"
+lf=$'\x0a'   # ascii linefeed character
 cmdfile=$(readlink -f "$0")
 cmddir=$(dirname "$cmdfile")
 reporoot=$(readlink -f "$cmddir/..")
@@ -172,25 +174,80 @@ fi
 nextrel=$(grep -E '^NEXTREL=' "$makefile")
 nextrel="${nextrel##NEXTREL=}"
 aux_info "$nextrel is the next release (to be built)."
-# get the last existing local release number
-lastlocalrel=$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$$' | sort -V | tail -1)
+# get local release versions
+localrels=$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
+readarray -t locrelarr < <(echo "$localrels")
+# get the last existing local release version
+lastlocalrel=$(echo "$localrels" | tail -1)
 aux_info "$lastlocalrel is the last local release tag found."
 if [ "$nextrel" == "lastlocalrel" ]; then
     aux_error "Next release tag ($nextrel) already used locally."
     exit 1
 fi
+# get remote existing release versions
+remoterels=$(git ls-remote --tags origin)
+remoterels=$(echo "$remoterels" | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$')
+remoterels=$(echo "$remoterels" | sed 's#^.*refs/tags/##')
+remoterels=$(echo "$remoterels" | sort -V)
+readarray -t remrelarr < <(echo "$remoterels")
 # get the last existing remote release number
 tmpvar=$(git ls-remote --tags origin)
 tmpvar=$(echo "$tmpvar" | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$')
 tmpvar=$(echo "$tmpvar" | sed 's#^.*refs/tags/##')
 tmpvar=$(echo "$tmpvar" | sort -V)
-tmpvar=$(echo "$tmpvar" | tail -1)
-lastremoterel="$tmpvar"
+lastremoterel=$(echo "$remoterels" | tail -1)
 aux_info "$lastremoterel is the last remote release tag found."
 if [ "$nextrel" == "lastremoterel" ]; then
     aux_error "Next release tag ($nextrel) already used remotely."
     exit 1
 fi
+# check that nextrel not used on remote
+usedonrem="n"
+for rel in "${remrelarr[@]}"; do
+    if [ "$nextrel" == "$rel" ]; then
+        usedonrem="y"
+        break
+    fi
+done
+if [ "$usedonrem" == "y" ]; then
+    aux_error "Next release $nextrel already used on git remote."
+    exit 1
+fi
+aux_info "Next release $nextrel in not yet used on git remote."
+# check that nextrel not used on remote
+usedonloc="n"
+for rel in "${locrelarr[@]}"; do
+    if [ "$nextrel" == "$rel" ]; then
+        usedonloc="y"
+        break
+    fi
+done
+if [ "$usedonloc" == "y" ]; then
+    if [ "$interactiveflag" == "y" ]; then
+        aux_notice "Next release $nextrel already used locally, but not remotely."
+        dotagdel="n"
+        while true; do
+            read -p "Do you want to delete the old local $nextrel tagging [yN]? " answer
+            case $answer in
+                [Yy]* ) dotagdel="y"; break;;
+                [Nn]* ) dotagdel="n"; break;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
+        if [ "$dotagdel" == "y" ]; then
+            git tag --delete $nextrel
+            if [ "$?" != "0" ]; then
+                aux_error "git tag --delete completion status problem."
+            fi
+            usedonloc="n"  # cleaned up now
+        fi
+    fi
+fi
+if [ "$usedonloc" == "y" ]; then
+    aux_error "Next release $nextrel already used locally."
+    exit 1
+fi
+aux_info "Next release $nextrel in not now used locally."
 # make sure we built everything ok
 cd "$reporoot"
 tmpvar=$(make build)
@@ -310,7 +367,7 @@ fi
 aux_info "Local git appears to be in sync with remote git."
 # tag local files
 dotag="y"
-if [ "interactiveflag" == "y" ]; then
+if [ "$interactiveflag" == "y" ]; then
     dotag="n"
     while true; do
         read -p "Do you want to tag local files with '$nextrel' [yN]? " answer
