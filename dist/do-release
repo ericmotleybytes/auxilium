@@ -264,4 +264,28 @@ if [ "$isclean" == "n" ]; then
     exit 1
 fi
 aux_info "git status appear to be clean, for now."
+# try a git pull and check it
+gitpullout=$(git pull origin master)
+gitpulllastline=$(echo "$gitpulloutput" | tail -1)
+if [ "$gitpulllastline" != "Already up-to-date." ]; then
+    aux_error "git pull indicates some possible issues."
+    exit 1
+fi
+aux_info "git pull did not reveal any new issues."
+# push changes if needed
+$gitstatout=$(git status)
+$grepout=$(echo "$gitstatout: | grep "use" | grep "git push" | grep "publish" | grep "local commits")
+if [ ! -z "$grepout" ]; then
+    aux_debug "$grepout"
+    aux_notice "Looks like some local changes need to be pushed to remote origin."
+    aux_notice "Pushing changes to remote origin..."
+    git push origin master
+    $gitstatout=$(git status)
+    $grepout=$(echo "$gitstatout: | grep "use" | grep "git push" | grep "publish" | grep "local commits")
+    if [ ! -z "$grepout" ]; then
+        aux_error "Unable to get in sync with remote origin, see git status."
+        exit 1
+    fi
+fi
+aux_info "Local git appears to be in sync with remote git."
 exit 0
