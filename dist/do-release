@@ -134,9 +134,15 @@ aux_debug "cmdname=$cmdname."
 branch=$(git status --porcelain --branch | grep -e '^##\ ' | head -1)
 branch="${branch:3}"
 branch="${branch%%\ *}"
+branchok="n"
 aux_debug "branch=$branch."
-if [ "$branch" != "master...origin/master" ]; then
+if [ "$branch" == "master...origin/master" ]; then
+    branchok="y"
+elif [ "$branch" == "master" ]; then
+    branchok="y"
+else
     aux_error "Unexpected branch ($branch)."
+    exit 1
 fi
 aux_info "$branch is the current git branch."
 # make sure makefile exists
