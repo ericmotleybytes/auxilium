@@ -49,6 +49,10 @@ function aux_info() {
     echo "INFO: $1"
     return 0
 }
+function aux_notice() {
+    echo "NOTICE: $1"
+    return 0
+}
 #
 # begin main program
 #
@@ -201,14 +205,56 @@ if [ "${tmpvar:0:3}" != "ok " ]; then
 fi
 aux_info "test appears to be successful."
 # look for clean git status
-tmpvar=$(git status --porcelain)
-tmpvar2=$(echo $tmpvar | wc -l)
-if [ "$tmpvar2" != "0" ]; then
-    aux_error "Git status not clean, 'git add' or 'git commit' required."
-    if [ "$verboseflag" == "y" ]; then
-        git status
+cd "$reporoot"
+keeplooping="y"
+while [ "$keeplooping" == "y" ]; do
+    tmpvar=$(git status --porcelain)
+    tmpvar2=$(echo $tmpvar | wc -l)
+    aux_debug "$tmpvar2 git status lines found."
+    isclean="y"
+    if [ "$tmpvar2" != "0" ]; then
+        aux_debug "unclean!"
+        isclean="n"
+        #if [[ $- == *i* ]]; then
+        if [[ -t "0" || -p /dev/stdin ]]; then
+            # running interactively
+            aux_debug "Interactive!?!?"
+            aux_notice "Git status not clean!"
+            echo "This script can try to clean things up by git adding all untracked and modified files."
+            echo "This script can try to clean things up perfroming a git commit."
+            tryfix="n"
+            while true; do
+                read -p "Do you want this script to try to clean this up [yN]? " answer
+                case $answer in
+                    [Yy]* ) tryfix="y"; break;;
+                    [Nn]* ) tryfix="n"; break;;
+                    * ) echo "Please answer yes or no.";;
+                esac
+            done
+            if [ "$tryfix" == "n" ]; then
+                keeplooping="n"
+            elif [ "$tryfix" == "y" ]; then
+                git add .
+                echo "Untracked and modified files have been added to git."
+                read -p "Please enter a comment for the git commit: " comment
+                git commit -m "$comment"
+            else
+                keeplooping="n"
+            fi
+        else
+            aux_debug "Not interactive!?!?"
+            # running non-interactively, give up
+            keeplooping="n"
+        fi
+    else
+        aux_debug "No lines of uncleanliness."
+        keeplooping="n"
     fi
+done
+if [ "$isclean" == "n" ]; then
+    errmsg="Git status not clean, 'git add' or 'git commit' required."
+    aux_error "$errmsg"
     exit 1
 fi
-aux_info "git status appear to be clean (for now)."
+aux_info "git status appear to be clean, for now."
 exit 0
