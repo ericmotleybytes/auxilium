@@ -392,12 +392,12 @@ fi
 aux_info "Local files tagged with '$nextrel'."
 # now make the run-time distribution tar file
 cd "$reporoot"
-make clean-runtime-dist
+make clean-runtime-dist > /dev/null
 if [ "$?" != "0" ]; then
     aux_error "make clean-runtime-dist completion status was not 0."
     exit 1
 fi
-make runtime-dist
+make runtime-dist > /dev/null
 if [ "$?" != "0" ]; then
     aux_error "make runtime-dist completion status was not 0."
     exit 1
@@ -409,7 +409,6 @@ if [ ! -e  "$tarfile" ]; then
 fi
 aux_info "Run-tine distribution tar file created ($tarfile)."
 # now push the tag to the remote git server
-exit 2 # TBD
 git push origin $nextrel
 if [ "$?" != "0" ]; then
     aux_error "git push origin $nextrel completion status was not 0."
