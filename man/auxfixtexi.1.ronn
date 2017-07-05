@@ -1,18 +1,18 @@
-auxchecktap(1) -- Check TAP compliant unit test results
+ auxfixtexi(1) -- Check TAP compliant unit test results
 =======================================================
 
 ## SYNOPSIS
 
-`auxchecktap --help`<br>
-`auxchecktap --version`<br>
-`auxchecktap [<option>...]`<br>
-`auxchecktap [<option>...] <filespec>...`
+`auxfixtexi --help`<br>
+`auxfixtexi --version`<br>
+`auxfixtexi [<option>...]`<br>
+`auxfixtexi [<option>...] <filespec>...`
 
 Syntax:
-  auxchecktap --help     # display this help text.
-  auxchecktap --version  # display program version information.
-  auxchecktap [<outoption>]               # read from standard input.
-  auxchecktap [<outoption>] <filespec>... # read from specified file(s).
+  auxfixtexi --help     # display this help text.
+  auxfixtexi --version  # display program version information.
+  auxfixtexi [<outoption>]               # read from standard input.
+  auxfixtexi [<outoption>] <filespec>... # read from specified file(s).
 Options:
 
 TBD
@@ -71,9 +71,8 @@ target sourced file.
 
 ## COPYRIGHT
 
-Copyright (C) 2017 Eric Alan Christiansen.
+Copyright © 2017 Eric Alan Christiansen.
 
 ## SEE ALSO
 
-https://testanything.org/ - The Test Anything Protocol (TAP).<br>
-http://www.json.org/ - The JavaScript Object Notation (JSON).
+TBD

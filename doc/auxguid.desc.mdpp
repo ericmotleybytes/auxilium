@@ -1,0 +1,8 @@
+**auxguid** - Generates a 32 hexidecimal character representation of
+a 128 bit randomly generated GUID (Globally Unique IDentifier) using
+only bash. These are also sometimes called UUID's (Universally Unique
+IDentifiers). By default, an auxilium specific algorithm is used to
+generate the GUID using bash random, timestamp to nanoseconds, process
+id, etc. The odds of an accidental duplicate GUID collision are
+astronomically low. Optionally, if it is installed on the system,
+auxguid can use the Linux "uuidgen" utility.

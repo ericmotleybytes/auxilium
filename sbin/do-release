@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# This script is for auxium source developers only.
+# This script is for auxilium source developers only.
 # It facilitates making a new GitHub release.
 #
 # usage:
@@ -8,7 +8,6 @@
 # options:
 #     -v --version # display version info
 #     -h --help    # display help info
-#     -n --dry-run # just dry run as far as possible
 #     -w --warn    # display warning messages to stderr
 #     -b --verbose # display additional information
 #     -d --debug   # display debug messages to stderr
@@ -72,8 +71,6 @@ warnflag="n"
 warncnt=$((0))
 debugflag="n"
 errorcnt=$((0))
-dryrunflag="n"
-dryrunflag="y"   # TBD
 verboseflag="n"
 # check if running interactively
 if [[ -t "0" || -p /dev/stdin ]]; then
@@ -88,15 +85,11 @@ while [ $# -gt 0 ]; do
         versionflag="y"
     elif [[ "$param" == "--help"    || "$param" == "-h" ]]; then
         helpflag="y"
-    elif [[ "$param" == "--lower"   || "$param" == "-l" ]]; then
-        lowerflag="y"
     elif [[ "$param" == "--warn"    || "$param" == "-w" ]]; then
         warnflag="y"
     elif [[ "$param" == "--debug"   || "$param" == "-d" ]]; then
         debugflag="y"
         warnflag="y"
-    elif [[ "$param" == "--dry-run" || "$param" == "-n" ]]; then
-        dryrunflag="y"
     elif [[ "$param" == "--verbose" || "$param" == "-b" ]]; then
         verboseflag="y"
     else
@@ -119,12 +112,11 @@ if [ "$helpflag" == "y" ]; then
     echo "Syntax:"
     echo "  $cmdname -h | --help     # display this help text."
     echo "  $cmdname -v | --version  # display program version information."
-    echo "  $cmdname [<option>...]   # do a GitHub release (or dryrun)."
+    echo "  $cmdname [<option>...]   # do a GitHub release."
     echo "Options:"
     echo "  -b --verbose  # display extra info."
     echo "  -w --warn     # output non-fatal warnings to stderr."
     echo "  -d --debug    # output debug info to stderr."
-    echo "  -n --dry-run  # use uuidgen command if available."
 fi
 #
 # if --help or --version and no files specified, assume we are done.
@@ -133,7 +125,7 @@ if [[ "$versionflag" == "y" || "$helpflag" == "y" ]]; then
     exit 0
 fi
 #
-# do release (or a dry run)
+# do release
 #
 aux_debug "cmdfile=$cmdfile."
 aux_debug "cmddir=$cmddir."

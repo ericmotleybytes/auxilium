@@ -7,7 +7,8 @@
 #.PHONY: test
 test: test/auxilium.taplog test/auxilium.tapchk
 
-test/auxilium.taplog : bin/auxenv bin/auxsource bin/auxalias bin/auxchecktap bin/auxguid \
+test/auxilium.taplog : bin/auxenv bin/auxsource bin/auxalias \
+  bin/auxchecktap bin/auxguid bin/auxfixtexi \
   $(wildcard test/*.bash) $(wildcard test/*.bats)
 	cd test; bats -t . | tee auxilium.taplog
 

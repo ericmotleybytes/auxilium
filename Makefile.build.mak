@@ -29,13 +29,14 @@ build: docs
 	@echo "[build complete]"
 
 .PHONY: docs
-docs: doc/README.md \
+docs: doc/README.md doc/README.txt \
   share/man/man1               share/html/man/man1 \
   share/man/man1/auxenv.1      share/html/man/man1/auxenv.1.html \
   share/man/man1/auxsource.1   share/html/man/man1/auxsource.1.html \
   share/man/man1/auxalias.1    share/html/man/man1/auxalias.1.html \
   share/man/man1/auxchecktap.1 share/html/man/man1/auxchecktap.1.html \
   share/man/man1/auxguid.1     share/html/man/man1/auxguid.1.html \
+  share/man/man1/auxfixtexi.1  share/html/man/man1/auxfixtexi.1.html \
   share/html/auxilium.README.md.html
 
 doc/README.md : doc/README.mdpp \
@@ -44,6 +45,9 @@ doc/README.md : doc/README.mdpp \
   doc/install-runtime.mdpp \
   doc/install-sources.mdpp
 	cd doc ; markdown-pp README.mdpp -o README.md
+
+doc/README.txt : doc/README.md
+	pandoc --from=markdown_github --to=plain --output="$@" "$<"
 
 share/man/man1 :
 	mkdir -p $@
@@ -81,6 +85,12 @@ share/man/man1/auxguid.1 : man/auxguid.1.ronn
 share/html/man/man1/auxguid.1.html : man/auxguid.1.ronn
 	ronn --html < $< > $@
 
+share/man/man1/auxfixtexi.1 : man/auxfixtexi.1.ronn
+	ronn < $< > $@
+
+share/html/man/man1/auxfixtexi.1.html : man/auxfixtexi.1.ronn
+	ronn --html < $< > $@
+
 share/html/auxilium.README.md.html : README.md
 	grip $< --export $@
 
@@ -98,6 +108,8 @@ cleandocs:
 	rm -f share/html/man/man1/auxchecktap.1.html
 	rm -f share/man/man1/auxguid.1
 	rm -f share/html/man/man1/auxguid.1.html
+	rm -f share/man/man1/auxfixtexi.1
+	rm -f share/html/man/man1/auxfixtexi.1.html
 	rm -f share/html/auxilium.README.md.html
 
 #### Aggregate stuff ####

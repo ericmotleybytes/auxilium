@@ -1,0 +1,5 @@
+**auxsource** - Works pretty much like the standard bash "source"
+command, except that if only a filename (with no directory) is
+specified auxsource will search through a directory list in the
+AUXSOURCE_PATH environment variable (much like bash looks for
+executable programs using the PATH environment variable).
