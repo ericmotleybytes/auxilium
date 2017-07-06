@@ -1,0 +1,161 @@
+input texinfo
+@documentencoding UTF-8
+
+@ifnottex
+@paragraphindent 0
+@end ifnottex
+@node Top
+@top Top
+
+@menu
+* Auxilium - bash tools to help solve common problems::
+@end menu
+
+@node Auxilium - bash tools to help solve common problems
+@chapter Auxilium - bash tools to help solve common problems
+@anchor{#auxiliumbashtoolstohelpsolvecommonproblems}
+Auxilium provides a set of bash utility scripts which help solve some
+common problems such as:
+
+@itemize
+@item
+Viewing and manipulating settings of list environment variables like
+PATH.
+@item
+Checking and managing TAP-compliant unit test results.
+@item
+Being able to generate a GUID/UUID without an additional programming
+language.
+@item
+Controlling bash "source" file selection with a path-like environment
+variable.
+@end itemize
+
+Contents: 1. @ref{#installation,Installation}@*
+1.1.
+@ref{#installation_of_run_time_distribution,Installation_of_Run_Time_Distribution}@*
+1.1.1. @ref{#runtimedistributionsingleuserinstall,Run Time Distribution
+Single User Install}@*
+1.1.2. @ref{#runtimedistributionmultipleuserinstall,Run-Time
+Distribution, Multiple User Install}@*
+1.2.
+@ref{#installation_of_source_distribution,Installation_of_Source_Distribution}@*
+1.2.1.
+@ref{#source_distribution_single_user_install,Source_Distribution_Single_User_Install}@*
+1.2.2.
+@ref{#source_distribution_multiple_user_install,Source_Distribution_Multiple_User_Install}@*
+2. @ref{#commands,Commands}@*
+2.1. @ref{#auxenv,auxenv}@*
+2.2. @ref{#auxchecktap,auxchecktap}@*
+2.3. @ref{#auxguid,auxguid}@*
+2.4. @ref{#auxsource,auxsource}
+@menu
+* 1 Installation::
+* 2 Commands::
+@end menu
+
+@node 1 Installation
+@section 1. Installation
+@anchor{#installation}
+@menu
+* 11 Installation_of_Run_Time_Distribution::
+* 12 Installation_of_Source_Distribution::
+@end menu
+
+@node 11 Installation_of_Run_Time_Distribution
+@subsection 1.1. Installation_of_Run_Time_Distribution
+@anchor{#installation_of_run_time_distribution}
+@menu
+* 111 Run Time Distribution Single User Install::
+* 112 Run-Time Distribution Multiple User Install::
+@end menu
+
+@node 111 Run Time Distribution Single User Install
+@subsubsection 1.1.1. Run Time Distribution Single User Install
+@anchor{#runtimedistributionsingleuserinstall}
+TBD
+
+@node 112 Run-Time Distribution Multiple User Install
+@subsubsection 1.1.2. Run-Time Distribution, Multiple User Install
+@anchor{#runtimedistributionmultipleuserinstall}
+TBD
+
+@node 12 Installation_of_Source_Distribution
+@subsection 1.2. Installation_of_Source_Distribution
+@anchor{#installation_of_source_distribution}
+@menu
+* 121 Source_Distribution_Single_User_Install::
+* 122 Source_Distribution_Multiple_User_Install::
+@end menu
+
+@node 121 Source_Distribution_Single_User_Install
+@subsubsection 1.2.1. Source_Distribution_Single_User_Install
+@anchor{#source_distribution_single_user_install}
+TBD
+
+@node 122 Source_Distribution_Multiple_User_Install
+@subsubsection 1.2.2. Source_Distribution_Multiple_User_Install
+@anchor{#source_distribution_multiple_user_install}
+TBD
+
+@node 2 Commands
+@section 2. Commands
+@anchor{#commands}
+@menu
+* 21 auxenv::
+* 22 auxchecktap::
+* 23 auxguid::
+* 24 auxsource::
+@end menu
+
+@node 21 auxenv
+@subsection 2.1. auxenv
+@anchor{#auxenv}
+@strong{auxenv} - Solves many problems working with path-like
+environment variables such as PATH, MANPATH, LD_LIBRARY_PATH, and so
+forth. It can display current settings in an easy to read form. It can
+add, delete, and reorder directory positions, it can weed out duplicate
+or nonexistent directories, and much more. The power of auxenv allows
+system administrators and end-users to create more robust and flexible
+login initialization scripts. Auxenv is also very useful to anyone who
+needs to switch back and forth between different versions of a
+programming language, enhancing or replacing the Linux "scl" utility.
+
+@node 22 auxchecktap
+@subsection 2.2. auxchecktap
+@anchor{#auxchecktap}
+@strong{auxchecktap} - Helps check with "TAP" (Test Anything Protocol)
+unit test result files. Many unit testing tools for many different
+programming have to option to display or record test results in TAP
+format. Sometimes, however, if there are many unit tests, a TAP test
+result file might be very long and it is easy to miss a reported error
+somewhere in the middle. The TAP format also makes it possible to detect
+is unit testing stop prematurely without an error message, but humans
+often do not notice this subtle inconsistency. Auxchecktap finds these
+and other problems and presents an easier to read summary test result
+display, which is also in TAP format. Using auxchecktap it is also
+possible to create hierarchical summaries of unit tests from many
+projects and divisions.
+
+@node 23 auxguid
+@subsection 2.3. auxguid
+@anchor{#auxguid}
+@strong{auxguid} - Generates a 32 hexidecimal character representation
+of a 128 bit randomly generated GUID (Globally Unique IDentifier) using
+only bash. These are also sometimes called UUID's (Universally Unique
+IDentifiers). By default, an auxilium specific algorithm is used to
+generate the GUID using bash random, timestamp to nanoseconds, process
+id, etc. The odds of an accidental duplicate GUID collision are
+astronomically low. Optionally, if it is installed on the system,
+auxguid can use the Linux "uuidgen" utility.
+
+@node 24 auxsource
+@subsection 2.4. auxsource
+@anchor{#auxsource}
+@strong{auxsource} - Works pretty much like the standard bash "source"
+command, except that if only a filename (with no directory) is specified
+auxsource will search through a directory list in the AUXSOURCE_PATH
+environment variable (much like bash looks for executable programs using
+the PATH environment variable).
+
+@bye

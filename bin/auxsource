@@ -15,16 +15,22 @@ function auxsource_main_func() {
     local sourcecand
     local sourceparams
     local sourcefound
+    local whereflag
     local idx
     local IFS
     scriptspec=$(readlink -f "${BASH_SOURCE[0]}")  # full spec
     scriptname=$(basename "$scriptspec")           # basename part
     scriptdir=$(dirname "$scriptspec")             # dirpart
+    whereflag="n"
+    if [[ "$1" == "-w" || "$1" == "--where" ]]; then
+        whereflag="y"
+        shift
+    fi
     if [ -z "$1" -o "$1" == "--help" ]; then
         # display help
         echo "Command:"
-        echo "  $scriptname <filename> [<param> ...] # source file where 1st found in AUXSOURCE_PATH."
-        echo "  $scriptname <dir/spec> [<param> ...] # source the file in specified directory."
+        echo "  $scriptname [-w] <filename> [<param> ...] # source file where 1st found in AUXSOURCE_PATH."
+        echo "  $scriptname [-w] <dir/spec> [<param> ...] # source the file in specified directory."
         echo "  $scriptname --help                   # display help."
         echo "  $scriptname --version                # display version."
         return 0
@@ -61,8 +67,12 @@ function auxsource_main_func() {
                 sourcecand="$sourcedir/$sourcefile"
                 if [ -e "$sourcecand" ]; then
                     sourcefound="y"
-                    set -- # clear positional parameters
-                    eval source "$sourcecand" $sourceparams
+                    if [ "$whereflag" == "y" ]; then
+                        echo "Found '$sourcecand'."
+                    else
+                        set -- # clear positional parameters
+                        eval source "$sourcecand" $sourceparams
+                    fi
                     break;
                 fi
             done
@@ -74,8 +84,12 @@ function auxsource_main_func() {
             # directory specified in sourcefile
             sourcefile=$(readlink -f "$sourcefile")
             if [ -e "$sourcefile" ]; then
-                set --   # clear old positional parameters
-                eval source "$sourcefile" $sourceparams
+                if [ "$whereflag" == "y" ]; then
+                    echo "Found '$sourcecand'."
+                else
+                    set --   # clear old positional parameters
+                    eval source "$sourcefile" $sourceparams
+                fi
             else
                 echo "ERROR: $scriptname could not locate $sourcefile." >&2
                 return 1
@@ -88,4 +102,10 @@ function auxsource_main_func() {
 # Now invoke the main function
 #
 auxsource_main_func $@
-unset auxsource_main_func
+if [ "$?" == "0" ]; then
+    unset auxsource_main_func
+    true  # final status
+else
+    unset auxsource_main_func
+    false # final status
+fi

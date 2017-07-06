@@ -596,7 +596,16 @@ function auxenv_main_func() {
 # Now invoke the main function
 #
 auxenv_main_func $@
-unset auxenv_version_func
-unset auxenv_help_func
-unset auxenv_badusage_func
-unset auxenv_main_func
+if [ "$?" == "0" ]; then
+    unset auxenv_version_func
+    unset auxenv_help_func
+    unset auxenv_badusage_func
+    unset auxenv_main_func
+    true  # final status
+else
+    unset auxenv_version_func
+    unset auxenv_help_func
+    unset auxenv_badusage_func
+    unset auxenv_main_func
+    false # final status
+fi
