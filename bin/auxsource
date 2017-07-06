@@ -55,8 +55,13 @@ function auxsource_main_func() {
             # no directory part in command line file parameter
             if [ -z "$AUXSOURCE_PATH" ]; then
                 # auxsource env var not set
-                sourcepath=$(readlink -f ".")
-                sourcepath="$sourcepath:$scriptdir"
+                if [ -z "$PATH" ]; then
+                    # PATH not set
+                    sourcepath=$(readlink -f ".")
+                    sourcepath="$sourcepath:$scriptdir"
+                else
+                    # use PATH
+                    sourcepath="$PATH"
             else
                 # auxsource env var was set
                 sourcepath="$AUXSOURCE_PATH"

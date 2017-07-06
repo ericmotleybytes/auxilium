@@ -1,6 +1,10 @@
 ###
 # This file designed to be included by Makefile.
 ###
+PANDOCSTD=pandoc -s --from=markdown
+PANDOCMANTMP=$(PANDOCSTD) --to=man -M adjusting=l -M hyphenate=false -M section=1
+PANDOCMAN=$(PANDOCMANTMP) -M header="General Commands Manual" -M footer="General Commands Manual"
+PANDOCHTML=$(PANDOCSTD)	--to=html --self-contained
 
 .PHONY: helpbuild
 helpbuild:
@@ -55,11 +59,21 @@ share/man/man1 :
 share/html/man/man1 :
 	mkdir -p $@
 
-share/man/man1/auxenv.1 : man/auxenv.1.ronn
-	ronn < $< > $@
+doc/man/auxenv.md : doc/man/auxenv.pp.md \
+  doc/include/auxenv-description.md \
+  doc/include/auxenv-options.md \
+  doc/include/auxenv-commands.md \
+  doc/include/authors.md \
+  doc/include/sources.md \
+  doc/include/copyright.md \
+  doc/include/license.md
+	pp $< > $@
 
-share/html/man/man1/auxenv.1.html : man/auxenv.1.ronn
-	ronn --html < $< > $@
+share/man/man1/auxenv.1 : doc/man/auxenv.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxenv
+
+share/html/man/man1/auxenv.1.html : doc/man/auxenv.md
+	$(PANDOCHTML) $< --output=$@ -M title=auxenv --toc
 
 share/man/man1/auxsource.1 : man/auxsource.1.ronn
 	ronn < $< > $@
@@ -98,6 +112,7 @@ share/html/auxilium.README.md.html : README.md
 
 .PHONY: cleandocs
 cleandocs:
+	rm -f doc/man/auxenv.md
 	rm -f share/man/man1/auxenv.1
 	rm -f share/html/man/man1/auxenv.1.html
 	rm -f share/man/man1/auxsource.1

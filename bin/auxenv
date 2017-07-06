@@ -11,21 +11,22 @@ function auxenv_help_func() {
     echo "Command:"
     echo "  $scriptname - A sourceable bash script to display/setup environment variables."
     echo "Syntax:"
-    echo "  $scriptname --help     # display usage help"
-    echo "  $scriptname --version  # display version information"
-    echo "  $scriptname [<switch>...] <envname> <command> [<parameter>...]"
-    echo "Optional Switches:"
-    echo "  --unsetempty  # if final environment variable value is \"\", also unset it."
-    echo "  --ifs=\"<char>\" # list separator to use when parsing path-like env var values."
-    echo "  --ifs=x<hh>  # specify --ifs char in hex, e.g., \"--ifs=x20\" for space."
+    echo "  $scriptname [<options>...] <command> <envname> [<parameter>...]"
+    echo "  $scriptname -h | --help | -v | --version"
+    echo "Options:"
+    echo "  --unsetempty     # if final environment variable value is \"\", also unset it."
+    echo "  --ifs=\"<char>\"   # list separator to use when parsing path-like env var values."
+    echo "  --ifs=x<hh>      # specify --ifs char in hex, e.g., \"--ifs=x20\" for space."
+    echo "  -h | --help      # display help screen."
+    echo "  -v | --version   # display version information."
     echo "Commands and Parameters:"
     echo "  show    <envname>             # display environment var readably."
-    echo "  dump    <envname>             # display environment var basically."
+    echo "  dump    <envname>             # display environment var one item per line."
     echo "  count   <envname> [<dir>]     # count all entries of occurances of dir."
     echo "  get     <envname> <pos>       # get entry at position."
     echo "  find    <envname> <dir>       # get position of directory."
     echo "  prepend <envname> <dir>       # prepend directory to env var."
-    echo "  append  <envname> <dir>       # prepend directory to env var."
+    echo "  append  <envname> <dir>       # append directory to env var."
     echo "  insert  <envname> <dir> before <olddir> # add dir before olddir."
     echo "  insert  <envname> <dir> after  <olddir> # add dir after olddir."
     echo "  insert  <envname> <dir> before <pos>    # add dir before position."
@@ -91,10 +92,10 @@ function auxenv_main_func() {
     #
     # look for optional initial switches (--ifs=":" ; --unsetempty; --version ; --help)
     #
-    while [[ $# -gt 0 && "${1:0:2}" == "--" ]]; do
+    while [[ $# -gt 0 && "${1:0:1}" == "-" ]]; do
         local switch="$1"
         shift
-        if [ "$switch" == "--version" ]; then
+        if [[ "$switch" == "-v" || "$switch" == "--version" ]]; then
             if [ "$#" == "0" ]; then
                 auxenv_version_func
                 return 0
@@ -102,7 +103,7 @@ function auxenv_main_func() {
                 auxenv_badusage_func
                 return 1
             fi
-        elif [ "$switch" == "--help" ]; then
+        elif [[ "$switch" == "-h" || "$switch" == "--help" ]]; then
             if [ "$#" == "0" ]; then
                 auxenv_help_func
                 return 0
@@ -516,7 +517,9 @@ function auxenv_main_func() {
                 break
             fi
         done
-        echo "$tgtcnt"
+        if [ ! -z "$tgtcnt" ]; then
+            echo "$tgtcnt"
+        fi
         return 0
     elif [ "$action" == "get" ]; then
         envname="$2"
