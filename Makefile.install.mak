@@ -16,7 +16,7 @@ install : installinfo \
   $(PREFIX)/bin/auxalias \
   $(PREFIX)/bin/auxchecktap \
   $(PREFIX)/bin/auxguid \
-  $(PREFIX)/bin/auxfixtexi \
+  $(PREFIX)/bin/auxwhere \
   $(PREFIX)/share \
   $(PREFIX)/share/man \
   $(PREFIX)/share/man/man1 \
@@ -25,7 +25,6 @@ install : installinfo \
   $(PREFIX)/share/man/man1/auxalias.1 \
   $(PREFIX)/share/man/man1/auxchecktap.1 \
   $(PREFIX)/share/man/man1/auxguid.1 \
-  $(PREFIX)/share/man/man1/auxfixtexi.1 \
   $(PREFIX)/share/html \
   $(PREFIX)/share/html/man \
   $(PREFIX)/share/html/man/man1 \
@@ -34,7 +33,6 @@ install : installinfo \
   $(PREFIX)/share/html/man/man1/auxalias.1.html \
   $(PREFIX)/share/html/man/man1/auxchecktap.1.html \
   $(PREFIX)/share/html/man/man1/auxguid.1.html \
-  $(PREFIX)/share/html/man/man1/auxfixtexi.1.html \
   installinfo2
 
 .PHONY: installinfo
@@ -74,7 +72,7 @@ $(PREFIX)/bin/auxguid : bin/auxguid
 	cp -a "$<" "$@"
 	chmod $(BINMODE) "$@"
 
-$(PREFIX)/bin/auxfixtexi : bin/auxfixtexi
+$(PREFIX)/bin/auxwhere : bin/auxwhere
 	cp -a "$<" "$@"
 	chmod $(BINMODE) "$@"
 
@@ -110,10 +108,6 @@ $(PREFIX)/share/man/man1/auxguid.1: share/man/man1/auxguid.1
 	cp -a "$<" "$@"
 	chmod $(SRCMODE) "$@"
 
-$(PREFIX)/share/man/man1/auxfixtexi.1: share/man/man1/auxfixtexi.1
-	cp -a "$<" "$@"
-	chmod $(SRCMODE) "$@"
-
 $(PREFIX)/share/html:
 	mkdir "$@"
 	chmod $(DIRMODE) "$@"
@@ -146,10 +140,6 @@ $(PREFIX)/share/html/man/man1/auxguid.1.html: share/html/man/man1/auxguid.1.html
 	cp -a "$<" "$@"
 	chmod $(SRCMODE) "$@"
 
-$(PREFIX)/share/html/man/man1/auxfixtexi.1.html: share/html/man/man1/auxfixtexi.1.html
-	cp -a "$<" "$@"
-	chmod $(SRCMODE) "$@"
-
 #### uninstall stuff ####
 
 .PHONY: sysuninstall
@@ -164,16 +154,14 @@ uninstall:
 	rm -f $(PREFIX)/bin/auxalias
 	rm -f $(PREFIX)/bin/auxchecktap
 	rm -f $(PREFIX)/bin/auxguid
-	rm -f $(PREFIX)/bin/auxfixtexi
+	rm -f $(PREFIX)/bin/auxwhere
 	rm -f $(PREFIX)/share/man/man1/auxenv.1
 	rm -f $(PREFIX)/share/man/man1/auxsource.1
 	rm -f $(PREFIX)/share/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/man/man1/auxchecktap.1
 	rm -f $(PREFIX)/share/man/man1/auxguid.1
-	rm -f $(PREFIX)/share/man/man1/auxfixtexi.1
 	rm -f $(PREFIX)/share/html/man/man1/auxenv.1
 	rm -f $(PREFIX)/share/html/man/man1/auxsource.1
 	rm -f $(PREFIX)/share/html/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/html/man/man1/auxchecktap.1
 	rm -f $(PREFIX)/share/html/man/man1/auxguid.1
-	rm -f $(PREFIX)/share/html/man/man1/auxfixtexi.1

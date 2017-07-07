@@ -31,7 +31,7 @@ exit status of 1 if an error was detected.
 
 !include(../include/auxenv-examples.md)
 
-PREREQUISITES
+## PREREQUISITES
 
 * bash 4.0 or higher.
 

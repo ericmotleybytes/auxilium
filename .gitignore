@@ -1,6 +1,7 @@
 *.tmp
 *.2017*
 *.ppo.md
+*.texi
 share/*
 scratch/*
 extdoc/*

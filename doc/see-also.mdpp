@@ -1,5 +1,6 @@
 ## See Also
 
+* The texinfo linux package ('sudo yum install texinfo' or 'apt-get install texinfo')
 * https://github.com/sstephenson/bats - Bats GitHub page.
 * https://testanything.org/ - TAP format.
 * https://github.com/jgm/pandoc - Pandoc GitHub page. 
