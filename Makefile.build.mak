@@ -34,6 +34,7 @@ build: docs
 
 .PHONY: docs
 docs: doc/README.md doc/README.txt \
+  doc/include/auxenv-aliasing.ppo.md \
   share/man/man1               share/html/man/man1 \
   share/man/man1/auxenv.1      share/html/man/man1/auxenv.1.html \
   share/man/man1/auxsource.1   share/html/man/man1/auxsource.1.html \
@@ -53,26 +54,22 @@ doc/README.md : doc/README.mdpp \
 doc/README.txt : doc/README.md
 	pandoc --from=markdown_github --to=plain --output="$@" "$<"
 
+doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
+	pp -D AUXCMD=auxenv $< > $@
+
 share/man/man1 :
 	mkdir -p $@
 
 share/html/man/man1 :
 	mkdir -p $@
 
-doc/man/auxenv.md : doc/man/auxenv.pp.md \
-  doc/include/auxenv-description.md \
-  doc/include/auxenv-options.md \
-  doc/include/auxenv-commands.md \
-  doc/include/authors.md \
-  doc/include/sources.md \
-  doc/include/copyright.md \
-  doc/include/license.md
+doc/man/auxenv.ppo.md : doc/man/auxenv.ppi.md doc/include
 	pp $< > $@
 
-share/man/man1/auxenv.1 : doc/man/auxenv.md
+share/man/man1/auxenv.1 : doc/man/auxenv.ppo.md
 	$(PANDOCMAN) $< --output=$@ -M title=auxenv
 
-share/html/man/man1/auxenv.1.html : doc/man/auxenv.md
+share/html/man/man1/auxenv.1.html : doc/man/auxenv.ppo.md
 	$(PANDOCHTML) $< --output=$@ -M title=auxenv --toc
 
 share/man/man1/auxsource.1 : man/auxsource.1.ronn
@@ -112,7 +109,7 @@ share/html/auxilium.README.md.html : README.md
 
 .PHONY: cleandocs
 cleandocs:
-	rm -f doc/man/auxenv.md
+	rm -f doc/man/auxenv.ppo.md
 	rm -f share/man/man1/auxenv.1
 	rm -f share/html/man/man1/auxenv.1.html
 	rm -f share/man/man1/auxsource.1

@@ -1,4 +1,41 @@
-# auxenv - A "sourceable" bash script to show and setup environment variables
+##############################################################################
+# Name:
+#   auxenv - Manipulate path-like environment variables
+#
+# Introduction:
+#   auxenv solves many problems working with path-like environment variables
+#   such as PATH, MANPATH, LD_LIBRARY_PATH, and so forth. It can display
+#   current settings in an easy to read form. It can add, delete, and reorder
+#   directory positions, it can weed out duplicate or nonexistent directories,
+#   and much more. The power of auxenv allows system administrators and
+#   end-users to create more robust and flexible login initialization scripts.
+#   Auxenv is also very useful to anyone who needs to switch back and forth
+#   between different versions of a programming language, enhancing or
+#   replacing the Linux "scl" utility.
+# 
+# Usage:
+#   auxenv [<option>...] <command> <envname> [<arg>...]
+#   auxenv -h | --help
+#   auxenv -v | --version
+#
+# Options and Commands:
+#   See "help" section in code (or the man page).
+#
+# Copyright:
+#   auxenv Copyright © 2017 Eric Alan Christiansen.
+#
+# Legal:
+#   This program comes with ABSOLUTELY NO WARRANTY.
+#   This is free software, and you are welcome to use and/or redistribute it
+#   under the conditions of the GNU General Public License v3.0.
+#   (See https://www.gnu.org/licenses/gpl-3.0.en.html)
+#
+# More Information:
+#   - auxilium - See https://github.com/ericmotleybytes/auxilium.
+#
+# Requirements:
+#   - bash version 4 or higher.
+##############################################################################
 #
 # define all logic in functions to isolate local variables
 #
@@ -23,14 +60,14 @@ function auxenv_help_func() {
     echo "  show    <envname>             # display environment var readably."
     echo "  dump    <envname>             # display environment var one item per line."
     echo "  count   <envname> [<dir>]     # count all entries of occurances of dir."
-    echo "  get     <envname> <pos>       # get entry at position."
+    echo "  get     <envname> [@]<pos>    # get entry at position."
     echo "  find    <envname> <dir>       # get position of directory."
     echo "  prepend <envname> <dir>       # prepend directory to env var."
     echo "  append  <envname> <dir>       # append directory to env var."
     echo "  insert  <envname> <dir> before <olddir> # add dir before olddir."
     echo "  insert  <envname> <dir> after  <olddir> # add dir after olddir."
-    echo "  insert  <envname> <dir> before <pos>    # add dir before position."
-    echo "  insert  <envname> <dir> after  <pos>    # add dir after position."
+    echo "  insert  <envname> <dir> before @<pos>   # add dir before position."
+    echo "  insert  <envname> <dir> after  @<pos>   # add dir after position."
     echo "  remove  <envname> <dir> [<n>] # remove dir and equiv up to n times."
     echo "  erase   <envname> <dir> [<n>] # remove literal dir up to n times."
     echo "  reverse <envname>             # reverse order of all entries."
@@ -46,37 +83,43 @@ function auxenv_badusage_func() {
     return 1
 }
 function auxenv_main_func() {
-    local scriptname
-    local scriptspec
-    local action
-    local envname
-    local part
-    local subpart
-    local newdir
-    local olddir
     local altdir
-    local result
+    local action
+    local befaft
     local cnt
     local dupflag
-    local foundflag
-    local existsflag
-    local intflag
-    local insertedflag
-    local befaft
-    local re
-    local tgtcnt
-    local remcnt
-    local workpath
-    local revflag
     local dupdir
-    #
-    # initialize special vars IFS
-    #
-    local genifs=" " # space, such as between command line arguments
+    local envname
+    local envval
     local envifs=":" # colon, such as between directories in PATH environment variable
-    local IFS="$genifs"
+    local existsflag
+    local foundflag
+    local genifs=" " # space, such as between command line arguments
+    local insertedflag
+    local intflag
+    local newdir
+    local numericdir
+    local olddir
+    local part
+    local partcan
+    local pos
+    local re
+    local remcnt
+    local remdir
+    local remdircan
+    local result
+    local revflag
+    local scriptname
+    local scriptspec
+    local subpart
+    local tgtcnt
     local unsetflag="n"
     local eraseflag="n"
+    local workpath
+    #
+    # initialize special var IFS
+    #
+    local IFS="$genifs"  # isolate script IFS from general process IFS
     #
     # get base script name
     #
@@ -159,13 +202,13 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname too many command line parameters." >&2
             return 1
         fi
-        echo "**** $envname is set to:"
+        echo "$envname is set to:"
         echo "${!envname}"
         IFS="$envifs"
         cnt="0"
         for part in ${!envname}; do
             let cnt=$cnt+1
-            if [ "$cnt" == "1" ]; then echo "** Part breakdown:"; fi
+            if [ "$cnt" == "1" ]; then echo "Item breakdown:"; fi
             echo "  $cnt=$part"
         done
         return 0
@@ -234,8 +277,8 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname Missing environment variable name parameter." >&2
             return 1
         fi
-        newdir="$3"
-        if [ -z "$newdir" ]; then
+        remdir="$3"   # dir to remove
+        if [ -z "$remdir" ]; then
             echo "ERROR: $scriptname Missing directory to remove parameter." >&2
             return 1
         fi
@@ -243,8 +286,7 @@ function auxenv_main_func() {
         if [ -z "$tgtcnt" ]; then
             let tgtcnt=999999
         else
-            re='^[0-9]+$'
-            if [[ ! $tgtcnt =~ $re ]]; then
+            if [[ ! $tgtcnt =~ ^[0-9]+$ ]]; then
                 echo "ERROR: $scriptname Count parameter must be positive integer." >&2
                 return 1
             fi
@@ -253,38 +295,75 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
-        if [ "$newdir" == "." ]; then
-            eraseflag="y"    # only do literal remove for "."
+        if [ "${remdir:0:1}" == "." ]; then
+            eraseflag="y"    # do only literal remove for "."
         fi
-        if [ "$eraseflag" == "y" ]; then
-            # do literal remove only, do not look for cannonical equivalents
-            altdir="" # should always not match
+        if [[ "${remdir}" =~ ^\@[0-9]+$ ]]; then
+            numericdir="y"
+            pos="${remdir:1}"  # requested position number to remove
         else
-            # remove literal and cannonical equivalent, if it exists
-            if [ -e "$newdir" ]; then
-                altdir=$(readlink -f "$newdir")
-            else
-                altdir="" # should always not match
-            fi
+            numericdir="n"
         fi
-        result=""
-        IFS="$envifs"
+        envval="${!envname}"
         remcnt="0"
-        for part in ${!envname}; do
-            if [ "$part" != "$newdir" -a "$part" != "$altdir" ]; then
-                # no match, keep dir
-                result="$result${envifs}$part"
-            else
-                # matched one or the other, skip unless count exceeded
+        IFS="$envifs"
+        if [ "$numericdir" == "y" ]; then
+            # remove by position
+            result=""
+            cnt=$((0))
+            for part in ${envval}; do
+                cnt=$(($cnt+1))
+                if [ "$cnt" != "$pos" ]; then
+                    result="$result${envifs}$part"
+                fi
+            done
+            result=${result:1}  # strip leading :
+            envval="$result"
+        else
+            # not a remove by position request
+            if [[ "$eraseflag" == "n" && -e "$remdir" ]]; then
+                # remove by cannonical if not just erasing and directory to remove exists
+                remdircan=$(readlink -f "$remdir")
+                result=""
+                for part in ${envval}; do
+                    if [ "$remcnt" -ge "$tgtcnt" ]; then
+                        # always keep if we have already removed enough times
+                        result="$result${envifs}$part"
+                    elif [ ! -e "$part" ]; then
+                        # always keep if dir does not exist (literal might still remove later)
+                        result="$result${envifs}$part"
+                    else
+                        partcan=$(readlink -f "$part")
+                        if [ "$partcan" != "$remdircan" ]; then
+                            # cannonicals do not match, keep part
+                            result="$result${envifs}$part"
+                        else
+                            # removing, increment remove count
+                            remcnt=$(($remcnt+1))
+                        fi
+                    fi
+                done
+                result=${result:1}  # strip leading :
+                envval="$result"
+            fi
+            # remove by literal
+            result=""
+            for part in ${envval}; do
                 if [ "$remcnt" -ge "$tgtcnt" ]; then
+                    # always keep if we have already removed enough times
+                    result="$result${envifs}$part"
+                elif [ "$part" != "$remdir" ]; then
+                    # keep, it is different
                     result="$result${envifs}$part"
                 else
-                    let remcnt=$remcnt+1
+                    # skipping, increment remove count
+                    remcnt=$(($remcnt+1))
                 fi
-            fi
-        done
-        result=${result:1}  # strip leading :
-        export $envname="$result"
+            done
+            result=${result:1}  # strip leading :
+            envval="$result"
+        fi
+        export $envname="$envval"
         if [[ "$unsetflag" == "y" && -z ${!envname} ]]; then unset $envname; fi
         return 0
     elif [ "$action" == "dedup" ]; then
@@ -357,7 +436,7 @@ function auxenv_main_func() {
         IFS="$envifs"
         for part in ${workpath}; do
             # try to dereference unless part is "." (current directory)
-            if [ "$part" != "." ]; then
+            if [ "${part:0:1}" != "." ]; then
                 part=$(readlink -f "$part")
             fi
             result="$result${envifs}$part"
@@ -424,9 +503,9 @@ function auxenv_main_func() {
         insertedflag="n"
         re='^[0-9]+$'
         intflag="n"
-        if [[ $olddir =~ $re ]]; then
+        if [[ $olddir =~ ^\@[0-9]+$ ]]; then
             intflag="y"
-            tgtcnt="$olddir"
+            tgtcnt="${olddir:1}"
         fi
         result=""
         IFS="$envifs"
@@ -536,8 +615,10 @@ function auxenv_main_func() {
             echo "ERROR: $scriptname Too many command line parameters." >&2
             return 1
         fi
-        re='^[0-9]+$'
-        if [[ $tgtcnt =~ $re ]]; then
+        if [ "${tgtcnt:0:1}" == "@" ]; then
+            tgtcnt="${tgtcnt:1}"
+        fi
+        if [[ "$tgtcnt" =~ ^[0-9]+$ ]]; then
             intflag="y"
         else
             intflag="n"

@@ -1,0 +1,187 @@
+#!/usr/bin/env bash
+##############################################################################
+# Name:
+#   auxwhere - Find any type file in a path-like directory list.
+#
+# Introduction:
+#   There are already a few "whereis" type programs, so it is sad to write
+#   another, but none of those other programs seemed adequately useful to
+#   find non-executable files such as sourceable scripts. The auxwhere
+#   command will look along path-like list of directories for any type
+#   of file using any environment variable as the list source.
+# 
+# Usage:
+#   auxwhere [options] <filename>
+#
+# Options and Commands:
+#   See "help" display in code (or the man page).
+#
+# Copyright:
+#   auxwhere Copyright © 2017 Eric Alan Christiansen.
+#
+# Legal:
+#   This program comes with ABSOLUTELY NO WARRANTY.
+#   This is free software, and you are welcome to use and/or redistribute it
+#   under the conditions of the GNU General Public License v3.0.
+#   (See https://www.gnu.org/licenses/gpl-3.0.en.html)
+#
+# More Information:
+#   - auxilium - See https://github.com/ericmotleybytes/auxilium.
+#
+# Requirements:
+#   - bash version 4 or higher.
+##############################################################################
+#
+# define functions
+#
+function put_debug() {
+    if [ "$debugflag" == "y" ]; then
+        echo "DEBUG: $1" >&2
+    fi
+    return 0
+}
+#
+# begin main program
+#
+declare -a filenames=()
+declare -a envnames=()
+declare -a subdirs=()
+declare -a filetypes=()
+ifsorg="$IFS"
+lf=$'\x0a'   # ascii linefeed character
+cmdfile=$(readlink -f "$0")
+cmddir=$(dirname "$cmdfile")
+cmdname="${cmdfile##*/}"
+version="$cmdname version 1.0 (2017-07-06)"
+versionflag="n"
+helpflag="n"
+debugflag="n"
+execflag="n"
+dashdash="n"
+sep=":"  # separator
+while [ $# -gt 0 ]; do
+    param="$1"
+    shift
+    if [[ "$dashdash" == "y" ]]; then
+        filenames+=("$param")  # every param after "--" is considered a file
+    elif [[ "$param" == "--" ]]; then
+        dashdash="y"
+    elif [[ "$param" == "--version" || "$param" == "-v" ]]; then
+        versionflag="y"
+    elif [[ "$param" == "--help"    || "$param" == "-h" ]]; then
+        helpflag="y"
+    elif [[ "$param" == "--debug"   || "$param" == "-d" ]]; then
+        debugflag="y"
+    elif [[ "$param" == "--exec"    || "$param" == "-x" ]]; then
+        execflag="y"
+    elif [[ "$param" == "-e"                            ]]; then
+        envnames+=("$1")
+        shift
+    elif [[ "$param" == "-s"                            ]]; then
+        subdirs+=("$1")
+        shift
+    elif [[ "$param" == "-t"                            ]]; then
+        filetypes+=("$1")
+        shift
+    elif [[ "$param" =~ ^--env=.+$ ]];  then
+        envnames+=("${param:6}")
+    elif [[ "$param" =~ ^--subdir=.+$ ]]; then
+        subdirs+=("${param:9}")
+    elif [[ "$param" =~ ^--type=.+$ ]]; then
+        filetypes+=("${param:7}")
+    elif [[ "${param:0:1}" == "-" ]]; then
+        echo "ERROR: bad command line option ($param)." >&2
+        exit 1
+    else
+        filenames+=("$param")
+    fi
+done
+#
+# show version if it was requested
+#
+if [ "$versionflag" == "y" ]; then
+    echo "$version"
+fi
+#
+# show help if it was requested
+#
+if [ "$helpflag" == "y" ]; then
+    echo "Command:"
+    echo "  $cmdname - Find any type file in a path-like directory list."
+    echo "Syntax:"
+    echo "  $cmdname [<option>...] <filename>... # find filename."
+    echo "  $cmdname -h | --help     # display this help text."
+    echo "  $cmdname -v | --version  # display program version information."
+    echo "Options:"
+    echo "  -h | --help      # display this help screen."
+    echo "  -v | --version   # display program version information."
+    echo "  -e <envname> | --env=<envname> # use a particular env var (repeatable)."
+    echo "  -t <.filetype> | --type=<.filetype> # file type (repeatable)"
+    echo "  -s | --subdir=<dir>      # append subdir to each path dir (repeatable)."
+    echo "  -x | --exec      # only show execuatable files."
+#
+fi
+#
+# if --help or --version and no files specified, assume we are done.
+#
+if [[ "$versionflag" == "y" || "$helpflag" == "y" ]]; then
+    exit 0
+fi
+#
+# add default envnames if no envnames specified
+#
+if [[ ${#envnames[@]} -eq 0 ]]; then
+    if [ ! -z "$PATH" ]; then
+        envnames+=("PATH")
+    fi
+    if [ ! -z "$AUXSOURCE_PATH" ]; then
+        envnames+=("AUXSOURCE_PATH")
+    fi
+fi
+#
+# add default empty subdir if no subdirs specified
+#
+if [[ ${#subdirs[@]} -eq 0 ]]; then
+    subdirs+=("")
+fi
+#
+# add default empty filetype if no filetypes specified
+#
+if [[ ${#filetypes[@]} -eq 0 ]]; then
+    filetypes+=("")
+fi
+put_debug "execflag='$execflag'."
+#
+# loop through all filenames
+#
+for filename in "${filenames[@]}"; do
+    put_debug "filename='$filename'."
+    for filetype in "${filetypes[@]}"; do
+        put_debug "filetype='$filetype'."
+        filenametype="${filename}${filetype}"
+        for envname in "${envnames[@]}"; do
+            put_debug "envname='$envname'."
+            IFS="$sep"
+            for dir in ${!envname}; do
+                put_debug "dir='$dir'."
+                for subdir in "${subdirs[@]}"; do
+                    put_debug "subdir='$subdir'."
+                    testspec="$dir"
+                    if [ ! -z "$subdir" ]; then
+                        testspec="$testspec/$subdir"
+                    fi
+                    testspec="$testspec/$filenametype"
+                    put_debug "testspec='$testspec'."
+                    if [ -e "$testspec" ]; then
+                        put_debug "$testspec exists!"
+                        # files exists
+                        if [[ -x "$testspec" || "$execflag" == "n" ]]; then
+                            echo -e "${testspec}\t(Found via ${envname})"
+                        fi
+                    fi
+                done
+            done
+        done
+    done
+done
+exit 0

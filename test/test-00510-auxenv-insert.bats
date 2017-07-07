@@ -88,7 +88,7 @@ load test_helper
     [ "${arr[1]}" == "/usr/bin" ]
     [ "${arr[2]}" == "/dummy/bin" ]
     arr=();
-    source ../bin/auxenv insert MYTEST /root/one before 3
+    source ../bin/auxenv insert MYTEST /root/one before @3
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "4" ]
     [ "${arr[0]}" == "/usr/local/bin" ]
@@ -96,7 +96,7 @@ load test_helper
     [ "${arr[2]}" == "/root/one" ]
     [ "${arr[3]}" == "/dummy/bin" ]
     arr=();
-    source ../bin/auxenv insert MYTEST /root/two before 9
+    source ../bin/auxenv insert MYTEST /root/two before @9
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "5" ]
     [ "${arr[0]}" == "/usr/local/bin" ]
@@ -106,13 +106,13 @@ load test_helper
     [ "${arr[4]}" == "/root/two" ]
     arr=();
     export MYTEST=""
-    source ../bin/auxenv insert MYTEST /root/three before 9
+    source ../bin/auxenv insert MYTEST /root/three before @9
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "1" ]
     [ "${arr[0]}" == "/root/three" ]
     arr=();
     unset MYTEST
-    source ../bin/auxenv insert MYTEST /root/three before 9
+    source ../bin/auxenv insert MYTEST /root/three before @9
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "1" ]
     [ "${arr[0]}" == "/root/three" ]
@@ -127,7 +127,7 @@ load test_helper
     [ "${arr[1]}" == "/usr/bin" ]
     [ "${arr[2]}" == "/dummy/bin" ]
     arr=();
-    source ../bin/auxenv insert MYTEST /root/one after 2
+    source ../bin/auxenv insert MYTEST /root/one after @2
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "4" ]
     [ "${arr[0]}" == "/usr/local/bin" ]
@@ -135,7 +135,7 @@ load test_helper
     [ "${arr[2]}" == "/root/one" ]
     [ "${arr[3]}" == "/dummy/bin" ]
     arr=();
-    source ../bin/auxenv insert MYTEST /root/two after 9
+    source ../bin/auxenv insert MYTEST /root/two after @9
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "5" ]
     [ "${arr[0]}" == "/usr/local/bin" ]
@@ -145,13 +145,13 @@ load test_helper
     [ "${arr[4]}" == "/root/two" ]
     arr=();
     export MYTEST=""
-    source ../bin/auxenv insert MYTEST /root/three after 99
+    source ../bin/auxenv insert MYTEST /root/three after @99
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "1" ]
     [ "${arr[0]}" == "/root/three" ]
     arr=();
     unset MYTEST
-    source ../bin/auxenv insert MYTEST /root/three after 99
+    source ../bin/auxenv insert MYTEST /root/three after @99
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "1" ]
     [ "${arr[0]}" == "/root/three" ]

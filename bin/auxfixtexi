@@ -94,9 +94,9 @@ while [ $# -gt 0 ]; do
         outfile="$1"
         shift
     elif [[ "$param" =~ ^--input=.+$ ]];  then
-        outfile="${param:9}"
+        infile="${param:8}"
     elif [[ "$param" =~ ^--output=.+$ ]]; then
-        outfile="${param:10}"
+        outfile="${param:9}"
     else
         echo "ERROR: bad command line option ($param)." >&2
         exit 1
@@ -117,7 +117,7 @@ if [ "$helpflag" == "y" ]; then
     echo "Syntax:"
     echo "  $cmdname -h | --help     # display this help text."
     echo "  $cmdname -v | --version  # display program version information."
-    echo "  $cmdname [<option>...]   # do a GitHub release (or dryrun)."
+    echo "  $cmdname [<option>...] <filename>  # find file."
     echo "Options:"
     echo "  -h | --help      # display this help screen."
     echo "  -v | --version   # display program version information."

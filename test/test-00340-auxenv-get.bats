@@ -12,6 +12,16 @@ load test_helper
     [ "$stuff" == "" ]
     stuff=`source ../bin/auxenv get MYTEST 0`
     [ "$stuff" == "" ]
+    stuff=`source ../bin/auxenv get MYTEST @1`
+    [ "$stuff" == "/usr/local/bin" ]
+    stuff=`source ../bin/auxenv get MYTEST @2`
+    [ "$stuff" == "/usr/bin" ]
+    stuff=`source ../bin/auxenv get MYTEST @3`
+    [ "$stuff" == "/root/bin" ]
+    stuff=`source ../bin/auxenv get MYTEST @4`
+    [ "$stuff" == "" ]
+    stuff=`source ../bin/auxenv get MYTEST @0`
+    [ "$stuff" == "" ]
 }
 @test "check auxenv get empty" {
     export MYTEST=""

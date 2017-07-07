@@ -113,4 +113,89 @@ load test_helper
     [ "${arr[1]}" == "$harddir" ]
     [ "${arr[2]}" == "/usr/bin" ]
 }
+@test "check auxenv erase by position" {
+    export MYTEST="/usr/local/bin:/usr/bin:/dummy/bin"
+    IFS=":"
+    arr=();
+    for part in $MYTEST; do arr+=("$part"); done
+    [ "${#arr[*]}" == "3" ]
+    [ "${arr[0]}" == "/usr/local/bin" ]
+    [ "${arr[1]}" == "/usr/bin" ]
+    [ "${arr[2]}" == "/dummy/bin" ]
+    # erase dir in list
+    arr=();
+    source ../bin/auxenv erase MYTEST @3
+    for part in $MYTEST; do arr+=("$part"); done
+    [ "${#arr[*]}" == "2" ]
+    [ "${arr[0]}" == "/usr/local/bin" ]
+    [ "${arr[1]}" == "/usr/bin" ]
+    # "erase" dir not in list
+    arr=();
+    source ../bin/auxenv erase MYTEST @9
+    for part in $MYTEST; do arr+=("$part"); done
+    [ "${#arr[*]}" == "2" ]
+    [ "${arr[0]}" == "/usr/local/bin" ]
+    [ "${arr[1]}" == "/usr/bin" ]
+    # erase first item in list
+    arr=();
+    source ../bin/auxenv erase MYTEST @1
+    for part in $MYTEST; do arr+=("$part"); done
+    [ "${#arr[*]}" == "1" ]
+    [ "${arr[0]}" == "/usr/bin" ]
+    # erase last item in list
+    arr=();
+    source ../bin/auxenv erase MYTEST @1
+    for part in $MYTEST; do arr+=("$part"); done
+    stillset=`printenv | grep ^MYTEST\=`
+    [ "${#arr[*]}" == "0" ]
+    [ "$MYTEST" == "" ]
+    [ ! -z "$stillset" ]
+    # "erase" dir from empty
+    arr=();
+    source ../bin/auxenv erase MYTEST @1
+    for part in $MYTEST; do arr+=("$part"); done
+    stillset=`printenv | grep ^MYTEST\=`
+    [ "${#arr[*]}" == "0" ]
+    [ "$MYTEST" == "" ]
+    [ ! -z "$stillset" ]
+    # "erase" dir from unset
+    unset MYTEST
+    arr=();
+    source ../bin/auxenv erase MYTEST @1
+    for part in $MYTEST; do arr+=("$part"); done
+    run stillset=`printenv | grep ^MYTEST\=`
+    [ "${#arr[*]}" == "0" ]
+    [ "$MYTEST" == "" ]
+    [ ! -z "$stillset" ]
+    # erase last item in list with --unsetempty
+    arr=();
+    export MYTEST=/usr/bin
+    source ../bin/auxenv --unsetempty erase MYTEST @1
+    for part in $MYTEST; do arr+=("$part"); done
+    stillset=""
+    run stillset=`printenv | grep ^MYTEST\=`
+    [ "${#arr[*]}" == "0" ]
+    [ "$MYTEST" == "" ]
+    [ -z "$stillset" ]
+    # "erase" dir from empty with --unsetempty
+    arr=();
+    export MYTEST=""
+    source ../bin/auxenv --unsetempty erase MYTEST @1
+    for part in $MYTEST; do arr+=("$part"); done
+    stillset=""
+    run stillset=`printenv | grep ^MYTEST\=`
+    [ "${#arr[*]}" == "0" ]
+    [ "$MYTEST" == "" ]
+    [ -z "$stillset" ]
+    # "erase" dir from unset with --unsetempty
+    unset MYTEST
+    arr=();
+    source ../bin/auxenv --unsetempty erase MYTEST @1
+    for part in $MYTEST; do arr+=("$part"); done
+    stillset=""
+    run stillset=`printenv | grep ^MYTEST\=`
+    [ "${#arr[*]}" == "0" ]
+    [ "$MYTEST" == "" ]
+    [ -z "$stillset" ]
+}
 # all done

@@ -11,8 +11,8 @@ shrmandir=$(readlink -f "$shrmandir")
 shrhtmlmandir="$testdir/../share/html/man"
 mkdir -p "$shrhtmlmandir"
 shrhtmlmandir=$(readlink -f "$shrhtmlmandir")
-alias auxenv="source \"$bindir\"/auxenv"
-alias auxsource="source \"$bindir\"/auxsource"
+alias auxenv="source $bindir/auxenv"
+alias auxsource="source $bindir/auxsource"
 export PATH="$bindir:$PATH"
 auxenv dedup PATH
 export MANPATH="$shrmandir:$MANPATH"
