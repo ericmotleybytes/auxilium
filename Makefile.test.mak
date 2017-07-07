@@ -8,16 +8,16 @@
 test: test/auxilium.taplog test/auxilium.tapchk
 
 test/auxilium.taplog : bin/auxenv bin/auxsource bin/auxalias \
-  bin/auxchecktap bin/auxguid bin/auxfixtexi \
+  bin/auxchecktap bin/auxguid bin/auxwhere \
   $(wildcard test/*.bash) $(wildcard test/*.bats)
 	cd test; bats -t . | tee auxilium.taplog
 
 test/auxilium.tapchk : test/auxilium.taplog
-	auxchecktap $< > $@
+	bin/auxchecktap $< > $@
 
 .PHONY: checktest
 checktest: test/auxilium.tapchk
-	auxchecktap $<
+	bin/auxchecktap $<
 
 #### Cleaning test logs ####
 
@@ -25,4 +25,3 @@ checktest: test/auxilium.tapchk
 cleantest:
 	rm -f test/auxilium.taplog
 	rm -f test/auxilium.tapchk
-
