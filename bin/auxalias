@@ -1,4 +1,123 @@
-# source this file to setup auxilium aliases based on directory this file is in.
-scratch_auxilium_bin_dir=$(readlink -f ${BASH_SOURCE[0]%/*})
-alias auxenv="source \"$scratch_auxilium_bin_dir\"/auxenv"
-alias auxsource="source \"$scratch_auxilium_bin_dir\"/auxsource"
+##############################################################################
+# Name:
+#   auxalias - easy creation of auxilium aliases
+#
+# Introduction:
+#   Some auxilium solutions a scripts which must be invoke through the
+#   bash built-in "source" command. This makes it slightly inconvenient to
+#   use those sourcable scripts like executable programs. Fortunately,
+#   bash also has the built-in "alias" command, which allows sourceable
+#   scripts to be invoked in like manner to an executable program.
+#
+#   This file, auxalias, is itself a sourceable script, which defines aliases
+#   for all auxilium sourceable scripts.
+# 
+# Usage:
+#   source [<dir>/]auxalias [<option>...]
+#
+# Options:
+#   -h | --help     # display help information.
+#   -v | --version  # display version information.
+#   -y | --dyn      # define "dynamic" aliases.
+#
+# Notes:
+#   The auxalias script only defines aliases for auxilium sourcable scripts,
+#   such as auxenv, auxsource, and auxalias. The auxilium executable programs,
+#   such as auxwhere, auxchecktao, and auxguid do not need aliases.
+#
+# Copyright:
+#   auxalias Copyright © 2017 Eric Alan Christiansen.
+#
+# Legal:
+#   This program comes with ABSOLUTELY NO WARRANTY.
+#   This is free software, and you are welcome to use and/or redistribute it
+#   under the conditions of the GNU General Public License v3.0.
+#   (See https://www.gnu.org/licenses/gpl-3.0.en.html)
+#
+# More Information:
+#   - auxilium - See https://github.com/ericmotleybytes/auxilium.
+#
+# Requirements:
+#   - bash version 4 or higher.
+##############################################################################
+# do work in a function to help isolate variables (but not aliases) from
+# the calling environment.
+function auxalias_main () {
+    declare -a params=()
+    local p
+    for p in "$@"; do
+        params+=("$p")
+    done
+    local scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
+    local version="$scriptname: version 2.0 (2017-07-07)"
+    local thisfile
+    local thisdir
+    local param
+    local helpflag="n"
+    local versionflag="n"
+    local dynflag="n"
+    local auxwherebin
+    # start processing
+    thisfile="${BASH_SOURCE[0]}"
+    thisfile="$(readlink -f $thisfile)"
+    thisdir="$(dirname "$thisfile")"
+    auxwherebin="$thisdir/auxwhere"
+    for param in "${params[@]}"; do
+        if   [[ "$param" == "-h" || "$param" == "--help" ]]; then
+            helpflag="y"
+        elif [[ "$param" == "-v" || "$param" == "--version" ]]; then
+            versionflag="y"
+        elif [[ "$param" == "-y" || "$param" == "--dyn" ]]; then
+            dynflag="y"
+        else
+            echo "ERROR: unrecognized option ($param)" >&2
+            return 1
+        fi
+    done
+    # display help if requested
+    if [ "$helpflag" == "y" ]; then
+        echo "Command:"
+        echo "  $scriptname - A sourceable bash script to define auxilium aliases."
+        echo "Syntax:"
+        echo "  $scriptname [<option>...]        # if $scriptname alias defined."
+        echo "  source $scriptname [<option>...] # if $scriptname alias not defined."
+        echo "Options:"
+        echo "  -y | --dyn     # define \"dynamic\" path following aliases."
+        echo "  -h | --help    # display help information."
+        echo "  -v | --version # display version information."
+    fi
+    # display version if requested
+    if [ "$versionflag" == "y" ]; then
+        echo "$version"
+        echo "Location: $thisfile"
+    fi
+    # keep going only if no help of version requested
+    if [[ "$helpflag" == "y" || "$versionflag" == "y" ]]; then
+        return 0
+    fi
+    # define aliases as requested
+    if [ "$dynflag" == "n" ]; then
+        # define simple hardcoded aliases
+        alias auxenv="source \"$thisdir\"/auxenv"
+        alias auxsource="source \"$thisdir\"/auxsource"
+        alias auxalias="source \"$thisdir\"/auxalias"
+    else
+        # define dynamic aliases which invoke source files in a path-like
+        # manner similar to executable files.
+        alias auxenv="eval source \$(auxwhere auxenv)"
+        alias auxsource="eval source \$(auxwhere auxsource)"
+        alias auxalias="eval source \$(auxwhere auxalias)"
+    fi
+    return 0
+}
+#
+# begin main program
+#
+auxalias_main $@
+if [ "$?" == "0" ]; then
+    unset auxalias_main
+    true  # final status
+else
+    unset auxalias_main
+    false # final status
+fi

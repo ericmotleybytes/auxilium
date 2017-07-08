@@ -1,0 +1,2 @@
+This is just a dummy file to test the ability to process files
+with spaces in their names.

@@ -41,14 +41,16 @@
 #
 function auxenv_version_func() {
     local scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
-    echo "$scriptname version 2.1 (2017-06-27)"
+    echo "$scriptname: version 2.1 (2017-06-27)"
+    local scriptspec=$(readlink -f "${BASH_SOURCE[0]}")
+    echo "Location: $scriptspec"
     return 0
 }
 function auxenv_help_func() {
     echo "Command:"
     echo "  $scriptname - A sourceable bash script to display/setup environment variables."
     echo "Syntax:"
-    echo "  $scriptname [<options>...] <command> <envname> [<parameter>...]"
+    echo "  $scriptname [<option>...] <command> <envname> [<parameter>...]"
     echo "  $scriptname -h | --help | -v | --version"
     echo "Options:"
     echo "  --unsetempty     # if final environment variable value is \"\", also unset it."

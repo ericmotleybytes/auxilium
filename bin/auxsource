@@ -26,16 +26,17 @@ function auxsource_main_func() {
         whereflag="y"
         shift
     fi
-    if [ -z "$1" -o "$1" == "--help" ]; then
+    if [ -z "$1" -o "$1" == "--help" -o "$1" == "-h" ]; then
         # display help
         echo "Command:"
         echo "  $scriptname [-w] <filename> [<param> ...] # source file where 1st found in AUXSOURCE_PATH."
         echo "  $scriptname [-w] <dir/spec> [<param> ...] # source the file in specified directory."
-        echo "  $scriptname --help                   # display help."
-        echo "  $scriptname --version                # display version."
+        echo "  $scriptname -h | --help                   # display help."
+        echo "  $scriptname -v | --version                # display version."
         return 0
-    elif [ "$1" == "--version" ]; then
-        echo "$scriptname version 2.1 (2017-06-27)"
+    elif [ "$1" == "--version" -o "$1" == "-v" ]; then
+        echo "$scriptname: version 2.1 (2017-06-27)"
+        echo "Location: $scriptspec"
         return 0
     else
         sourcefile="$1"

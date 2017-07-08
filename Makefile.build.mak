@@ -4,7 +4,8 @@
 PANDOCSTD=pandoc -s --from=markdown
 PANDOCMANTMP=$(PANDOCSTD) --to=man -M adjusting=l -M hyphenate=false -M section=1
 PANDOCMAN=$(PANDOCMANTMP) -M header="General Commands Manual" -M footer="General Commands Manual"
-PANDOCHTML=$(PANDOCSTD)	--to=html --self-contained
+PANDOCHTML=$(PANDOCSTD) --to=html --self-contained
+PANDOCHTMLMAN=$(PANDOCHTML) --toc -H doc/css/man.css
 
 .PHONY: helpbuild
 helpbuild:
@@ -74,8 +75,8 @@ doc/man/auxenv.ppo.md : doc/man/auxenv.ppi.md doc/include
 share/man/man1/auxenv.1 : doc/man/auxenv.ppo.md
 	$(PANDOCMAN) $< --output=$@ -M title=auxenv
 
-share/html/man/man1/auxenv.1.html : doc/man/auxenv.ppo.md
-	$(PANDOCHTML) $< --output=$@ -M title=auxenv --toc
+share/html/man/man1/auxenv.1.html : doc/man/auxenv.ppo.md doc/css/man.css
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="auxenv - manage path-like env vars"
 
 share/man/man1/auxsource.1 : man/auxsource.1.ronn
 	ronn < $< > $@

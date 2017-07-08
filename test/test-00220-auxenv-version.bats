@@ -12,8 +12,8 @@ load test_helper
                 saveline=$(echo "$line" | xargs)   # trim leading and trailing spaces
             fi
         done
-        [ "$linecnt" == "1" ]
-        [[ "$saveline" =~ ^auxenv\ version\ .*$ ]]
+        [[ $linecnt -ge 1 ]]
+        [[ "$saveline" =~ ^auxenv\:\ version\ .*$ ]]
     done
 }
 # all done

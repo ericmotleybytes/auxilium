@@ -52,12 +52,14 @@ lf=$'\x0a'   # ascii linefeed character
 cmdfile=$(readlink -f "$0")
 cmddir=$(dirname "$cmdfile")
 cmdname="${cmdfile##*/}"
-version="$cmdname version 1.0 (2017-07-06)"
+version="$cmdname: version 1.0 (2017-07-06)"
 versionflag="n"
 helpflag="n"
 debugflag="n"
 execflag="n"
 dashdash="n"
+allflag="n"
+howflag="n"
 sep=":"  # separator
 while [ $# -gt 0 ]; do
     param="$1"
@@ -74,6 +76,10 @@ while [ $# -gt 0 ]; do
         debugflag="y"
     elif [[ "$param" == "--exec"    || "$param" == "-x" ]]; then
         execflag="y"
+    elif [[ "$param" == "--all"     || "$param" == "-a" ]]; then
+        allflag="y"
+    elif [[ "$param" == "--how"     || "$param" == "-w" ]]; then
+        howflag="y"
     elif [[ "$param" == "-e"                            ]]; then
         envnames+=("$1")
         shift
@@ -101,6 +107,7 @@ done
 #
 if [ "$versionflag" == "y" ]; then
     echo "$version"
+    echo "Location: $cmdfile"
 fi
 #
 # show help if it was requested
@@ -119,6 +126,8 @@ if [ "$helpflag" == "y" ]; then
     echo "  -t <.filetype> | --type=<.filetype> # file type (repeatable)"
     echo "  -s | --subdir=<dir>      # append subdir to each path dir (repeatable)."
     echo "  -x | --exec      # only show execuatable files."
+    echo "  -a | --all       # show all matches, not just the first one."
+    echo "  -w | --how       # show how each match found (which env var)."
 #
 fi
 #
@@ -176,7 +185,15 @@ for filename in "${filenames[@]}"; do
                         put_debug "$testspec exists!"
                         # files exists
                         if [[ -x "$testspec" || "$execflag" == "n" ]]; then
-                            echo -e "${testspec}\t(Found via ${envname})"
+                            if [ "$howflag" == "y" ]; then
+                                echo -e "${testspec}\t(Found via ${envname})"
+                            else
+                                echo "${testspec}"
+                            fi
+                            # exit after one match unless "--all" mode
+                            if [ "$allflag" == "n" ]; then
+                                exit 0
+                            fi
                         fi
                     fi
                 done
