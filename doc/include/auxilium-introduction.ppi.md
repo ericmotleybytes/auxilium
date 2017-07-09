@@ -8,14 +8,14 @@ prerequisites other than bash version 4.2 or higher.
 The core auxilium utilities include:
 
 * **auxenv**.
-!include(auxenv-introduction.md)
+!include(auxenv-short.md)
 * **auxwhere**.
-!include(auxwhere-introduction.md)
+!include(auxwhere-short.md)
 * **auxsource**.
-!include(auxsource-introduction.md)
+!include(auxsource-short.md)
 * **auxalias**.
-!include(auxalias-introduction.md)
+!include(auxalias-short.md)
 * **auxchecktap**.
-!include(auxguid-introduction.md)
+!include(auxchecktap-short.md)
 * **auxguid**.
-!include(auxguid-introduction.md)
+!include(auxguid-short.md)

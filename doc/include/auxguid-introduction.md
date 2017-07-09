@@ -1,5 +1,5 @@
 An executable script.
-This script generates a pseudo random 128-but (32 hex character) GUID (Globally
+This script generates a pseudo random 128-bit (32 hex character) GUID (Globally
 Unique IDentifier) sometimes also known as a UUID (Universally Unique IDentifier).
 There are some standards for GUID/UUID generation, but none are universal and even the
 definition of GUID and UUID is under debate

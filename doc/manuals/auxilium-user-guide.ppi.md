@@ -16,9 +16,109 @@ see TBD.
 ## auxenv
 
 !include(../include/auxenv-title.md)
+
+### auxenv introduction
+
 !include(../include/auxenv-description.md)
+
+### auxenv usage
+
+!include(../include/auxenv-usage.md)
+
+### auxenv options
+
+!include(../include/auxenv-options.md)
+
+### auxenv commands
+
+!include(../include/auxenv-commands.md)
+
+### auxenv exit status
+
+!include(../include/auxenv-exitstat.md)
+
+### auxenv description
+
+!include(../include/auxenv-description.md)
+
+### auxenv examples
+
+!include(../include/auxenv-examples.md)
+
+### auxenv aliasing
+
+!include(../include/auxenv-aliasing.ppo.md)
+
+## auxwhere
+
+!include(../include/auxwhere-title.md)
+
+### auxwhere introduction
+
+!include(../include/auxwhere-description.md)
+
+### auxwhere usage
+
+!include(../include/auxwhere-usage.md)
+
+### auxwhere options
+
+!include(../include/auxwhere-options.md)
+
+### auxwhere exit status
+
+!include(../include/auxwhere-exitstat.md)
+
+### auxwhere description
+
+!include(../include/auxwhere-description.md)
+
+### auxwhere examples
+
+!include(../include/auxwhere-examples.md)
 
 ## auxsource
 
 !include(../include/auxsource-title.md)
+
+### auxsource introduction
+
 !include(../include/auxsource-description.md)
+
+### auxsource usage
+
+!include(../include/auxsource-usage.md)
+
+### auxsource options
+
+!include(../include/auxsource-options.md)
+
+### auxsource exit status
+
+!include(../include/auxsource-exitstat.md)
+
+### auxsource description
+
+!include(../include/auxsource-description.md)
+
+### auxsource examples
+
+!include(../include/auxsource-examples.md)
+
+### auxsource aliasing
+
+!include(../include/auxsource-aliasing.ppo.md)
+
+# Authors
+
+!include(../include/authors.md)
+
+# Legal
+
+## Copyright
+
+!include(../include/copyright.md)
+
+## Licensing
+
+!include(../include/license.md)
