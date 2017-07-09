@@ -14,14 +14,6 @@ code{
   white-space: pre;
   font-family: "Courier New", Courier, monospace;
   font-size: 1.25em;
-}
-pre{
   background-color: #F9F9F9;
-  border-style: solid;
-  border-width: 1px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 10px;
-  padding-right: 5px;
 }
 </style>

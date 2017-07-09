@@ -8,14 +8,14 @@ executable program. For example, consider the alias definition:
 
 Once this alias is defined, interactive users and other scripts can invoke (source)
 the !AUXCMD script simply by specifying "!AUXCMD" followed by any desired additional
-!AUXCMD parameters. (Assuming !AUXCMD was installin in /usr/local/bin.) If auxilium
+!AUXCMD parameters. (Assuming !AUXCMD was installed in /usr/local/bin.) If auxilium
 was installed system-wide by your system administrator it is quite likely this alias
 will already be defined for you (probably in the /etc/bashrc file). You can type "alias"
-to see a list of all currently defined aliases). If this alias is not defined, you
+to see a list of all currently defined aliases. If this alias is not defined, you
 can add the alias definition in your personal \$(HOME)/.bashrc file. Note that your
 aliases should be defined in \$(HOME)/.bashrc file, not \$(HOME)/.bash_profile.
 
-Sourceable scripts are needed if the *current* process environment is to be modified,
+Sourceable scripts are needed if the current process environment is to be modified,
 rather than a subprocess environment that executable programs always run in. Since
-!AUXCMD aims to modify the current process environment, it needs to be a sourceable
-script.
+!AUXCMD potentially needs to modify the current process environment, it needs to be
+a sourceable script.

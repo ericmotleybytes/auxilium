@@ -1,33 +1,26 @@
 ## NAME
 
-!include(../include/auxenv-title.md)
+!include(../include/auxwhere-title.md)
 
 ## SYNOPSIS
 
-!include(../include/auxenv-usage.md)
+!include(../include/auxwhere-usage.md)
 
 ## DESCRIPTION
 
-!include(../include/auxenv-description.md)
+!include(../include/auxwhere-description.md)
 
 ## OPTIONS
 
-!include(../include/auxenv-options.md)
-
-## COMMANDS
-
-!include(../include/auxenv-commands.md)
+!include(../include/auxwhere-options.md)
 
 ## EXIT STATUS
-!include(../include/auxenv-exitstat.md)
 
-## NOTES
-
-!include(../include/auxenv-aliasing.ppo.md)
+!include(../include/auxwhere-exitstat.md)
 
 ## EXAMPLES
 
-!include(../include/auxenv-examples.md)
+!include(../include/auxwhere-examples.md)
 
 ## PREREQUISITES
 

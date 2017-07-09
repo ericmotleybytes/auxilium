@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+echo "\$0=$0"
+cnt=$((0))
+for param in "$@"; do
+    cnt=$(($cnt+1))
+    echo "\$${cnt}=$param"
+done
+exit 0

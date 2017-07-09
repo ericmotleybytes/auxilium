@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ##############################################################################
 # Name:
-#   auxwhere - Find any type file in a path-like directory list.
+#   auxwhere - Find files via path-like environment variables
 #
 # Introduction:
 #   There are already a few "whereis" type programs, so it is sad to write
@@ -11,7 +11,7 @@
 #   of file using any environment variable as the list source.
 # 
 # Usage:
-#   auxwhere [options] <filename>
+#   auxwhere [options] <filename>...
 #
 # Options and Commands:
 #   See "help" display in code (or the man page).
@@ -29,7 +29,7 @@
 #   - auxilium - See https://github.com/ericmotleybytes/auxilium.
 #
 # Requirements:
-#   - bash version 4 or higher.
+#   - bash version 4.2 or higher.
 ##############################################################################
 #
 # define functions
@@ -45,6 +45,7 @@ function put_debug() {
 #
 declare -a filenames=()
 declare -a envnames=()
+declare -a envnames2=()
 declare -a subdirs=()
 declare -a filetypes=()
 ifsorg="$IFS"
@@ -95,6 +96,8 @@ while [ $# -gt 0 ]; do
         subdirs+=("${param:9}")
     elif [[ "$param" =~ ^--type=.+$ ]]; then
         filetypes+=("${param:7}")
+    elif [[ "$param" =~ ^--ifs=.+$ [[; then
+        sep="${param:6}"
     elif [[ "${param:0:1}" == "-" ]]; then
         echo "ERROR: bad command line option ($param)." >&2
         exit 1
@@ -120,15 +123,16 @@ if [ "$helpflag" == "y" ]; then
     echo "  $cmdname -h | --help     # display this help text."
     echo "  $cmdname -v | --version  # display program version information."
     echo "Options:"
-    echo "  -h | --help      # display this help screen."
-    echo "  -v | --version   # display program version information."
     echo "  -e <envname> | --env=<envname> # use a particular env var (repeatable)."
     echo "  -t <.filetype> | --type=<.filetype> # file type (repeatable)"
     echo "  -s | --subdir=<dir>      # append subdir to each path dir (repeatable)."
     echo "  -x | --exec      # only show execuatable files."
     echo "  -a | --all       # show all matches, not just the first one."
     echo "  -w | --how       # show how each match found (which env var)."
-#
+    echo "  --ifs="char"     # env var values separator character (default=":")."
+    echo "  --               # forces all following parameters to be considered filenames."
+    echo "  -h | --help      # display this help screen."
+    echo "  -v | --version   # display program version information."
 fi
 #
 # if --help or --version and no files specified, assume we are done.
@@ -143,10 +147,12 @@ if [[ ${#envnames[@]} -eq 0 ]]; then
     if [ ! -z "$PATH" ]; then
         envnames+=("PATH")
     fi
-    if [ ! -z "$AUXSOURCE_PATH" ]; then
-        envnames+=("AUXSOURCE_PATH")
-    fi
 fi
+#
+# define pseudo env vars for "./*" and "/*" cases.
+#
+dot="${PWD}"
+absolute="/"
 #
 # add default empty subdir if no subdirs specified
 #
@@ -165,10 +171,25 @@ put_debug "execflag='$execflag'."
 #
 for filename in "${filenames[@]}"; do
     put_debug "filename='$filename'."
+    if [ "$filename" == "." ]; then
+        filename="./"  # adjust
+        put_debug "filename='$filename' (adj)."
+    fi
     for filetype in "${filetypes[@]}"; do
         put_debug "filetype='$filetype'."
         filenametype="${filename}${filetype}"
-        for envname in "${envnames[@]}"; do
+        envnames2=()
+        if [ "${filename:0:2}" == "./" ]; then
+            # leading dot
+            envnames2=("dot")
+        elif [ "${filename:0:1}" == "/" ]; then
+            # absolute name
+            envnames2=("absolute")
+        else
+            # relative name
+            for x in "${envnames[@]}"; do envnames2+=("$x"); done
+        fi
+        for envname in "${envnames2[@]}"; do
             put_debug "envname='$envname'."
             IFS="$sep"
             for dir in ${!envname}; do
@@ -185,8 +206,20 @@ for filename in "${filenames[@]}"; do
                         put_debug "$testspec exists!"
                         # files exists
                         if [[ -x "$testspec" || "$execflag" == "n" ]]; then
+                            dispname="$envname"
+                            if [ "$envname" == "dot" ]; then
+                                testspec="${testspec//\/\.\///}"  # replace /./ with /
+                                dispname="leading dot '.'"
+                            elif [ "$envname" == "absolute" ]; then
+                                testspec="${testspec/\/\/\///}"   # replace /// with /
+                                dispname="leading slash '/'"
+                            fi
+                            if [ "${testspec: -1}" == "/" ]; then
+                                # check if ends with slash
+                                testspec="${testspec:0:-1}"
+                            fi
                             if [ "$howflag" == "y" ]; then
-                                echo -e "${testspec}\t(Found via ${envname})"
+                                echo -e "${testspec}\t(Found via ${dispname})"
                             else
                                 echo "${testspec}"
                             fi

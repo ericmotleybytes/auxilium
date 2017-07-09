@@ -1,114 +1,127 @@
-# auxsource - A "sourceable" bash script to source a file somewhere in AUXSOURCE_PATH.
+##############################################################################
+# Name:
+#   auxsource - Enhanced source capability
 #
-# Known limitations: Only up to 7 command line parameters can be passed to the sourced script.
+# Introduction:
+# auxsource is a sourceable bash script which extends the capabilities
+# of the built-in bash command "source". Its primary feature is that
+# if a relative file specification is specified (a filename with no
+# directory or a relative directory) then it will search through 
+# a path-list (using the PATH environment variable by default) and
+# source the first match found. This makes working with sourceable
+# scripts a little more like working with executable scripts or programs.
+#
+# auxsource uses the auxwhere executable script (also part of the auxilium
+# distribution) to find the exact file to be sourced. Command line parameters
+# on the auxsource command line cannot be passed to auxwhere because they
+# are reserved for use by whatever sourceable script is being invoked. However,
+# the "AUXSOURCE_OPTIONS" environment variable may be set to whatever auxwhere
+# options are desired. This allows full control over how sourceable files are
+# located.
+# 
+# Usage:
+#   auxsource <file> [<arg>...]
+#   auxsource -h | --help
+#   auxsource -v | --version
+#
+# Options and Commands:
+#   See "help" section in code (or the man page).
+#
+# Copyright:
+#   auxenv Copyright © 2017 Eric Alan Christiansen.
+#
+# Legal:
+#   This program comes with ABSOLUTELY NO WARRANTY.
+#   This is free software, and you are welcome to use and/or redistribute it
+#   under the conditions of the GNU General Public License v3.0.
+#   (See https://www.gnu.org/licenses/gpl-3.0.en.html)
+#
+# More Information:
+#   - auxilium - See https://github.com/ericmotleybytes/auxilium.
+#
+# Requirements:
+#   - bash version 4.2 or higher.
+##############################################################################
 #
 # define all logic in a function to isolate local variables
 #
+function aux_error() {
+    msg="$1"
+    echo "ERROR: ($scriptname) $msg" >&2
+    return 1
+}
 function auxsource_main_func() {
-    local scriptspec
-    local scriptname
-    local scriptdir
-    local sourcefile
-    local sourcefiledir
-    local sourcepath
-    local sourcedir
-    local sourcecand
-    local sourceparams
-    local sourcefound
-    local whereflag
-    local idx
-    local IFS
-    scriptspec=$(readlink -f "${BASH_SOURCE[0]}")  # full spec
-    scriptname=$(basename "$scriptspec")           # basename part
-    scriptdir=$(dirname "$scriptspec")             # dirpart
-    whereflag="n"
-    if [[ "$1" == "-w" || "$1" == "--where" ]]; then
-        whereflag="y"
-        shift
-    fi
-    if [ -z "$1" -o "$1" == "--help" -o "$1" == "-h" ]; then
-        # display help
-        echo "Command:"
-        echo "  $scriptname [-w] <filename> [<param> ...] # source file where 1st found in AUXSOURCE_PATH."
-        echo "  $scriptname [-w] <dir/spec> [<param> ...] # source the file in specified directory."
-        echo "  $scriptname -h | --help                   # display help."
-        echo "  $scriptname -v | --version                # display version."
-        return 0
-    elif [ "$1" == "--version" -o "$1" == "-v" ]; then
-        echo "$scriptname: version 2.1 (2017-06-27)"
-        echo "Location: $scriptspec"
-        return 0
-    else
-        sourcefile="$1"
-        shift
-        IFS=" "
-        #sourceparams="$@"
-        sourceparams=""
-        idx="0"
-        while [ "$#" != "0" ]; do
-            if [ ! -z "$sourceparams" ]; then sourceparams="$sourceparams "; fi
-            sourceparams="${sourceparams}\"$1\""
-            shift
-        done
-        sourcefiledir="${sourcefile%/*}"
-        if [ "$sourcefile" == "$sourcefiledir" ]; then sourcefiledir=""; fi
-        if [ -z "$sourcefiledir" ]; then
-            # no directory part in command line file parameter
-            if [ -z "$AUXSOURCE_PATH" ]; then
-                # auxsource env var not set
-                if [ -z "$PATH" ]; then
-                    # PATH not set
-                    sourcepath=$(readlink -f ".")
-                    sourcepath="$sourcepath:$scriptdir"
-                else
-                    # use PATH
-                    sourcepath="$PATH"
-                fi
-            else
-                # auxsource env var was set
-                sourcepath="$AUXSOURCE_PATH"
-            fi
-            sourcefound="n"
-            IFS=":"
-            for sourcedir in $sourcepath; do
-                sourcecand="$sourcedir/$sourcefile"
-                if [ -e "$sourcecand" ]; then
-                    sourcefound="y"
-                    if [ "$whereflag" == "y" ]; then
-                        echo "Found '$sourcecand'."
-                    else
-                        set -- # clear positional parameters
-                        eval source "$sourcecand" $sourceparams
-                    fi
-                    break;
-                fi
-            done
-            if [ "$sourcefound" == "n" ]; then
-                echo "ERROR: $scriptname could not locate $sourcefile." >&2
-                return 1
-            fi
-        else
-            # directory specified in sourcefile
-            sourcefile=$(readlink -f "$sourcefile")
-            if [ -e "$sourcefile" ]; then
-                if [ "$whereflag" == "y" ]; then
-                    echo "Found '$sourcecand'."
-                else
-                    set --   # clear old positional parameters
-                    eval source "$sourcefile" $sourceparams
-                fi
-            else
-                echo "ERROR: $scriptname could not locate $sourcefile." >&2
-                return 1
-            fi
+    local scriptspec=$(readlink -f "${BASH_SOURCE[0]}")  # full spec
+    local scriptname=$(basename "$scriptspec")           # basename part
+    local scriptdir=$(dirname "$scriptspec")             # dirpart
+    local version="${scriptname}: version 2.2 (2017-07-08)"
+    local param
+    local sourcefile=""
+    local sourceargs=()
+    # do help if appropriate
+    if [[ $# -le 1 ]]; then
+        if [[ "$#" == "0" || "$1" == "-h" || "$1" == "--help" ]]; then
+            echo "Command:"
+            echo "  $scriptname <filename> [<arg> ...] # source found file with specified args."
+            echo "  $scriptname -h | --help            # display help."
+            echo "  $scriptname -v | --version         # display version."
+            echo ""
+            echo "Note: The AUXSOURCE_OPTIONS environment variable may be used to control"
+            echo "      the embedded auxwhere invocation."
+            return 0
         fi
     fi
-    return 0
+    # do version if appropriate
+    if [[ $# -eq 1 ]]; then
+        if [[ "$1" == "-v" || "$1" == "--version" ]]; then
+            echo "$version"
+            echo "Location: $scriptspec"
+            return 0
+        fi
+    fi
+    # shift away "--" if found
+    if [[ "$1" == "--" ]]; then
+        shift
+    fi
+    # parse the sourcing stuff
+    for param in "$@"; do
+        if [[ -z "$sourcefile" ]]; then
+            sourcefile="$param"
+        else
+           sourceargs+=("$param")
+        fi
+    done
+    if [[ -z "$sourcefile" ]]; then
+        aux_error "No source file specified."
+        return 1
+    fi
+    # invoke auxwhere to find sourcefile
+    local whereparams=""
+    if [ -z "$AUXSOURCE_OPTIONS" ]; then
+        whereparams="\"$sourcefile\""
+    else
+        whereparams="$AUXSOURCE_OPTIONS \"$sourcefile\""
+    fi
+    local sourcespec=""
+    eval set -- $(echo "$whereparams")
+    sourcespec=$(source "$scriptdir/auxwhere")
+    if [ -z "$sourcespec" ]; then
+        aux_error "File not found ($sourcefile)."
+        return 1
+    fi
+    # source the sourcefile
+    local args=""
+    for arg in "${sourceargs[@]}"; do
+        args="$args \"$arg\""
+    done
+    eval set -- $(echo "$args")
+    source "$sourcespec"
+    return $?
 }
 #
 # Now invoke the main function
 #
-auxsource_main_func $@
+auxsource_main_func "$@"
 if [ "$?" == "0" ]; then
     unset auxsource_main_func
     true  # final status

@@ -34,7 +34,7 @@
 #   - auxilium - See https://github.com/ericmotleybytes/auxilium.
 #
 # Requirements:
-#   - bash version 4 or higher.
+#   - bash version 4.2 or higher.
 ##############################################################################
 #
 # define all logic in functions to isolate local variables
@@ -681,7 +681,7 @@ function auxenv_main_func() {
 #
 # Now invoke the main function
 #
-auxenv_main_func $@
+auxenv_main_func "$@"
 if [ "$?" == "0" ]; then
     unset auxenv_version_func
     unset auxenv_help_func

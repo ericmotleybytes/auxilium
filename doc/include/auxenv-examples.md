@@ -46,7 +46,7 @@ Here are some examples of using auxenv.
 * Working with alternate separators:
 
         $ export DEMOPATH="red|green|blue"
-        $ auxenv show DEMOPATH
+        $ auxenv --ifs="|" show DEMOPATH
         DEMOPATH is set to:
         red|green|blue
         Item breakdown:

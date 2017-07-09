@@ -54,3 +54,13 @@ Files in this directory include:
     variables. Amongst other thing, this script reruns /etrc/bashrc, ~/.bashrc,
     and ~/.bash_profile. This normally restores things to a sensible default,
     but it is not fail proof.
+
+  ./paramdump-executable
+    This is an executable bash script that simply dumps all the current values
+    of $0, $1, $2, and so forth (as far as they are set). It is used by some
+    test scripts to facilitate testing.
+
+  ./paramdump-sourceable
+    This is a sourceable bash script that simply dumps all the current values
+    of $0, $1, $2, and so forth (as far as they are set). It is used by some
+    test scripts to facilitate testing.

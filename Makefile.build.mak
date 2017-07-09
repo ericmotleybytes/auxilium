@@ -2,10 +2,19 @@
 # This file designed to be included by Makefile.
 ###
 PANDOCSTD=pandoc -s --from=markdown
-PANDOCMANTMP=$(PANDOCSTD) --to=man -M adjusting=l -M hyphenate=false -M section=1
-PANDOCMAN=$(PANDOCMANTMP) -M header="General Commands Manual" -M footer="General Commands Manual"
+PANDOCMAN1=$(PANDOCSTD) --to=man -M adjusting=l -M hyphenate=false -M section=1
+PANDOCMAN=$(PANDOCMAN1) -M header="General Commands Manual" -M footer="General Commands Manual"
 PANDOCHTML=$(PANDOCSTD) --to=html --self-contained
 PANDOCHTMLMAN=$(PANDOCHTML) --toc -H doc/css/man.css
+PANDOCHTMLMANUAL=$(PANDOCHTML) --toc -H doc/css/manual.css
+PANDOCPDF1=$(PANDOCSTD) --to=latex -M papersize=letter -M colorlinks
+PANDOCPDF2=$(PANDOCPDF1) -M margin-left=1in -M margin-right=1in
+PANDOCPDF=$(PANDOCPDF2) -M margin-top=1in -M margin-bottom=1in
+PANDOCPDFMANUAL=$(PANDOCPDF2) --toc -M toc-depth=3 
+AUXENV_TITLE=`head -1 doc/include/auxenv-title.md`
+AUXSOURCE_TITLE=`head -1 doc/include/auxsource-title.md`
+AUXWHERE_TITLE=`head -1 doc/include/auxwhere-title.md`
+AUXILIUM_UG_TITLE=`head -1 doc/include/auxilium-user-guide-title.md`
 
 .PHONY: helpbuild
 helpbuild:
@@ -36,18 +45,24 @@ build: docs
 .PHONY: docs
 docs: doc/README.md doc/README.txt \
   doc/include/auxenv-aliasing.ppo.md \
+  doc/include/auxsource-aliasing.ppo.md \
   share/man/man1 \
     share/man/man1/auxenv.1 \
     share/man/man1/auxsource.1 \
+    share/man/man1/auxwhere.1 \
     share/man/man1/auxalias.1 \
     share/man/man1/auxchecktap.1 \
     share/man/man1/auxguid.1 \
   share/html/man/man1 \
     share/html/man/man1/auxenv.1.html \
     share/html/man/man1/auxsource.1.html \
+    share/html/man/man1/auxwhere.1.html \
     share/html/man/man1/auxalias.1.html \
     share/html/man/man1/auxchecktap.1.html \
     share/html/man/man1/auxguid.1.html \
+  share/html/manuals \
+    share/html/manuals/auxilium-user-guide.html \
+    share/html/manuals/auxilium-user-guide.pdf \
   share/html/auxilium.README.md.html
 
 doc/README.md : doc/README.mdpp \
@@ -63,6 +78,9 @@ doc/README.md : doc/README.mdpp \
 doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 	pp -D AUXCMD=auxenv $< > $@
 
+doc/include/auxsource-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
+	pp -D AUXCMD=auxsource $< > $@
+
 share/man/man1 :
 	mkdir -p $@
 
@@ -76,13 +94,25 @@ share/man/man1/auxenv.1 : doc/man/auxenv.ppo.md
 	$(PANDOCMAN) $< --output=$@ -M title=auxenv
 
 share/html/man/man1/auxenv.1.html : doc/man/auxenv.ppo.md doc/css/man.css
-	$(PANDOCHTMLMAN) $< --output=$@ -M title="auxenv - manage path-like env vars"
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXENV_TITLE)"
 
-share/man/man1/auxsource.1 : man/auxsource.1.ronn
-	ronn < $< > $@
+doc/man/auxsource.ppo.md : doc/man/auxsource.ppi.md doc/include
+	pp $< > $@
 
-share/html/man/man1/auxsource.1.html : man/auxsource.1.ronn
-	ronn --html < $< > $@
+share/man/man1/auxsource.1 : doc/man/auxsource.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxenv
+
+share/html/man/man1/auxsource.1.html : doc/man/auxsource.ppo.md doc/css/man.css
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXSOURCE_TITLE)"
+
+doc/man/auxwhere.ppo.md : doc/man/auxwhere.ppi.md doc/include
+	pp $< > $@
+
+share/man/man1/auxwhere.1 : doc/man/auxwhere.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxwhere
+
+share/html/man/man1/auxwhere.1.html : doc/man/auxwhere.ppo.md doc/css/man.css
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXWHERE_TITLE)"
 
 share/man/man1/auxalias.1 : man/auxalias.1.ronn
 	ronn < $< > $@
@@ -102,6 +132,19 @@ share/man/man1/auxguid.1 : man/auxguid.1.ronn
 share/html/man/man1/auxguid.1.html : man/auxguid.1.ronn
 	ronn --html < $< > $@
 
+share/html/manuals :
+	mkdir -p $@
+
+doc/manuals/auxilium-user-guide.ppo.md : doc/manuals/auxilium-user-guide.ppi.md doc/include
+	pp $< > $@
+
+share/html/manuals/auxilium-user-guide.html : doc/manuals/auxilium-user-guide.ppo.md \
+  doc/css/manual.css
+	$(PANDOCHTMLMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)"
+
+share/html/manuals/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.ppo.md
+	$(PANDOCPDFMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)"
+
 share/html/auxilium.README.md.html : README.md
 	grip $< --export $@
 
@@ -110,10 +153,14 @@ share/html/auxilium.README.md.html : README.md
 .PHONY: cleandocs
 cleandocs:
 	rm -f doc/man/auxenv.ppo.md
+	rm -f doc/man/auxsource.ppo.md
+	rm -f doc/man/auxwhere.ppo.md
 	rm -f share/man/man1/auxenv.1
 	rm -f share/html/man/man1/auxenv.1.html
 	rm -f share/man/man1/auxsource.1
 	rm -f share/html/man/man1/auxsource.1.html
+	rm -f share/man/man1/auxwhere.1
+	rm -f share/html/man/man1/auxwhere.1.html
 	rm -f share/man/man1/auxalias.1
 	rm -f share/html/man/man1/auxalias.1.html
 	rm -f share/man/man1/auxchecktap.1
