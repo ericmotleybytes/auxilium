@@ -1,15 +1,16 @@
-# Introduction to Auxilium
+# Introduction to auxilium
 
 !include(../include/auxilium-introduction.ppi.md)
 
-# Installation of auxilium
+# Installation of auxilium run-time distribution
 
 TBD
 
-This section describes the run-time auxilium installation, which is appropriate for end-users
-who just want to use auxilium utilities, not modify them. For information on how
-to install a development installation and contribute changes to this open source project
-see TBD.
+This section describes the run-time auxilium installation, which is
+appropriate for end-users
+who just want to use auxilium utilities, not modify them. For information
+on how to install a development installation and contribute changes to
+this open source project see TBD.
 
 # Utilities
 
