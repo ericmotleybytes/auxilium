@@ -68,16 +68,6 @@ docs: doc/README.md doc/README.txt \
     share/html/manuals/auxilium-user-guide.pdf \
   share/html/auxilium.README.md.html
 
-doc/README.md : doc/README.mdpp \
-  doc/auxilium-general.mdpp \
-  doc/install.mdpp doc \
-  doc/install-runtime.mdpp \
-  doc/install-sources.mdpp
-	cd doc ; markdown-pp README.mdpp -o README.md
-
-#doc/README.txt : doc/README.md
-#	pandoc --from=markdown_github --to=plain --output="$@" "$<"
-
 doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 	pp -D AUXCMD=auxenv $< > $@
 

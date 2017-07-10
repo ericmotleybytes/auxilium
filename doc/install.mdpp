@@ -1,4 +1,0 @@
-# Installation
-
-!INCLUDE "install-runtime.mdpp",1
-!INCLUDE "install-sources.mdpp",1
