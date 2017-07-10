@@ -7,6 +7,7 @@ PANDOCMAN=$(PANDOCMAN1) -M header="General Commands Manual" -M footer="General C
 PANDOCHTML=$(PANDOCSTD) --to=html --self-contained
 PANDOCHTMLMAN=$(PANDOCHTML) --toc -H doc/css/man.css
 PANDOCHTMLMANUAL=$(PANDOCHTML) --toc -H doc/css/manual.css
+PANDOCHTMLINFO=$(PANDOCHTML) --toc -H doc/css/info.css
 PANDOCPDF1=$(PANDOCSTD) --to=latex -M papersize=letter -M colorlinks
 PANDOCPDF2=$(PANDOCPDF1) -M margin-left=1in -M margin-right=1in
 PANDOCPDF=$(PANDOCPDF2) -M margin-top=1in -M margin-bottom=1in
@@ -18,6 +19,7 @@ AUXALIAS_TITLE=`head -1 doc/include/auxalias-title.md`
 AUXCHECKTAP_TITLE=`head -1 doc/include/auxchecktap-title.md`
 AUXGUID_TITLE=`head -1 doc/include/auxguid-title.md`
 AUXILIUM_UG_TITLE=`head -1 doc/include/auxilium-user-guide-title.md`
+AUXILIUM_INFO_TITLE=`head -1 doc/include/auxilium-info-page-title.md`
 
 .PHONY: helpbuild
 helpbuild:
@@ -66,7 +68,8 @@ docs: doc/include/auxenv-aliasing.ppo.md \
   share/html/auxilium \
     share/html/auxilium/index.html \
     share/html/auxilium/auxilium-user-guide.html \
-    share/html/auxilium/auxilium-user-guide.pdf
+    share/html/auxilium/auxilium-user-guide.pdf \
+  docs/index.html
 
 doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 	pp -D AUXCMD=auxenv $< > $@
@@ -157,6 +160,12 @@ share/html/auxilium/auxilium-user-guide.html : \
 share/html/auxilium/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.ppo.md
 	$(PANDOCPDFMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)"
 
+doc/docs/index.ppo.md : doc/docs/index.ppi.md
+	pp $< > $@
+
+docs/index.html : doc/docs/index.ppo.md doc/css/info.css
+	$(PANDOCHTMLINFO) $< --output=$@ -M title="$(AUXILIUM_INFO_TITLE)"
+
 #### Cleaning built stuff ####
 
 .PHONY: cleandocs
@@ -183,6 +192,7 @@ cleandocs:
 	rm -f share/html/auxilium/index.html
 	rm -f share/html/auxilium/auxilium-user-guide.html
 	rm -f share/html/auxilium/auxilium-user-guide.pdf
+	rm -f doc/docs/index.ppo.md
 
 #### Aggregate stuff ####
 
