@@ -1,4 +1,4 @@
-*Auxilium* is the latin word for *support". The "auxilium" package is an open-source
+*Auxilium* is the latin word for *support*. The "auxilium" package is an open-source
 project which contains a collection of bash shell executable and sourceable scripts which
 support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are
 written in *bash", the standard Linux interpretive shell language. This facilitates

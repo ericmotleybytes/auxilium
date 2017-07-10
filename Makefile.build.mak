@@ -15,6 +15,7 @@ AUXENV_TITLE=`head -1 doc/include/auxenv-title.md`
 AUXSOURCE_TITLE=`head -1 doc/include/auxsource-title.md`
 AUXWHERE_TITLE=`head -1 doc/include/auxwhere-title.md`
 AUXALIAS_TITLE=`head -1 doc/include/auxalias-title.md`
+AUXCHECKTAP_TITLE=`head -1 doc/include/auxchecktap-title.md`
 AUXILIUM_UG_TITLE=`head -1 doc/include/auxilium-user-guide-title.md`
 
 .PHONY: helpbuild
@@ -128,11 +129,14 @@ share/man/man1/auxalias.1 : doc/man/auxalias.ppo.md
 share/html/man/man1/auxalias.1.html : doc/man/auxalias.ppo.md doc/css/man.css
 	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXALIAS_TITLE)"
 
-share/man/man1/auxchecktap.1 : man/auxchecktap.1.ronn
-	ronn < $< > $@
+doc/man/auxchecktap.ppo.md : doc/man/auxchecktap.ppi.md doc/include
+	pp $< > $@
 
-share/html/man/man1/auxchecktap.1.html : man/auxchecktap.1.ronn
-	ronn --html < $< > $@
+share/man/man1/auxchecktap.1 : doc/man/auxchecktap.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxchecktap
+
+share/html/man/man1/auxchecktap.1.html : doc/man/auxchecktap.ppo.md doc/css/man.css
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXCHECKTAP_TITLE)"
 
 share/man/man1/auxguid.1 : man/auxguid.1.ronn
 	ronn < $< > $@
@@ -164,6 +168,7 @@ cleandocs:
 	rm -f doc/man/auxsource.ppo.md
 	rm -f doc/man/auxwhere.ppo.md
 	rm -f doc/man/auxalias.ppo.md
+	rm -f doc/man/auxchecktap.ppo.md
 	rm -f share/man/man1/auxenv.1
 	rm -f share/html/man/man1/auxenv.1.html
 	rm -f share/man/man1/auxsource.1

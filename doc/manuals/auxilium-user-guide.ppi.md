@@ -19,7 +19,7 @@ see TBD.
 
 ### auxenv introduction
 
-!include(../include/auxenv-description.md)
+!include(../include/auxenv-introduction.md)
 
 ### auxenv usage
 
@@ -55,7 +55,7 @@ see TBD.
 
 ### auxwhere introduction
 
-!include(../include/auxwhere-description.md)
+!include(../include/auxwhere-introduction.md)
 
 ### auxwhere usage
 
@@ -83,7 +83,7 @@ see TBD.
 
 ### auxsource introduction
 
-!include(../include/auxsource-description.md)
+!include(../include/auxsource-introduction.md)
 
 ### auxsource usage
 
@@ -115,7 +115,7 @@ see TBD.
 
 ### auxalias introduction
 
-!include(../include/auxalias-description.md)
+!include(../include/auxalias-introduction.md)
 
 ### auxalias usage
 
@@ -140,6 +140,34 @@ see TBD.
 ### auxalias notes
 
 !include(../include/auxalias-aliasing.ppo.md)
+
+## auxchecktap
+
+!include(../include/auxchecktap-title.md)
+
+### auxchecktap introduction
+
+!include(../include/auxchecktap-introduction.md)
+
+### auxchecktap usage
+
+!include(../include/auxchecktap-usage.md)
+
+### auxchecktap options
+
+!include(../include/auxchecktap-options.md)
+
+### auxchecktap exit status
+
+!include(../include/auxchecktap-exitstat.md)
+
+### auxchecktap description
+
+!include(../include/auxchecktap-description.md)
+
+### auxchecktap examples
+
+!include(../include/auxchecktap-examples.md)
 
 # Authors
 
