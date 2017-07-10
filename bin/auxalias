@@ -13,7 +13,8 @@
 #   for all auxilium sourceable scripts.
 # 
 # Usage:
-#   source [<dir>/]auxalias [<option>...]
+#   source <dir>/auxalias [<option>...] # if no alias yet
+#   auxalias [<option>...]  # iff alias already defined
 #
 # Options:
 #   -h | --help     # display help information.
@@ -23,7 +24,7 @@
 # Notes:
 #   The auxalias script only defines aliases for auxilium sourcable scripts,
 #   such as auxenv, auxsource, and auxalias. The auxilium executable programs,
-#   such as auxwhere, auxchecktao, and auxguid do not need aliases.
+#   such as auxwhere, auxchecktap, and auxguid do not need aliases.
 #
 # Copyright:
 #   auxalias Copyright © 2017 Eric Alan Christiansen.

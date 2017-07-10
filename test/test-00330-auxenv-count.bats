@@ -1,9 +1,10 @@
 #!/usr/bin/env bats
 load test_helper
 @test "check auxenv count" {
-    export MYTEST="/usr/local/bin:/usr/bin"
+    spacedir=$(readlink -f "fake/dir with spaces")
+    export MYTEST="/usr/local/bin:/usr/bin:$spacedir"
     stuff=`source ../bin/auxenv count MYTEST`
-    [ "$stuff" == "2" ]
+    [ "$stuff" == "3" ]
 }
 @test "check auxenv count empty" {
     export MYTEST=""

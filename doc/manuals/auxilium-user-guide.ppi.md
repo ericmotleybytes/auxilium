@@ -45,7 +45,7 @@ see TBD.
 
 !include(../include/auxenv-examples.md)
 
-### auxenv aliasing
+### auxenv notes
 
 !include(../include/auxenv-aliasing.ppo.md)
 
@@ -105,9 +105,41 @@ see TBD.
 
 !include(../include/auxsource-examples.md)
 
-### auxsource aliasing
+### auxsource notes
 
 !include(../include/auxsource-aliasing.ppo.md)
+
+## auxalias
+
+!include(../include/auxalias-title.md)
+
+### auxalias introduction
+
+!include(../include/auxalias-description.md)
+
+### auxalias usage
+
+!include(../include/auxalias-usage.md)
+
+### auxalias options
+
+!include(../include/auxalias-options.md)
+
+### auxalias exit status
+
+!include(../include/auxalias-exitstat.md)
+
+### auxalias description
+
+!include(../include/auxalias-description.md)
+
+### auxalias examples
+
+!include(../include/auxalias-examples.md)
+
+### auxalias notes
+
+!include(../include/auxalias-aliasing.ppo.md)
 
 # Authors
 

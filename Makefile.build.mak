@@ -14,6 +14,7 @@ PANDOCPDFMANUAL=$(PANDOCPDF2) --toc -M toc-depth=3
 AUXENV_TITLE=`head -1 doc/include/auxenv-title.md`
 AUXSOURCE_TITLE=`head -1 doc/include/auxsource-title.md`
 AUXWHERE_TITLE=`head -1 doc/include/auxwhere-title.md`
+AUXALIAS_TITLE=`head -1 doc/include/auxalias-title.md`
 AUXILIUM_UG_TITLE=`head -1 doc/include/auxilium-user-guide-title.md`
 
 .PHONY: helpbuild
@@ -46,6 +47,7 @@ build: docs
 docs: doc/README.md doc/README.txt \
   doc/include/auxenv-aliasing.ppo.md \
   doc/include/auxsource-aliasing.ppo.md \
+  doc/include/auxalias-aliasing.ppo.md \
   share/man/man1 \
     share/man/man1/auxenv.1 \
     share/man/man1/auxsource.1 \
@@ -81,6 +83,9 @@ doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 doc/include/auxsource-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 	pp -D AUXCMD=auxsource $< > $@
 
+doc/include/auxalias-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
+	pp -D AUXCMD=auxalias $< > $@
+
 share/man/man1 :
 	mkdir -p $@
 
@@ -114,11 +119,14 @@ share/man/man1/auxwhere.1 : doc/man/auxwhere.ppo.md
 share/html/man/man1/auxwhere.1.html : doc/man/auxwhere.ppo.md doc/css/man.css
 	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXWHERE_TITLE)"
 
-share/man/man1/auxalias.1 : man/auxalias.1.ronn
-	ronn < $< > $@
+doc/man/auxalias.ppo.md : doc/man/auxalias.ppi.md doc/include
+	pp $< > $@
 
-share/html/man/man1/auxalias.1.html : man/auxalias.1.ronn
-	ronn --html < $< > $@
+share/man/man1/auxalias.1 : doc/man/auxalias.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxenv
+
+share/html/man/man1/auxalias.1.html : doc/man/auxalias.ppo.md doc/css/man.css
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXALIAS_TITLE)"
 
 share/man/man1/auxchecktap.1 : man/auxchecktap.1.ronn
 	ronn < $< > $@
@@ -155,6 +163,7 @@ cleandocs:
 	rm -f doc/man/auxenv.ppo.md
 	rm -f doc/man/auxsource.ppo.md
 	rm -f doc/man/auxwhere.ppo.md
+	rm -f doc/man/auxalias.ppo.md
 	rm -f share/man/man1/auxenv.1
 	rm -f share/html/man/man1/auxenv.1.html
 	rm -f share/man/man1/auxsource.1

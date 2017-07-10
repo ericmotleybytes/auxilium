@@ -1,31 +1,35 @@
 #!/usr/bin/env bats
 load test_helper
 @test "check auxenv insert before dir" {
-    export MYTEST="/usr/local/bin:/usr/bin:/dummy/bin"
+    spacedir=$(readlink -f "fake/dir with spaces")
+    export MYTEST="/usr/local/bin:/usr/bin:$spacedir:/dummy/bin"
     IFS=":"
     arr=();
-    for part in $MYTEST; do arr+=("$part"); done
-    [ "${#arr[*]}" == "3" ]
-    [ "${arr[0]}" == "/usr/local/bin" ]
-    [ "${arr[1]}" == "/usr/bin" ]
-    [ "${arr[2]}" == "/dummy/bin" ]
-    arr=();
-    source ../bin/auxenv insert MYTEST /root/one before /dummy/bin
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "4" ]
     [ "${arr[0]}" == "/usr/local/bin" ]
     [ "${arr[1]}" == "/usr/bin" ]
-    [ "${arr[2]}" == "/root/one" ]
+    [ "${arr[2]}" == "$spacedir" ]
     [ "${arr[3]}" == "/dummy/bin" ]
     arr=();
-    source ../bin/auxenv insert MYTEST /root/two before /dummy/notthere
+    source ../bin/auxenv insert MYTEST /root/one before "$spacedir"
     for part in $MYTEST; do arr+=("$part"); done
     [ "${#arr[*]}" == "5" ]
     [ "${arr[0]}" == "/usr/local/bin" ]
     [ "${arr[1]}" == "/usr/bin" ]
     [ "${arr[2]}" == "/root/one" ]
-    [ "${arr[3]}" == "/dummy/bin" ]
-    [ "${arr[4]}" == "/root/two" ]
+    [ "${arr[3]}" == "$spacedir" ]
+    [ "${arr[4]}" == "/dummy/bin" ]
+    arr=();
+    source ../bin/auxenv insert MYTEST /root/two before /dummy/notthere
+    for part in $MYTEST; do arr+=("$part"); done
+    [ "${#arr[*]}" == "6" ]
+    [ "${arr[0]}" == "/usr/local/bin" ]
+    [ "${arr[1]}" == "/usr/bin" ]
+    [ "${arr[2]}" == "/root/one" ]
+    [ "${arr[3]}" == "$spacedir" ]
+    [ "${arr[4]}" == "/dummy/bin" ]
+    [ "${arr[5]}" == "/root/two" ]
     arr=();
     export MYTEST=""
     source ../bin/auxenv insert MYTEST /root/three before /dummy/notthere
