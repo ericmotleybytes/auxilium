@@ -2,7 +2,7 @@
 
 !include(../include/auxilium-introduction.ppi.md)
 
-# Installion of auxilium
+# Installation of auxilium
 
 TBD
 

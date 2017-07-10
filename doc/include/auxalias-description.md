@@ -9,3 +9,5 @@ scripts.
 The auxalias script only defines aliases for auxilium sourcable scripts.
 The auxilium executable programs, such as auxwhere, auxchecktap, and
 auxguid do not need aliases.
+
+auxalias is part of the auxilium installation package.

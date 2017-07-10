@@ -5,3 +5,5 @@ also called a UUID (Universally Unique IDentifier) using nothing by bash.
 
 Optionally, if the "--uuidgen" option is specified and if the optional Linux program
 "uuidgen" is installed then that program is used to generate the GUID/UUID.
+
+auxguid is part of the auxilium installation package.

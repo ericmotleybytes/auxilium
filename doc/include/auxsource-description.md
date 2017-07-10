@@ -13,3 +13,5 @@ are reserved for use by whatever sourceable script is being invoked. However,
 the "AUXSOURCE_OPTIONS" environment variable may be set to whatever auxwhere
 options are desired. This allows full control over how sourceable files are
 located.
+
+auxsource is part of the auxilium installation package.

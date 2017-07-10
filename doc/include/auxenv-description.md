@@ -7,3 +7,5 @@ system administrators and end-users to create more robust and flexible
 login initialization scripts. Auxenv is also very useful to anyone who
 needs to switch back and forth between different versions of a
 programming language, enhancing or replacing the Linux "scl" utility.
+
+auxenv is part of the auxilium installation package.

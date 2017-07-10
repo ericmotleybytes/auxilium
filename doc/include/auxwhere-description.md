@@ -5,3 +5,5 @@ Permutations of sub-directories and file types can also be specified.
 By default, only the file specification of the first match is output, but
 if optionally requested, then all matches can be output, one file specification per line.
 If no matching files are found, then nothing is output.
+
+auxwhere is part of the auxilium installation package.
