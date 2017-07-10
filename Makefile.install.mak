@@ -35,6 +35,10 @@ install : installinfo \
   $(PREFIX)/share/html/man/man1/auxalias.1.html \
   $(PREFIX)/share/html/man/man1/auxchecktap.1.html \
   $(PREFIX)/share/html/man/man1/auxguid.1.html \
+  $(PREFIX)/share/html/auxilium \
+  $(PREFIX)/share/html/auxilium/index.html \
+  $(PREFIX)/share/html/auxilium/auxilium-user-guide.html \
+  $(PREFIX)/share/html/auxilium/auxilium-user-guide.pdf \
   installinfo2
 
 .PHONY: installinfo
@@ -150,6 +154,25 @@ $(PREFIX)/share/html/man/man1/auxguid.1.html: share/html/man/man1/auxguid.1.html
 	cp -a "$<" "$@"
 	chmod $(SRCMODE) "$@"
 
+$(PREFIX)/share/html/auxilium :
+	mkdir "$@"
+	chmod $(DIRMODE) "$@"
+
+$(PREFIX)/share/html/auxilium/index.html : \
+  share/html/auxilium/index.html
+	cp -a "$<" "$@"
+	chmod $(SRCMODE) "$@"
+
+$(PREFIX)/share/html/auxilium/auxilium-user-guide.html : \
+  share/html/auxilium/auxilium-user-guide.html
+	cp -a "$<" "$@"
+	chmod $(SRCMODE) "$@"
+
+$(PREFIX)/share/html/auxilium/auxilium-user-guide.pdf : \
+  share/html/auxilium/auxilium-user-guide.pdf
+	cp -a "$<" "$@"
+	chmod $(SRCMODE) "$@"
+
 #### uninstall stuff ####
 
 .PHONY: sysuninstall
@@ -177,3 +200,6 @@ uninstall:
 	rm -f $(PREFIX)/share/html/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/html/man/man1/auxchecktap.1
 	rm -f $(PREFIX)/share/html/man/man1/auxguid.1
+	rm -f $(PREFIX)/share/html/auxilium/index.html
+	rm -f $(PREFIX)/share/html/auxilium/auxilium-user-guide.html
+	rm -f $(PREFIX)/share/html/auxilium/auxilium-user-guide.pdf

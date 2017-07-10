@@ -63,9 +63,10 @@ docs: doc/include/auxenv-aliasing.ppo.md \
     share/html/man/man1/auxalias.1.html \
     share/html/man/man1/auxchecktap.1.html \
     share/html/man/man1/auxguid.1.html \
-  share/html/manuals \
-    share/html/manuals/auxilium-user-guide.html \
-    share/html/manuals/auxilium-user-guide.pdf
+  share/html/auxilium \
+    share/html/auxilium/index.html \
+    share/html/auxilium/auxilium-user-guide.html \
+    share/html/auxilium/auxilium-user-guide.pdf
 
 doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 	pp -D AUXCMD=auxenv $< > $@
@@ -136,17 +137,24 @@ share/man/man1/auxguid.1 : doc/man/auxguid.ppo.md
 share/html/man/man1/auxguid.1.html : doc/man/auxguid.ppo.md doc/css/man.css
 	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXGUID_TITLE)"
 
-share/html/manuals :
+share/html/auxilium :
 	mkdir -p $@
+
+doc/html/index.ppo.md : doc/html/index.ppi.md
+	pp $< > $@
+
+share/html/auxilium/index.html : doc/html/index.ppo.md doc/css/man.css
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="auxilium documentation"
 
 doc/manuals/auxilium-user-guide.ppo.md : doc/manuals/auxilium-user-guide.ppi.md doc/include
 	pp $< > $@
 
-share/html/manuals/auxilium-user-guide.html : doc/manuals/auxilium-user-guide.ppo.md \
+share/html/auxilium/auxilium-user-guide.html : \
+  doc/manuals/auxilium-user-guide.ppo.md \
   doc/css/manual.css
 	$(PANDOCHTMLMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)"
 
-share/html/manuals/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.ppo.md
+share/html/auxilium/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.ppo.md
 	$(PANDOCPDFMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)"
 
 #### Cleaning built stuff ####
@@ -171,6 +179,10 @@ cleandocs:
 	rm -f share/html/man/man1/auxchecktap.1.html
 	rm -f share/man/man1/auxguid.1
 	rm -f share/html/man/man1/auxguid.1.html
+	rm -f doc/html/index.ppo.md
+	rm -f share/html/auxilium/index.html
+	rm -f share/html/auxilium/auxilium-user-guide.html
+	rm -f share/html/auxilium/auxilium-user-guide.pdf
 
 #### Aggregate stuff ####
 
