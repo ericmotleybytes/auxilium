@@ -16,6 +16,7 @@ AUXSOURCE_TITLE=`head -1 doc/include/auxsource-title.md`
 AUXWHERE_TITLE=`head -1 doc/include/auxwhere-title.md`
 AUXALIAS_TITLE=`head -1 doc/include/auxalias-title.md`
 AUXCHECKTAP_TITLE=`head -1 doc/include/auxchecktap-title.md`
+AUXGUID_TITLE=`head -1 doc/include/auxguid-title.md`
 AUXILIUM_UG_TITLE=`head -1 doc/include/auxilium-user-guide-title.md`
 
 .PHONY: helpbuild
@@ -45,8 +46,7 @@ build: docs
 	@echo "[build complete]"
 
 .PHONY: docs
-docs: doc/README.md doc/README.txt \
-  doc/include/auxenv-aliasing.ppo.md \
+docs: doc/include/auxenv-aliasing.ppo.md \
   doc/include/auxsource-aliasing.ppo.md \
   doc/include/auxalias-aliasing.ppo.md \
   share/man/man1 \
@@ -65,8 +65,7 @@ docs: doc/README.md doc/README.txt \
     share/html/man/man1/auxguid.1.html \
   share/html/manuals \
     share/html/manuals/auxilium-user-guide.html \
-    share/html/manuals/auxilium-user-guide.pdf \
-  share/html/auxilium.README.md.html
+    share/html/manuals/auxilium-user-guide.pdf
 
 doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 	pp -D AUXCMD=auxenv $< > $@
@@ -128,11 +127,14 @@ share/man/man1/auxchecktap.1 : doc/man/auxchecktap.ppo.md
 share/html/man/man1/auxchecktap.1.html : doc/man/auxchecktap.ppo.md doc/css/man.css
 	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXCHECKTAP_TITLE)"
 
-share/man/man1/auxguid.1 : man/auxguid.1.ronn
-	ronn < $< > $@
+doc/man/auxguid.ppo.md : doc/man/auxguid.ppi.md doc/include
+	pp $< > $@
 
-share/html/man/man1/auxguid.1.html : man/auxguid.1.ronn
-	ronn --html < $< > $@
+share/man/man1/auxguid.1 : doc/man/auxguid.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxguid
+
+share/html/man/man1/auxguid.1.html : doc/man/auxguid.ppo.md doc/css/man.css
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXGUID_TITLE)"
 
 share/html/manuals :
 	mkdir -p $@
@@ -147,9 +149,6 @@ share/html/manuals/auxilium-user-guide.html : doc/manuals/auxilium-user-guide.pp
 share/html/manuals/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.ppo.md
 	$(PANDOCPDFMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)"
 
-share/html/auxilium.README.md.html : README.md
-	grip $< --export $@
-
 #### Cleaning built stuff ####
 
 .PHONY: cleandocs
@@ -159,6 +158,7 @@ cleandocs:
 	rm -f doc/man/auxwhere.ppo.md
 	rm -f doc/man/auxalias.ppo.md
 	rm -f doc/man/auxchecktap.ppo.md
+	rm -f doc/man/auxguid.ppo.md
 	rm -f share/man/man1/auxenv.1
 	rm -f share/html/man/man1/auxenv.1.html
 	rm -f share/man/man1/auxsource.1
@@ -171,7 +171,6 @@ cleandocs:
 	rm -f share/html/man/man1/auxchecktap.1.html
 	rm -f share/man/man1/auxguid.1
 	rm -f share/html/man/man1/auxguid.1.html
-	rm -f share/html/auxilium.README.md.html
 
 #### Aggregate stuff ####
 

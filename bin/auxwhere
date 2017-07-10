@@ -96,7 +96,7 @@ while [ $# -gt 0 ]; do
         subdirs+=("${param:9}")
     elif [[ "$param" =~ ^--type=.+$ ]]; then
         filetypes+=("${param:7}")
-    elif [[ "$param" =~ ^--ifs=.+$ [[; then
+    elif [[ "$param" =~ ^--ifs=.+$ ]]; then
         sep="${param:6}"
     elif [[ "${param:0:1}" == "-" ]]; then
         echo "ERROR: bad command line option ($param)." >&2

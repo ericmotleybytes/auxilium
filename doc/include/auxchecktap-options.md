@@ -19,7 +19,7 @@
 
 -d | --debug
 
-:   Specifies that extra debug information should be outrput to stabdard error.
+:   Specifies that extra debug information should be outrput to standard error.
 
 -h | --help
 

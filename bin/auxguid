@@ -1,15 +1,32 @@
 #!/usr/bin/env bash
+##############################################################################
+# Name:
+#   auxguid - generate a 32 hex character (128 bit) GUID/UUID
 #
-# usage:
-#     auxguid [options]
-# options:
-#     -v --version
-#     -h --help
-#     -l --lower
-#     -u --upper
-#     -w --warn
-#     -d --debug
-#     --uuidgen
+# Introduction:
+#   auxguid generates a pseudo random unique GUID/UUID.
+# 
+# Usage:
+#   auxguid [options]
+#
+# Options and Commands:
+#   See "help" display in code (or the man page).
+#
+# Copyright:
+#   auxwhere Copyright © 2017 Eric Alan Christiansen.
+#
+# Legal:
+#   This program comes with ABSOLUTELY NO WARRANTY.
+#   This is free software, and you are welcome to use and/or redistribute it
+#   under the conditions of the GNU General Public License v3.0.
+#   (See https://www.gnu.org/licenses/gpl-3.0.en.html)
+#
+# More Information:
+#   - auxilium - See https://github.com/ericmotleybytes/auxilium.
+#
+# Requirements:
+#   - bash version 4.2 or higher.
+##############################################################################
 #
 # define functions
 #
@@ -85,15 +102,15 @@ if [ "$helpflag" == "y" ]; then
     echo "Command:"
     echo "  $cmdname - Generate a GUID/UUID"
     echo "Syntax:"
-    echo "  $cmdname -h | --help     # display this help text."
-    echo "  $cmdname -v | --version  # display program version information."
-    echo "  $cmdname [<option>...]   # output 32 hex char pseudo UUID."
+    echo "  $cmdname [<option>...]   # output 32 hex char GUID/UUID."
     echo "Options:"
-    echo "  -l --lower    # use lowercase hex digits."
-    echo "  -u --upper    # use uppercase hex digits."
-    echo "  -w --warn     # output non-fatal warnings to stderr."
-    echo "  -d --debug    # output debug info to stderr."
-    echo "  --uuidgen     # use uuidgen command if available."
+    echo "  -l | --lower    # use lowercase hex digits."
+    echo "  -u | --upper    # use uppercase hex digits."
+    echo "  -w | --warn     # output non-fatal warnings to stderr."
+    echo "  -d | --debug    # output debug info to stderr."
+    echo "  --uuidgen       # use uuidgen command if available."
+    echo "  -h | --help     # display help."
+    echo "  -v | --version  # display version."
 fi
 #
 # if --help or --version and no files specified, assume we are done.

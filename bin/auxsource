@@ -103,8 +103,7 @@ function auxsource_main_func() {
         whereparams="$AUXSOURCE_OPTIONS \"$sourcefile\""
     fi
     local sourcespec=""
-    eval set -- $(echo "$whereparams")
-    sourcespec=$(source "$scriptdir/auxwhere")
+    sourcespec=$(eval "$scriptdir/auxwhere" $whereparams)
     if [ -z "$sourcespec" ]; then
         aux_error "File not found ($sourcefile)."
         return 1

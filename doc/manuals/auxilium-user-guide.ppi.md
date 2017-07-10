@@ -169,6 +169,34 @@ see TBD.
 
 !include(../include/auxchecktap-examples.md)
 
+## auxguid
+
+!include(../include/auxguid-title.md)
+
+### auxguid introduction
+
+!include(../include/auxguid-introduction.md)
+
+### auxguid usage
+
+!include(../include/auxguid-usage.md)
+
+### auxguid options
+
+!include(../include/auxguid-options.md)
+
+### auxguid exit status
+
+!include(../include/auxguid-exitstat.md)
+
+### auxguid description
+
+!include(../include/auxguid-description.md)
+
+### auxguid examples
+
+!include(../include/auxguid-examples.md)
+
 # Authors
 
 !include(../include/authors.md)
