@@ -24,4 +24,13 @@ pre{
   padding-left: 10px;
   padding-right: 5px;
 }
+div#TOC{
+  background-color: #DDDDDD;
+  padding-bottom: 1px;
+}
+p.auxdate{
+  font-size: .75em;
+  background-color: #EEEEEE;
+  text-align: right;
+}
 </style>

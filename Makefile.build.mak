@@ -3,11 +3,13 @@
 ###
 PANDOCSTD=pandoc -s --from=markdown
 PANDOCMAN1=$(PANDOCSTD) --to=man -M adjusting=l -M hyphenate=false -M section=1
-PANDOCMAN=$(PANDOCMAN1) -M header="General Commands Manual" -M footer="General Commands Manual"
+PANDOCMAN=$(PANDOCMAN1) -M header="General Commands Manual" -M footer="$(CURDATE)"
 PANDOCHTML=$(PANDOCSTD) --to=html --self-contained
-PANDOCHTMLMAN=$(PANDOCHTML) --toc -H doc/css/man.css
+PANDOCHTMLMAN1=$(PANDOCHTML) --toc -H doc/css/man.css -M auxdate="$(CURDATE)"
+PANDOCHTMLMAN=$(PANDOCHTMLMAN1) --template=doc/templates/man.html.pandoc.template
 PANDOCHTMLMANUAL=$(PANDOCHTML) --toc -H doc/css/manual.css
-PANDOCHTMLINFO=$(PANDOCHTML) --toc -H doc/css/info.css
+PANDOCHTMLINFO1=$(PANDOCHTML) --toc -H doc/css/info.css -M auxdate="$(CURDATE)"
+PANDOCHTMLINFO=$(PANDOCHTMLINFO1) --template=doc/templates/info.html.pandoc.template
 PANDOCPDF1=$(PANDOCSTD) --to=latex -M papersize=letter -M colorlinks
 PANDOCPDF2=$(PANDOCPDF1) -M margin-left=1in -M margin-right=1in
 PANDOCPDF=$(PANDOCPDF2) -M margin-top=1in -M margin-bottom=1in
@@ -80,65 +82,73 @@ doc/include/auxsource-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 doc/include/auxalias-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 	pp -D AUXCMD=auxalias $< > $@
 
-share/man/man1 :
-	mkdir -p $@
-
-share/html/man/man1 :
-	mkdir -p $@
+# generic man stuff
 
 doc/man/auxenv.ppo.md : doc/man/auxenv.ppi.md doc/include
 	pp $< > $@
 
-share/man/man1/auxenv.1 : doc/man/auxenv.ppo.md
-	$(PANDOCMAN) $< --output=$@ -M title=auxenv
-
-share/html/man/man1/auxenv.1.html : doc/man/auxenv.ppo.md doc/css/man.css
-	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXENV_TITLE)"
-
 doc/man/auxsource.ppo.md : doc/man/auxsource.ppi.md doc/include
 	pp $< > $@
-
-share/man/man1/auxsource.1 : doc/man/auxsource.ppo.md
-	$(PANDOCMAN) $< --output=$@ -M title=auxenv
-
-share/html/man/man1/auxsource.1.html : doc/man/auxsource.ppo.md doc/css/man.css
-	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXSOURCE_TITLE)"
 
 doc/man/auxwhere.ppo.md : doc/man/auxwhere.ppi.md doc/include
 	pp $< > $@
 
-share/man/man1/auxwhere.1 : doc/man/auxwhere.ppo.md
-	$(PANDOCMAN) $< --output=$@ -M title=auxwhere
-
-share/html/man/man1/auxwhere.1.html : doc/man/auxwhere.ppo.md doc/css/man.css
-	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXWHERE_TITLE)"
-
 doc/man/auxalias.ppo.md : doc/man/auxalias.ppi.md doc/include
 	pp $< > $@
-
-share/man/man1/auxalias.1 : doc/man/auxalias.ppo.md
-	$(PANDOCMAN) $< --output=$@ -M title=auxenv
-
-share/html/man/man1/auxalias.1.html : doc/man/auxalias.ppo.md doc/css/man.css
-	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXALIAS_TITLE)"
 
 doc/man/auxchecktap.ppo.md : doc/man/auxchecktap.ppi.md doc/include
 	pp $< > $@
 
-share/man/man1/auxchecktap.1 : doc/man/auxchecktap.ppo.md
-	$(PANDOCMAN) $< --output=$@ -M title=auxchecktap
-
-share/html/man/man1/auxchecktap.1.html : doc/man/auxchecktap.ppo.md doc/css/man.css
-	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXCHECKTAP_TITLE)"
-
 doc/man/auxguid.ppo.md : doc/man/auxguid.ppi.md doc/include
 	pp $< > $@
+
+# man in man format stuff
+
+share/man/man1 :
+	mkdir -p $@
+
+share/man/man1/auxenv.1 : doc/man/auxenv.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxenv
+
+share/man/man1/auxsource.1 : doc/man/auxsource.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxenv
+
+share/man/man1/auxwhere.1 : doc/man/auxwhere.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxwhere
+
+share/man/man1/auxalias.1 : doc/man/auxalias.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxenv
+
+share/man/man1/auxchecktap.1 : doc/man/auxchecktap.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxchecktap
 
 share/man/man1/auxguid.1 : doc/man/auxguid.ppo.md
 	$(PANDOCMAN) $< --output=$@ -M title=auxguid
 
-share/html/man/man1/auxguid.1.html : doc/man/auxguid.ppo.md doc/css/man.css
+# man in html format stuff
+
+share/html/man/man1 :
+	mkdir -p $@
+
+share/html/man/man1/auxenv.1.html : doc/man/auxenv.ppo.md doc/css doc/templates
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXENV_TITLE)"
+
+share/html/man/man1/auxsource.1.html : doc/man/auxsource.ppo.md doc/css doc/templates
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXSOURCE_TITLE)"
+
+share/html/man/man1/auxwhere.1.html : doc/man/auxwhere.ppo.md doc/css doc/templates
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXWHERE_TITLE)"
+
+share/html/man/man1/auxalias.1.html : doc/man/auxalias.ppo.md doc/css doc/templates
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXALIAS_TITLE)"
+
+share/html/man/man1/auxchecktap.1.html : doc/man/auxchecktap.ppo.md doc/css doc/templates
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXCHECKTAP_TITLE)"
+
+share/html/man/man1/auxguid.1.html : doc/man/auxguid.ppo.md doc/css doc/templates
 	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXGUID_TITLE)"
+
+# documentation index page
 
 share/html/auxilium :
 	mkdir -p $@
@@ -146,15 +156,17 @@ share/html/auxilium :
 doc/html/index.ppo.md : doc/html/index.ppi.md
 	pp $< > $@
 
-share/html/auxilium/index.html : doc/html/index.ppo.md doc/css/man.css
+share/html/auxilium/index.html : doc/html/index.ppo.md doc/css doc/templates
 	$(PANDOCHTMLMAN) $< --output=$@ -M title="auxilium documentation"
+
+# users guide
 
 doc/manuals/auxilium-user-guide.ppo.md : doc/manuals/auxilium-user-guide.ppi.md doc/include
 	pp $< > $@
 
 share/html/auxilium/auxilium-user-guide.html : \
   doc/manuals/auxilium-user-guide.ppo.md \
-  doc/css/manual.css
+  doc/css doc/templates
 	$(PANDOCHTMLMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)"
 
 share/html/auxilium/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.ppo.md
@@ -163,7 +175,9 @@ share/html/auxilium/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.pp
 doc/docs/index.ppo.md : doc/docs/index.ppi.md
 	pp $< > $@
 
-docs/index.html : doc/docs/index.ppo.md doc/css/info.css
+# github pages stuff
+
+docs/index.html : doc/docs/index.ppo.md doc/css doc/templates
 	$(PANDOCHTMLINFO) $< --output=$@ -M title="$(AUXILIUM_INFO_TITLE)"
 
 #### Cleaning built stuff ####

@@ -206,7 +206,7 @@ this open source project see TBD.
 
 ## Copyright
 
-!include(../include/copyright.md)
+!include(../include/copyright.ppi.md)
 
 ## Licensing
 

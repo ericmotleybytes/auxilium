@@ -37,7 +37,7 @@
 
 ## LEGAL
 
-!include(../include/copyright.md)
+!include(../include/copyright.ppi.md)
 !include(../include/license.md)
 
 ## SEE ALSO

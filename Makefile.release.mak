@@ -13,6 +13,7 @@ helprel:
 	@echo "  make clean-runtime-dist       # clean distribution area."
 	@echo "  make runtime-dist             # create distribution and tarball."
 	@echo "  make runtime-test             # test distribution copy."
+	@echo "  make devtime-dist             # create dev  distribution and tarball."
 	@echo "  make list-runtime-dist        # list contents of dist tarball."
 	@echo "  make local-release-tag        # tag files locally."
 	@echo "  make push-release-tag         # tag files on remote."
@@ -151,3 +152,8 @@ local-release-tag:
 .PHONY: push-release-tag
 push-release-tag:
 	git push origin $(THISREL)
+
+.PHONY: devtime-dist
+devtime-dist:
+	cd dist; wget https://github.com/ericmotleybytes/auxilium/archive/$(THISREL).tar.gz
+	cd dist; mv $(THISREL).tar.gz auxilium-dev-$(THISREL).tar.gz
