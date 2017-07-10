@@ -7,7 +7,7 @@ helprel:
 	@echo "Common Help for release actions:"
 	@echo "  make helprel                  # display this screen."
 	@echo "  make helprelcheck             # see a release checklist."
-	@echo "  make show-next-release        # version being built to be released next."
+	@echo "  make show-this-release        # version being built to be released next."
 	@echo "  make show-remote-release-tags # release tags on GitHub server."
 	@echo "  make show-local-release-tags  # release tags on local server."
 	@echo "  make clean-runtime-dist       # clean distribution area."
@@ -44,13 +44,13 @@ helprelcheck:
 	@echo "      # If you really want to reuse a version which is only locally tagged,"
 	@echo "      # you could delete the old tag definition tag locally."
 	@echo "        git tag --delete <release-tag>."
-	@echo "  # View the currently configured next release version number."
-	@echo "    make -f $(THISFILE) show-next-release."
-	@echo "  # If needed, edit $(THISFILE) and find the 'NEXTREL=...' line towards the top."
+	@echo "  # View the currently configured this release version number."
+	@echo "    make -f $(THISFILE) show-this-release."
+	@echo "  # If needed, edit $(RELDATAFILE) and find the 'THISREL=...' line."
 	@echo "  # Edit/change this release version to the new release version you picked."
 	@echo "  # Save the edited file."
 	@echo "  # Verify your change:"
-	@echo "    make -f $(THISFILE) show-next-release."
+	@echo "    make -f $(THISFILE) show-this-release."
 	@echo "  # Optional: Make sure the runtime distribution area is clean."
 	@echo "    make -f $(THISFILE) clean-runtime-dist"
 	@echo "  # Make the runtime-only distribution tarball."
@@ -71,9 +71,9 @@ helprelcheck:
 	@echo "  the 'sbin/do-release' script."
 
 #### GitHub Release Stuff
-.PHONY: show-next-release
-show-next-release:
-	@nr=`grep -E '^NEXTREL=' $(THISFILE)`; echo "$${nr##NEXTREL=}"
+.PHONY: show-this-release
+show-this-release:
+	@echo "$(THISREL)"
 
 .PHONY: show-local-release-tags
 show-local-release-tags:
@@ -146,8 +146,8 @@ runtime-test:
 
 .PHONY: local-release-tag
 local-release-tag:
-	git tag $(NEXTREL)
+	git tag $(THISREL)
 
 .PHONY: push-release-tag
 push-release-tag:
-	git push origin $(NEXTREL)
+	git push origin $(THISREL)

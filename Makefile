@@ -4,8 +4,9 @@
 SYS_PREFIX=/usr/local
 DEV_PREFIX=$(HOME)/local
 PREFIX=$(DEV_PREFIX)
-NEXTREL=0.1.3
-RUNTIME=auxilium-run-$(NEXTREL)
+RELDATAFILE=data/releases.dat
+THISREL=`sbin/show-release --current`
+RUNTIME=auxilium-run-$(THISREL)
 THISFILE:=$(lastword $(MAKEFILE_LIST))
 BINMODE=a+r+x
 SRCMODE=a+r-x

@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+#
+# This script display the current (next) release.
+# It facilitates making a new GitHub release.
+#
+# usage:
+#     show-release [options]
+# options:
+#     -v --version # display version info
+#     -h --help    # display help info
+#     -c --current # THISREL=
+#     -s --stable  # STABREL=
+#     -l --last    # LASTREL=
+#     -a --all     # all (verbose)
+#     -b --verbose # show prefix
+#
+# begin main program
+#
+cmdfile=$(readlink -f "$0")
+cmddir=$(dirname "$cmdfile")
+reporoot=$(readlink -f "$cmddir/..")
+datadir=$(readlink -f "$cmddir/../data")
+cmdname="${cmdfile##*/}"
+version="$cmdname version 1.0 (2017-07-10)"
+versionflag="n"
+helpflag="n"
+currentflag="y"
+stableflag="n"
+lastflag="n"
+allflag="n"
+verboseflag="n"
+while [ $# -gt 0 ]; do
+    param="$1"
+    shift
+    if   [[ "$param" == "-v" || "$param" == "--version" ]]; then
+        versionflag="y"
+    elif [[ "$param" == "-h" || "$param" == "--help"    ]]; then
+        helpflag="y"
+    elif [[ "$param" == "-c" || "$param" == "--current" ]]; then
+        currentflag="y"
+        stableflag="n"
+        lastflag="n"
+        allflag="n"
+    elif [[ "$param" == "-s" || "$param" == "--stable" ]]; then
+        currentflag="n"
+        stableflag="y"
+        lastflag="n"
+        allflag="n"
+    elif [[ "$param" == "-l" || "$param" == "--last" ]]; then
+        currentflag="n"
+        stableflag="n"
+        lastflag="y"
+        allflag="n"
+    elif [[ "$param" == "-a" || "$param" == "--all" ]]; then
+        currentflag="n"
+        stableflag="n"
+        lastflag="n"
+        allflag="y"
+        verboseflag="y"
+    elif [[ "$param" == "-b" || "$param" == "--verbose" ]]; then
+        verboseflag="y"
+    else
+        echo "ERROR: bad command line option ($param)." >&2
+        exit 1
+    fi
+done
+#
+# show version if it was requested
+#
+if [ "$versionflag" == "y" ]; then
+    echo "$version"
+fi
+#
+# show help if it was requested
+#
+if [ "$helpflag" == "y" ]; then
+    echo "Command:"
+    echo "  $cmdname - display release version info"
+    echo "Syntax:"
+    echo "  $cmdname [option...]   # display release version info."
+    echo "    -c | --current       # display THISREL release (default)."
+    echo "    -s | --stable        # display STABREL release."
+    echo "    -l | --last          # display LASTREL release."
+    echo "    -a | --all           # display all releases."
+    echo "    -b | --verbose       # verbose display."
+    echo "    -h | --help          # display help text."
+    echo "    -v | --version       # display version information."
+fi
+#
+# if --help or --version and no files specified, assume we are done.
+#
+if [[ "$versionflag" == "y" || "$helpflag" == "y" ]]; then
+    exit 0
+fi
+thisrel=""
+stabrel=""
+lastrel=""
+allrels=()
+#
+# get info from releases.dat
+#
+datafile="$datadir/releases.dat"
+if [ ! -e "$datafile" ]; then
+    echo "ERROR: file not found ($datafile)." >&2
+    exit 1
+fi
+readarray -t datalines < "$datafile"
+for line in "${datalines[@]}"; do
+    line="${line/\#*/}"     # strip comments
+    line="${line/ //}"      # strip spaces
+    line="${line/$'\t'//}"  # strip tabs
+    if [ -z "$line" ]; then
+        continue;
+    fi
+    allrels+=("$line")
+    if [ "${line:0:8}" == "THISREL=" ]; then
+        if [ -z "$thisrel" ]; then
+            thisrel="${line:8}"
+        else
+            echo "ERROR: multiple THISREL= in $datafile." >&2
+            exit 1
+        fi
+    elif [ "${line:0:8}" == "STABREL=" ]; then
+        if [ -z "$stabrel" ]; then
+            stabrel="${line:8}"
+        else
+            echo "ERROR: multiple STABREL= in $datafile." >&2
+            exit 1
+        fi
+    elif [ "${line:0:8}" == "LASTREL=" ]; then
+        if [ -z "$lastrel" ]; then
+            lastrel="${line:8}"
+        else
+            echo "ERROR: multiple LASTREL= in $datafile." >&2
+            exit 1
+        fi
+    fi
+done
+if [ "$currentflag" == "y" ]; then
+    if [ -z "$thisrel" ]; then
+        echo "ERROR: THISREL= not found in $datafile." >&2
+        exit 1
+    fi
+    if [ "$verboseflag" == "y" ]; then
+        echo "THISREL=$thisrel"
+    else
+        echo "$thisrel"
+    fi
+fi
+if [ "$stableflag" == "y" ]; then
+    if [ -z "$stabrel" ]; then
+        echo "ERROR: STABREL= not found in $datafile." >&2
+        exit 1
+    fi
+    if [ "$verboseflag" == "y" ]; then
+        echo "STABREL=$stabrel"
+    else
+        echo "$stabrel"
+    fi
+fi
+if [ "$lastflag" == "y" ]; then
+    if [ -z "$lastrel" ]; then
+        echo "ERROR: LASTREL= not found in $datafile." >&2
+        exit 1
+    fi
+    if [ "$verboseflag" == "y" ]; then
+        echo "LASTREL=$lastrel"
+    else
+        echo "$lastrel"
+    fi
+fi
+if [ "$allflag" == "y" ]; then
+    for rel in "${allrels[@]}"; do
+        echo "$rel"
+    done
+fi
+exit 0

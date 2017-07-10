@@ -154,19 +154,13 @@ if [ ! -e "$makefile" ]; then
    exit 1
 fi
 aux_checkpass "Makefile ($makefile) found."
-# make sure NEXTREL only defined once in Makefile
-tmpcnt=$(grep -E '^NEXTREL=' "$makefile" | wc -l)
-if [ "$tmpcnt" == "0" ]; then
-    aux_error "NEXTREL=<relver> not found in $makefile."
-    exit 1
-elif [ "$tmpcnt" != "1" ]; then
-    aux_error "NEXTREL=<relver> not too many ($tmpcnt) times in $makefile."
+# get this release number
+nextrel=$("$reporoot/show-release" --current)
+if [ -z "$nextrel" ]; then
+    aux_error "current next release could not be read."
     exit 1
 fi
-# get the next release number
-nextrel=$(grep -E '^NEXTREL=' "$makefile")
-nextrel="${nextrel##NEXTREL=}"
-aux_info "$nextrel is the next release (to be built)."
+aux_info "$nextrel is the current release (to be built)."
 # get local release versions
 localrels=$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
 readarray -t locrelarr < <(echo "$localrels")
@@ -231,6 +225,7 @@ if [ "$usedonloc" == "y" ]; then
             git tag --delete $nextrel
             if [ "$?" != "0" ]; then
                 aux_error "git tag --delete completion status problem."
+                exit 1
             fi
             usedonloc="n"  # cleaned up now
         fi
@@ -405,6 +400,7 @@ cd "${reporoot}"
 make -f Makefile.test.mak checktest
 if [ "$?" != "0" ]; then
     aux_error "Unit tests on release working copy failed."
+    exit 1
 fi
 aux_info "Unit tests on release working copy passed."
 # now push the tag to the remote git server
