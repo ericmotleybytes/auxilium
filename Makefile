@@ -4,9 +4,9 @@
 SYS_PREFIX=/usr/local
 DEV_PREFIX=$(HOME)/local
 PREFIX=$(DEV_PREFIX)
-CURDATE=`date +%Y-%m-%d`
+CURDATE=$(shell date +%Y-%m-%d)
 RELDATAFILE=data/releases.dat
-THISREL=`sbin/show-release --current`
+THISREL=$(shell sbin/show-release)
 RUNTIME=auxilium-run-$(THISREL)
 DEVTIME=auxilium-dev-$(THISREL)
 THISFILE:=$(lastword $(MAKEFILE_LIST))

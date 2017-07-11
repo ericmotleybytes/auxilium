@@ -14,14 +14,14 @@ PANDOCPDF1=$(PANDOCSTD) --to=latex -M papersize=letter -M colorlinks
 PANDOCPDF2=$(PANDOCPDF1) -M margin-left=1in -M margin-right=1in
 PANDOCPDF=$(PANDOCPDF2) -M margin-top=1in -M margin-bottom=1in
 PANDOCPDFMANUAL=$(PANDOCPDF2) --toc -M toc-depth=3 
-AUXENV_TITLE=`head -1 doc/include/auxenv-title.md`
-AUXSOURCE_TITLE=`head -1 doc/include/auxsource-title.md`
-AUXWHERE_TITLE=`head -1 doc/include/auxwhere-title.md`
-AUXALIAS_TITLE=`head -1 doc/include/auxalias-title.md`
-AUXCHECKTAP_TITLE=`head -1 doc/include/auxchecktap-title.md`
-AUXGUID_TITLE=`head -1 doc/include/auxguid-title.md`
-AUXILIUM_UG_TITLE=`head -1 doc/include/auxilium-user-guide-title.md`
-AUXILIUM_INFO_TITLE=`head -1 doc/include/auxilium-info-page-title.md`
+AUXENV_TITLE=$(shell head -1 doc/include/auxenv-title.md)
+AUXSOURCE_TITLE=$(shell head -1 doc/include/auxsource-title.md)
+AUXWHERE_TITLE=$(shell head -1 doc/include/auxwhere-title.md)
+AUXALIAS_TITLE=$(shell head -1 doc/include/auxalias-title.md)
+AUXCHECKTAP_TITLE=$(shell head -1 doc/include/auxchecktap-title.md)
+AUXGUID_TITLE=$(shell head -1 doc/include/auxguid-title.md)
+AUXILIUM_UG_TITLE=$(shell head -1 doc/include/auxilium-user-guide-title.md)
+AUXILIUM_INFO_TITLE=$(shell head -1 doc/include/auxilium-info-page-title.md)
 
 .PHONY: helpbuild
 helpbuild:

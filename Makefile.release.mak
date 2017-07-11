@@ -153,7 +153,7 @@ local-release-tag:
 push-release-tag:
 	git push origin $(THISREL)
 
-.PHONY: devtime-dist
-devtime-dist:
-	cd dist; wget https://github.com/ericmotleybytes/auxilium/archive/$(THISREL).tar.gz
-	cd dist; mv $(THISREL).tar.gz auxilium-dev-$(THISREL).tar.gz
+#.PHONY: devtime-dist
+#devtime-dist:
+#	cd dist; wget https://github.com/ericmotleybytes/auxilium/archive/$(THISREL).tar.gz
+#	cd dist; mv $(THISREL).tar.gz auxilium-dev-$(THISREL).tar.gz

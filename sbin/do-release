@@ -155,7 +155,7 @@ if [ ! -e "$makefile" ]; then
 fi
 aux_checkpass "Makefile ($makefile) found."
 # get this release number
-nextrel=$("$reporoot/show-release" --current)
+nextrel=$("$reporoot/sbin/show-release" --current)
 if [ -z "$nextrel" ]; then
     aux_error "current next release could not be read."
     exit 1
