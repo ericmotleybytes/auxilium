@@ -104,8 +104,8 @@ and pdf format (auxilium-user-guide.pdf).
 For convenience the latest version of the user guide is also
 available online in both HTML and PDF formats:
 
-* [https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.html](Auxilium User Guide (html))
-* [https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.pdf](Auxilium User Guide (pdf))
+* [Auxilium User Guide (html)](https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.html)
+* [Auxilium User Guide (pdf)](https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.pdf)
 
 ## Auxilium Runtime Uninstall
 

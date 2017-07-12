@@ -435,7 +435,7 @@ function create_devtime_tarball() {
     if [ ! -e  "$tarfile2" ]; then
         aux_die "File not found ($tarfile2)."
     fi
-    aux_info "Dev-time distribution tar file created ($tarfile)."
+    aux_info "Dev-time distribution tar file created ($tarfile2)."
 }
 #
 # begin main program
