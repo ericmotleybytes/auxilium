@@ -42,4 +42,4 @@
 
 ## SEE ALSO
 
-uuidgen(1)
+auxilium(1), uuidgen(1)

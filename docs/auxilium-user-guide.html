@@ -1,0 +1,579 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Auxilium User's Guide</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+  body{
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  h1.title{
+    text-align: center;
+    font-size: 2em;
+    background-color: #AED6F1;
+  }
+  h1.subtitle{
+    text-align: center;
+    font-size: 1.5em;
+  }
+  h2{
+    font-size: 1.75em;
+  }
+  code{
+    white-space: pre;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 1.25em;
+  }
+  pre{
+    background-color: #F9F9F9;
+    border-style: solid;
+    border-width: 1px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 5px;
+  }
+  </style>
+</head>
+<body>
+<div id="header">
+<h1 class="title">Auxilium User's Guide</h1>
+<h1 class="subtitle">Version 0.1.3</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#introduction-to-auxilium">Introduction to auxilium</a></li>
+<li><a href="#installation-of-auxilium-run-time-distribution">Installation of auxilium run-time distribution</a></li>
+<li><a href="#utilities">Utilities</a><ul>
+<li><a href="#auxenv">auxenv</a><ul>
+<li><a href="#auxenv-introduction">auxenv introduction</a></li>
+<li><a href="#auxenv-usage">auxenv usage</a></li>
+<li><a href="#auxenv-options">auxenv options</a></li>
+<li><a href="#auxenv-commands">auxenv commands</a></li>
+<li><a href="#auxenv-exit-status">auxenv exit status</a></li>
+<li><a href="#auxenv-description">auxenv description</a></li>
+<li><a href="#auxenv-examples">auxenv examples</a></li>
+<li><a href="#auxenv-notes">auxenv notes</a></li>
+</ul></li>
+<li><a href="#auxwhere">auxwhere</a><ul>
+<li><a href="#auxwhere-introduction">auxwhere introduction</a></li>
+<li><a href="#auxwhere-usage">auxwhere usage</a></li>
+<li><a href="#auxwhere-options">auxwhere options</a></li>
+<li><a href="#auxwhere-exit-status">auxwhere exit status</a></li>
+<li><a href="#auxwhere-description">auxwhere description</a></li>
+<li><a href="#auxwhere-examples">auxwhere examples</a></li>
+</ul></li>
+<li><a href="#auxsource">auxsource</a><ul>
+<li><a href="#auxsource-introduction">auxsource introduction</a></li>
+<li><a href="#auxsource-usage">auxsource usage</a></li>
+<li><a href="#auxsource-options">auxsource options</a></li>
+<li><a href="#auxsource-exit-status">auxsource exit status</a></li>
+<li><a href="#auxsource-description">auxsource description</a></li>
+<li><a href="#auxsource-examples">auxsource examples</a></li>
+<li><a href="#auxsource-notes">auxsource notes</a></li>
+</ul></li>
+<li><a href="#auxalias">auxalias</a><ul>
+<li><a href="#auxalias-introduction">auxalias introduction</a></li>
+<li><a href="#auxalias-usage">auxalias usage</a></li>
+<li><a href="#auxalias-options">auxalias options</a></li>
+<li><a href="#auxalias-exit-status">auxalias exit status</a></li>
+<li><a href="#auxalias-description">auxalias description</a></li>
+<li><a href="#auxalias-examples">auxalias examples</a></li>
+<li><a href="#auxalias-notes">auxalias notes</a></li>
+</ul></li>
+<li><a href="#auxchecktap">auxchecktap</a><ul>
+<li><a href="#auxchecktap-introduction">auxchecktap introduction</a></li>
+<li><a href="#auxchecktap-usage">auxchecktap usage</a></li>
+<li><a href="#auxchecktap-options">auxchecktap options</a></li>
+<li><a href="#auxchecktap-exit-status">auxchecktap exit status</a></li>
+<li><a href="#auxchecktap-description">auxchecktap description</a></li>
+<li><a href="#auxchecktap-examples">auxchecktap examples</a></li>
+</ul></li>
+<li><a href="#auxguid">auxguid</a><ul>
+<li><a href="#auxguid-introduction">auxguid introduction</a></li>
+<li><a href="#auxguid-usage">auxguid usage</a></li>
+<li><a href="#auxguid-options">auxguid options</a></li>
+<li><a href="#auxguid-exit-status">auxguid exit status</a></li>
+<li><a href="#auxguid-description">auxguid description</a></li>
+<li><a href="#auxguid-examples">auxguid examples</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#authors">Authors</a></li>
+<li><a href="#legal">Legal</a><ul>
+<li><a href="#copyright">Copyright</a></li>
+<li><a href="#licensing">Licensing</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="introduction-to-auxilium">Introduction to auxilium</h1>
+<p><em>Auxilium</em> is the latin word for <em>support</em>. The &quot;auxilium&quot; package is an open-source project which contains a collection of bash shell executable and sourceable scripts which support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are written in *bash&quot;, the standard Linux interpretive shell language. This facilitates portability (between bash platforms) and ease of installation. Auxilium has no run-time prerequisites other than bash version 4.2 or higher.</p>
+<p>The core auxilium utilities include:</p>
+<ul>
+<li><p><strong>auxenv</strong>. Setup, manipulation, and optimization of path-like environment variables such as <em>PATH</em>, <em>MANPATH</em>, and <em>LD_LIBRARY_PATH</em>.</p></li>
+<li><p><strong>auxwhere</strong>. Find files by filename search through path-like environment variable directories.</p></li>
+<li><p><strong>auxsource</strong>. An extended version of the bash built-in <em>source</em> command.</p></li>
+<li><p><strong>auxalias</strong>. Creates static or dynamic aliases for all auxilium sourceable scripts.</p></li>
+<li><p><strong>auxchecktap</strong>. Scans and checks TAP format unit test result logs, producing a summarized TAP test results log.</p></li>
+<li><p><strong>auxguid</strong>. Generates a pseudo random 128-bit (32 hex character) GUID/UUID.</p></li>
+</ul>
+<h1 id="installation-of-auxilium-run-time-distribution">Installation of auxilium run-time distribution</h1>
+<p>TBD</p>
+<p>This section describes the run-time auxilium installation, which is appropriate for end-users who just want to use auxilium utilities, not modify them. For information on how to install a development installation and contribute changes to this open source project see TBD.</p>
+<h1 id="utilities">Utilities</h1>
+<h2 id="auxenv">auxenv</h2>
+<p>auxenv - manipulate path-like environment variables</p>
+<h3 id="auxenv-introduction">auxenv introduction</h3>
+<p>A sourceable script. Facilitates setup, manipulation, and optimization of path-like environment variables such as <em>PATH</em>, <em>MANPATH&quot;, </em>LD_LIBRARY_PATH<em>, </em>PKG_CONFIG_PATH<em>, </em>PYTHONPATH*, and more. The auxenv utility is a valuable tool for both system administrators and end-users who have complex and/or multiple environment configuration issues.</p>
+<h3 id="auxenv-usage">auxenv usage</h3>
+<pre><code>auxenv [&lt;option&gt;...] &lt;command&gt; &lt;envname&gt; [&lt;arg&gt;...]
+  --ifs=&quot;&lt;char&gt;&quot;            # define separator character
+  --ifs=x&lt;hex&gt;&lt;hex&gt;         # define sep char in hex
+  --unset-empty             # unset env var when empty
+  -h | --help               # display help
+  -v | --version            # display version</code></pre>
+<p>(Assuming 'auxenv' is an alias to 'source &lt;dir&gt;/auxenv'.)</p>
+<h3 id="auxenv-options">auxenv options</h3>
+<dl>
+<dt>--ifs=&quot;&lt;char&gt;&quot; (default is &quot;:&quot;)</dt>
+<dd><p>Specifies the character which separates items within the environment variable value. For example, on Linux directories within the PATH ennvironment variable are separated by a colon (&quot;:&quot;) character. A colon (&quot;:&quot;) is the default separator if this option is not specified.</p>
+</dd>
+<dt>--ifs=x&lt;h&gt;&lt;h&gt;</dt>
+<dd><p>Same as the --ifs option above, except the separating character can be specified via its ASCII value in two hex digits. For example, --ifs=x20 specifies a space character.</p>
+</dd>
+<dt>--unset-empty</dt>
+<dd><p>If the final environment variable value being manipulated ends up being &quot;&quot; (an empty string) this option will cause the environment variable to be unset, not just left with a &quot;&quot; value.</p>
+</dd>
+<dt>-h | --help</dt>
+<dd><p>Displays a brief auxenv command usage summary. If used, this option must be the only option or parameter on the command line.</p>
+</dd>
+<dt>-v | --version</dt>
+<dd><p>Displays auxenv version information. If used, this option must be the only option or parameter on the command line.</p>
+</dd>
+</dl>
+<h3 id="auxenv-commands">auxenv commands</h3>
+<dl>
+<dt>append &lt;envvar&gt; &lt;item-or-dir&gt;</dt>
+<dd><p>Modifies the value of the environment variable so that the item (usually a directory) is placed as the very last item of the new environment variable value.</p>
+</dd>
+<dt>clean &lt;envvar&gt;</dt>
+<dd><p>This is a convenient way to do commands &quot;desym&quot;, &quot;dedup&quot;, and &quot;weed&quot;, in that order. See descriptions of those commands below for more information.</p>
+</dd>
+<dt>count &lt;envvar&gt;</dt>
+<dd><p>Parses the environment variable value into items (usually directories) and outputs a count of how many items were found.</p>
+</dd>
+<dt>dedup &lt;envvar&gt; [topdown|bottomup]</dt>
+<dd><p>Modifies the value of the environment variable by eliminating literal duplicates within listed items (usually directories). If 'topdown' is specified (also the default), then the first item match is kept. If 'bottomup' is specified, then the last item match is kept.</p>
+</dd>
+<dt>desym &lt;envvar&gt;</dt>
+<dd><p>Modifies the value of the environment variable by scanning the items (usually directories) withing the enviroment variable value. Each time an item is found that is a symbolic link, the item is replaced with its defererenced value. If no symbolic links are found, then the value of the environment variable is unchanged.</p>
+</dd>
+<dt>dump &lt;envvar&gt;</dt>
+<dd><p>Parses the environment variable value into items (usually directories) and outputs each item on a separate line.</p>
+</dd>
+<dt>erase &lt;envvar&gt; @&lt;position-number&gt;</dt>
+<dd><p>Modifies the environment variable by eliminating the item in the specifid position (starting with 1). If the position number is greater than the number of items, then the value of the environment variable is not modified.</p>
+</dd>
+<dt>erase &lt;envvar&gt; &lt;item-or-dir&gt; [&lt;number-of-times&gt;]</dt>
+<dd><p>Looks for the specified item (usually a directory) within the environment variable value and eliminates it up to the specified number of times (in case the item was listed more than once). The default number of times is 1. If the item is not found, then the value of the environment variable is not modified. (See also the &quot;remove&quot; command).</p>
+</dd>
+<dt>find &lt;envvar&gt; &lt;item-or-dir&gt;</dt>
+<dd><p>Looks for an item (usually a directrory) within the value of an environment variable and outputs the position number (starting with 1) at which the item was first found. If the item is not found, then nothing is output.</p>
+</dd>
+<dt>get &lt;envvar&gt; [@]&lt;position-number&gt;</dt>
+<dd><p>Outputs the position-number specified nth item (usually a directory) within the environment variable. The position number starts with 1 (one). If position number is greater than the count of items, then nothing is output.</p>
+</dd>
+<dt>insert &lt;envvar&gt; &lt;new-item-or-dir&gt; before|after &lt;old-item-or-dir&gt;</dt>
+<dd><p>Modifies the value of the environment variable such that the specified new item (usually a directory) is placed immediately before (if &quot;before&quot; was specified) or after (if &quot;after is specified) the first location of the old item (also usually a diectory). It the old item is not found, then the new item is appended to the end.</p>
+</dd>
+<dt>insert &lt;envvar&gt; &lt;new-item-or-dir&gt; before|after @&lt;position-number&gt;</dt>
+<dd><p>Modifies the value of the environment variable such that the specified new item (usually a directory) is placed immediately before (if &quot;before&quot; was specified) or after (if &quot;after is specified) the numeric position number specified. It the position number is greater than the number of items, then the new item is appended to the end.</p>
+</dd>
+<dt>prepend &lt;envvar&gt; &lt;item-or-dir&gt;</dt>
+<dd><p>Modifies the value of the environment variable so that the item (usually a directory) is placed as the very fist item of the new environment variable value.</p>
+</dd>
+<dt>remove &lt;envvar&gt; &lt;item-or-dir&gt; [&lt;number-of-times&gt;]</dt>
+<dd><p>Looks for the specified item (usually a directory) or any symbolic link equivalent within the environment variable value and eliminates it up to the specified number of times (in case the item or equivalent was listed more than once). The default number of times is 1. If the item is not found, then the value of the environment variable is not modified. (See also the &quot;erase&quot; command).</p>
+</dd>
+<dt>remove &lt;envvar&gt; @&lt;position-number&gt;</dt>
+<dd><p>Modifies the environment variable by eliminating the item in the specifid position (starting with 1). If the position number is greater than the number of items, then the value of the environment variable is not modified.</p>
+</dd>
+<dt>reverse &lt;envvar&gt;</dt>
+<dd><p>Modifies the value of the environment variable by reversing the order that items (usually directories) are listed.</p>
+</dd>
+<dt>show &lt;envvar&gt;</dt>
+<dd><p>Displays both the raw value of the environment variable and also breaks apart the items (usually directories) within the environment variable value into items which are displayed as a numbered list, one item per line.</p>
+</dd>
+<dt>weed &lt;envvar&gt;</dt>
+<dd><p>Modifies the value of the environment variable by scanning the items (usually directories) withing the enviroment variable value. Each time an item is found that is directory or file that actually exists, it is eliminated. If all items exist, then the value of the environment variable is unchanged.</p>
+</dd>
+</dl>
+<h3 id="auxenv-exit-status">auxenv exit status</h3>
+<p>auxenv completes with an exit status of 0 on success or with an exit status of 1 if an error was detected.</p>
+<h3 id="auxenv-description">auxenv description</h3>
+<p><em>auxenv</em> is a sourceable bash script which solves many problems working with path-like environment variables such as PATH, MANPATH, LD_LIBRARY_PATH, and so forth. It can display current settings in an easy to read form. It can add, delete, and reorder directory positions, it can weed out duplicate or nonexistent directories, and much more. The power of auxenv allows system administrators and end-users to create more robust and flexible login initialization scripts. Auxenv is also very useful to anyone who needs to switch back and forth between different versions of a programming language, enhancing or replacing the Linux &quot;scl&quot; utility.</p>
+<p>auxenv is part of the auxilium installation package.</p>
+<h3 id="auxenv-examples">auxenv examples</h3>
+<p>Here are some examples of using auxenv.</p>
+<ul>
+<li><p>Displaying a pathlike environment variable:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv show DEMOPATH
+DEMOPATH is set to:
+/dir1:/dir2:/dir3
+Item breakdown:
+  1=/dir1
+  2=/dir2
+  3=/dir3
+$ auxenv dump DEMOPATH
+/dir1
+/dir2
+/dir3</code></pre></li>
+<li><p>Prepending a directory:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv prepend DEMOPATH /dir0
+$ echo &quot;$DEMOPATH&quot;
+/dir0:/dir1:/dir2:/dir3</code></pre></li>
+<li><p>Inserting a directory:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv insert DEMOPATH &quot;/dir1a&quot; before &quot;/dir2&quot;
+$ echo &quot;$DEMOPATH&quot;
+/dir1:/dir1a:/dir2:/dir3</code></pre></li>
+<li><p>Erasing a directory by name:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv erase DEMOPATH &quot;/dir2&quot;
+$ echo &quot;$DEMOPATH&quot;
+/dir1:/dir3</code></pre></li>
+<li><p>Erasing a directory by position:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv erase DEMOPATH @2
+$ echo &quot;$DEMOPATH&quot;
+/dir1:/dir3</code></pre></li>
+<li><p>Working with alternate separators:</p>
+<pre><code>$ export DEMOPATH=&quot;red|green|blue&quot;
+$ auxenv --ifs=&quot;|&quot; show DEMOPATH
+DEMOPATH is set to:
+red|green|blue
+Item breakdown:
+  1=red
+  2=green
+  3=blue</code></pre></li>
+</ul>
+<h3 id="auxenv-notes">auxenv notes</h3>
+<p>Note that the auxenv &quot;command&quot; is not actually an &quot;executable&quot; script or binary image. Rather it is a &quot;sourceable&quot; script, meaning it is designed to run when invoked by the bash &quot;source&quot; built-in command. However, by using the bash built-in &quot;alias&quot; command, we can define an alias for auxenv such that it mimicks the usage behavior of an actual executable program. For example, consider the alias definition:</p>
+<pre><code>alias auxenv=&quot;source /usr/local/bin/auxenv&quot;</code></pre>
+<p>Once this alias is defined, interactive users and other scripts can invoke (source) the auxenv script simply by specifying &quot;auxenv&quot; followed by any desired additional auxenv parameters. (Assuming auxenv was installed in /usr/local/bin.) If auxilium was installed system-wide by your system administrator it is quite likely this alias will already be defined for you (probably in the /etc/bashrc file). You can type &quot;alias&quot; to see a list of all currently defined aliases. If this alias is not defined, you can add the alias definition in your personal $(HOME)/.bashrc file. Note that your aliases should be defined in $(HOME)/.bashrc file, not $(HOME)/.bash_profile.</p>
+<p>Sourceable scripts are needed if the current process environment is to be modified, rather than a subprocess environment that executable programs always run in. Since auxenv potentially needs to modify the current process environment, it needs to be a sourceable script.</p>
+<h2 id="auxwhere">auxwhere</h2>
+<p>auxwhere - find files via path-like env vars</p>
+<h3 id="auxwhere-introduction">auxwhere introduction</h3>
+<p>An executable script. Helps find files by filename when you are not sure of the directory by searching though a list in a path-like environment variable. The auxwhere utility is similar to, but also different than, other non-auxilium utilities such as <em>which</em> and <em>whereis</em>. The auxwhere utility is very flexible and can be used for many purposes, but it is geared towards making it easier to use sourceable (but non-executable) scripts in a manner closer to executable scripts.</p>
+<h3 id="auxwhere-usage">auxwhere usage</h3>
+<pre><code>auxwhere [&lt;option&gt;...] &lt;filename&gt;...
+  -e &lt;envvar&gt;    | --env=&lt;envvar&gt;     # add env var to dir search list
+  -t &lt;.filetype&gt; | --type=&lt;.filetype&gt; # add file type to permutation list
+  -s &lt;subdir&gt;    | --subdir=&lt;subdir&gt;  # add sub-directory to permutations
+  -x             | --exec             # only match executable files
+  -a             | --all              # display all matches
+  -h             | --help             # display help
+  -v             | --version          # display version</code></pre>
+<h3 id="auxwhere-options">auxwhere options</h3>
+<dl>
+<dt>-e &lt;envname&gt; | --env=&lt;envname&gt;</dt>
+<dd><p>Specifies an environment variable containing a path-like list of directories through which auxwhere will search. If not specified, auxwhere uses the PATH environment variable by default. If this option is specified multiple times on the command line than multiple environment variable directory lists can be searched.</p>
+</dd>
+<dt>-t &lt;.filetype&gt; | --type=&lt;.filetype&gt;</dt>
+<dd><p>Specifies a file type suffix to be appended to a file name when searching. By specifying this option multiple times multiple file type permutations can be searched for. For example, &quot;--type=.tar --type=.tar.gz&quot; will search for both &lt;filename&gt;.tar and &lt;filename&gt;.tar.gz in each directory.</p>
+</dd>
+<dt>-s &lt;dir&gt; | --subdir=&lt;dir&gt;</dt>
+<dd><p>Specifies a sub-directory to search within each directory. By specifying this option multiple times multiple sub directories can be searched. For example, &quot;--subdir=man1 --subdir=man1p --subdir=man1x --env=MANPATH&quot; will specify a search though each of those sub-directories for each directory listed in MANPATH.</p>
+</dd>
+<dt>-x | --exec</dt>
+<dd><p>Specifies that only executable files will be matched. Executable files have the &quot;x&quot; bit set in their file protection mode.</p>
+</dd>
+<dt>-a | --all</dt>
+<dd><p>Specifies that all matches found should be listed, one per line. By default, only the first match is listed.</p>
+</dd>
+<dt>-w | --how</dt>
+<dd><p>Specifies that additional information about how a match was found should be indicated. This is usually an indication of which environment variable lead to the match. Each match listed (one or all) is output as the file specification of the matched file, followed by a tab character, followed by a short &quot;hoe message&quot; on the same line.</p>
+</dd>
+<dt>--ifs=&quot;&lt;char&gt;&quot;</dt>
+<dd><p>Specifies the character which separates items within the environment variable value. For example, on Linux directories within the PATH ennvironment variable are separated by a colon (&quot;:&quot;) character. A colon (&quot;:&quot;) is the default separator if this option is not specified.</p>
+</dd>
+<dt>--</dt>
+<dd><p>Forces all following parameters to be considered filenames. This is only needed if you have are looking for a filename that migfht be confused with a command line option, for example, a file actually named &quot;--help&quot;.</p>
+</dd>
+<dt>-h | --help</dt>
+<dd><p>Displays a brief auxwhere command usage summary. If used, this option should be the only option or parameter on the command line.</p>
+</dd>
+<dt>-v | --version</dt>
+<dd><p>Displays auxwhere version information. If used, this option should be the only option or parameter on the command line.</p>
+</dd>
+</dl>
+<h3 id="auxwhere-exit-status">auxwhere exit status</h3>
+<p>auxwhere completes with an exit status of 0 if no errors are detected whether or not any matches were found. If some other error if found a non-zero exit status is returned.</p>
+<h3 id="auxwhere-description">auxwhere description</h3>
+<p><em>auxwhere</em> is an executable bash script which can find a file by filename searching across directories in path-like environment variables. By default, the PATH variable is used, but other environment variables can also be specified. Permutations of sub-directories and file types can also be specified. By default, only the file specification of the first match is output, but if optionally requested, then all matches can be output, one file specification per line. If no matching files are found, then nothing is output.</p>
+<p>auxwhere is part of the auxilium installation package.</p>
+<h3 id="auxwhere-examples">auxwhere examples</h3>
+<p>Here are some examples of using auxwhere.</p>
+<ul>
+<li><p>Finding the first instance of a file somewhere in a PATH directory:</p>
+<pre><code>$ auxwhere myfile
+/some/directory/myfile</code></pre></li>
+<li><p>Finding all instances of a file somewhere in a PATH directory:</p>
+<pre><code>$ auxwhere --all myfile
+/some/directory/myfile
+/some/other/directory/myfile
+/another/directory/myfile</code></pre></li>
+<li><p>Finding the first instance of a file somewhere in a LD_LIBRARY_PATH directory.</p>
+<pre><code>$ auxwhere --env=LD_LIBRARY_PATH libproxy.so.1
+/usr/lib64/libproxy.so.1</code></pre></li>
+<li><p>Finding a file and seeing how the file was found using two path-like environment variables.</p>
+<pre><code>$ auxwhere --all --env=PRIMARYPATH --env=SECONDARYPATH myfile.bash
+/some/directory/myfile.bash    (Found via PRIMARYPATH)
+/another/directory/myfile.bash     (Found via SECONDARYPATH)</code></pre></li>
+<li><p>Finding a file searching multiple file types and a sub-directory.</p>
+<pre><code>$ auxwhere --env=MANPATH --subdir=.man --type=.1 --type=.1.gz awk
+/usr/share/man/man1/awk.1.gz</code></pre></li>
+</ul>
+<h2 id="auxsource">auxsource</h2>
+<p>auxsource - enhanced bash source functionality</p>
+<h3 id="auxsource-introduction">auxsource introduction</h3>
+<p>A sourceable script. Implements an extended version of the bash built-in <em>source</em> command. This also can make using sourceable (non-executable) scripts more like using executable scripts.</p>
+<h3 id="auxsource-usage">auxsource usage</h3>
+<pre><code>auxsource [&lt;option&gt;...] [--] &lt;file&gt; [&lt;arg&gt;...]
+  -h | --help           # display help
+  -v | --version        # display version</code></pre>
+<p>(Assuming 'auxsource' is an alias to 'source &lt;dir&gt;/auxsource'.)</p>
+<h3 id="auxsource-options">auxsource options</h3>
+<dl>
+<dt>-h | --help</dt>
+<dd><p>Displays a brief auxenv command usage summary. If used, this option must be the only option or parameter on the command line.</p>
+</dd>
+<dt>-v | --version</dt>
+<dd><p>Displays auxenv version information. If used, this option must be the only option or parameter on the command line.</p>
+</dd>
+<dt>--</dt>
+<dd><p>Indicates that all remaining parameters are for the sourceable file. You will probably never need to use this, but if for some bizarre reason you had a file named &quot;--help&quot;, for example, the only way to auxsource it would be to specify &quot;-- --help&quot; instead of just &quot;--help&quot;.</p>
+</dd>
+</dl>
+<h3 id="auxsource-exit-status">auxsource exit status</h3>
+<p>auxsource completes with an exit status of 0 if the final status of the file sourced was 0, otherwise auxsource completes with a non-zero exit status.</p>
+<h3 id="auxsource-description">auxsource description</h3>
+<p><em>auxsource</em> is a sourceable bash script which extends the capabilities of the built-in bash command &quot;source&quot;. Its primary feature is that if a relative file specification is specified (a filename with no directory or a relative directory) then it will search through a path-list (using the PATH environment variable by default) and source the first match found. This makes working with sourceable scripts a little more like working with executable scripts or programs.</p>
+<p>auxsource uses the auxwhere executable script (also part of the auxilium distribution) to find the exact file to be sourced. Command line parameters on the auxsource command line cannot be passed to auxwhere because they are reserved for use by whatever sourceable script is being invoked. However, the &quot;AUXSOURCE_OPTIONS&quot; environment variable may be set to whatever auxwhere options are desired. This allows full control over how sourceable files are located.</p>
+<p>auxsource is part of the auxilium installation package.</p>
+<h3 id="auxsource-examples">auxsource examples</h3>
+<p>Here are some examples of using auxsource.</p>
+<ul>
+<li><p>Sourcing a file somewhere in a PATH directory:</p>
+<pre><code>$ auxsource myfile</code></pre></li>
+<li><p>Sourcing a file somewhere in a PATH directory and passing some parameters:</p>
+<pre><code>$ auxsource myfile say &quot;hello world&quot;</code></pre></li>
+<li><p>Sourcing a file specified by absolute location and passing parameters:</p>
+<pre><code>$ auxsource /home/alice/mything.bash &quot;more&quot; &quot;parameters&quot;</code></pre></li>
+<li><p>Sourcing a file somewhere in a MYPATH directory:</p>
+<pre><code>$ export MYPATH=&quot;/home/alice:/home/bob&quot;
+$ export AUXSOURCE_OPTIONS=&quot;--env=MYPATH&quot;
+$ auxsource myfile &quot;some&quot; &quot;more parameters&quot;</code></pre></li>
+</ul>
+<h3 id="auxsource-notes">auxsource notes</h3>
+<p>Note that the auxsource &quot;command&quot; is not actually an &quot;executable&quot; script or binary image. Rather it is a &quot;sourceable&quot; script, meaning it is designed to run when invoked by the bash &quot;source&quot; built-in command. However, by using the bash built-in &quot;alias&quot; command, we can define an alias for auxsource such that it mimicks the usage behavior of an actual executable program. For example, consider the alias definition:</p>
+<pre><code>alias auxsource=&quot;source /usr/local/bin/auxsource&quot;</code></pre>
+<p>Once this alias is defined, interactive users and other scripts can invoke (source) the auxsource script simply by specifying &quot;auxsource&quot; followed by any desired additional auxsource parameters. (Assuming auxsource was installed in /usr/local/bin.) If auxilium was installed system-wide by your system administrator it is quite likely this alias will already be defined for you (probably in the /etc/bashrc file). You can type &quot;alias&quot; to see a list of all currently defined aliases. If this alias is not defined, you can add the alias definition in your personal $(HOME)/.bashrc file. Note that your aliases should be defined in $(HOME)/.bashrc file, not $(HOME)/.bash_profile.</p>
+<p>Sourceable scripts are needed if the current process environment is to be modified, rather than a subprocess environment that executable programs always run in. Since auxsource potentially needs to modify the current process environment, it needs to be a sourceable script.</p>
+<h2 id="auxalias">auxalias</h2>
+<p>auxalias - easy creation of auxilium aliases</p>
+<h3 id="auxalias-introduction">auxalias introduction</h3>
+<p>A sourceable script. Facilitates creation of <em>aliases</em> for all auxilium sourceable scripts, which makes it possible to invoke a sourceable script like a command. It can create &quot;static&quot; aliases hard coded to a particular directory or &quot;dynamic&quot; aliases which dynamically use a path-like environment variable to find the right location of a sourcable script (much like how executable programs are located through PATH).</p>
+<h3 id="auxalias-usage">auxalias usage</h3>
+<pre><code>source &lt;dir&gt;/auxalias [&lt;option&gt;...] # if not yet aliased
+auxalias [&lt;option&gt;...]              # if already aliased
+  -y | --dyn                        # create dynamic aliases
+  -h | --help                       # display help
+  -v | --version                    # display version</code></pre>
+<p>(Assuming 'auxalias' is an alias to 'source &lt;dir&gt;/auxalias'.)</p>
+<h3 id="auxalias-options">auxalias options</h3>
+<dl>
+<dt>-y | --dyn</dt>
+<dd><p>Define &quot;dynamic aliases&quot; rather than &quot;static&quot; aliases.</p>
+</dd>
+<dt>-h | --help</dt>
+<dd><p>Displays a brief auxalias command usage summary. If used, this option should be the only option or parameter on the command line.</p>
+</dd>
+<dt>-v | --version</dt>
+<dd><p>Displays auxalias version information. If used, this option should be the only option or parameter on the command line.</p>
+</dd>
+</dl>
+<h3 id="auxalias-exit-status">auxalias exit status</h3>
+<p>auxalias completes with an exit status of 0 on success or with an non-zero exit status if an error was detected.</p>
+<h3 id="auxalias-description">auxalias description</h3>
+<p><em>auxalias</em> is a sourceable bash script which defines either &quot;static&quot; or &quot;dynamic&quot; aliases for all auxilium sourceable scripts (auxenv, auxsource, and auxalias). A static alias is linked to a hardcoded directory. A dynamic alias uses a path-like environment variable (PATH by default) to dynamically determine each time it is invoked the first occurance of the target file to source. This mimicks the PATH behavior of executable scripts.</p>
+<p>The auxalias script only defines aliases for auxilium sourcable scripts. The auxilium executable programs, such as auxwhere, auxchecktap, and auxguid do not need aliases.</p>
+<p>auxalias is part of the auxilium installation package.</p>
+<h3 id="auxalias-examples">auxalias examples</h3>
+<p>Here are some examples of using auxalias.</p>
+<ul>
+<li><p>Setting up static auxilium aliases to installation in /usr/local:</p>
+<pre><code>$ source /usr/local/bin/auxalias
+$ alias auxenv
+alias auxenv='source /usr/local/bin/auxenv'</code></pre></li>
+<li><p>Setting up dynamic auxilium aliases which use PATH:</p>
+<pre><code>$ source /usr/local/bin/auxalias
+$ alias auxenv
+alias auxenv='eval source $(auxwhere auxenv)'</code></pre></li>
+</ul>
+<h3 id="auxalias-notes">auxalias notes</h3>
+<p>Note that the auxalias &quot;command&quot; is not actually an &quot;executable&quot; script or binary image. Rather it is a &quot;sourceable&quot; script, meaning it is designed to run when invoked by the bash &quot;source&quot; built-in command. However, by using the bash built-in &quot;alias&quot; command, we can define an alias for auxalias such that it mimicks the usage behavior of an actual executable program. For example, consider the alias definition:</p>
+<pre><code>alias auxalias=&quot;source /usr/local/bin/auxalias&quot;</code></pre>
+<p>Once this alias is defined, interactive users and other scripts can invoke (source) the auxalias script simply by specifying &quot;auxalias&quot; followed by any desired additional auxalias parameters. (Assuming auxalias was installed in /usr/local/bin.) If auxilium was installed system-wide by your system administrator it is quite likely this alias will already be defined for you (probably in the /etc/bashrc file). You can type &quot;alias&quot; to see a list of all currently defined aliases. If this alias is not defined, you can add the alias definition in your personal $(HOME)/.bashrc file. Note that your aliases should be defined in $(HOME)/.bashrc file, not $(HOME)/.bash_profile.</p>
+<p>Sourceable scripts are needed if the current process environment is to be modified, rather than a subprocess environment that executable programs always run in. Since auxalias potentially needs to modify the current process environment, it needs to be a sourceable script.</p>
+<h2 id="auxchecktap">auxchecktap</h2>
+<p>auxchecktap - check and summarize TAP unit test results</p>
+<h3 id="auxchecktap-introduction">auxchecktap introduction</h3>
+<p>An executable script. Facilitates integration and checking of unit test results. Most unit test tools are targeted towards a particular programming language, which means most organizations have multiple unit test tools. Fortunately, there is a widely adopted format standard for unit test result file called &quot;TAP&quot;, which stands for &quot;Test Anything Protocol&quot; (see <a href="https://testanything.org/" class="uri">https://testanything.org/</a>). Most modern unit test tools can product TAP format unit test result files. The auxchecktap utility scans these TAP format unit test files and can optionally create a summary TAP unit test results file. This makes it possible to create tiered hierarchically unit test summary reports. This utility also checks unit test results files much more consistently and carefully than is reasonably human possible. Error lines buried in the middle of long files are always detected, abmormal early test suite termination without error messages are detected, test sequence problems are detected, and so forth.</p>
+<h3 id="auxchecktap-usage">auxchecktap usage</h3>
+<pre><code>auxchecktap [&lt;option&gt;...] [&lt;filename&gt;...]
+  -s | --strict   # strict TAP parsing (default)
+  -n | --nostrict # less strict TAP parsing
+  -b | --brief    # do not output # error comment lines
+  -d | --debug    # output debug info to stderr
+  -h | --help     # display help
+  -v | --version  # display version</code></pre>
+<h3 id="auxchecktap-options">auxchecktap options</h3>
+<dl>
+<dt>-s | --strict</dt>
+<dd><p>Specifies that strict TAP format parsing rules will be followed. Poorly formatted unit test results will result in an error being reported. This is the default.</p>
+</dd>
+<dt>-n | --nostrict</dt>
+<dd><p>Specifies that less restrictive TAP format parsing rules will be used. This sometimes helps when parsing rersult from unit test tools that only loosely follow TAP formatting rules.</p>
+</dd>
+<dt>-b | --brief</dt>
+<dd><p>Specifies that when producing summary TAP results, a &quot;not ok&quot; result line will be produce when a problem is detected, but the optional &quot;#&quot; comment lines following the report line which describe the problem will not be produced.</p>
+</dd>
+<dt>-d | --debug</dt>
+<dd><p>Specifies that extra debug information should be outrput to standard error.</p>
+</dd>
+<dt>-h | --help</dt>
+<dd><p>Displays a brief auxchecktap usage summary. If used, this option should be the only option or parameter on the command line.</p>
+</dd>
+<dt>-v | --version</dt>
+<dd><p>Displays auxchecktap version information. If used, this option should be the only option or parameter on the command line.</p>
+</dd>
+</dl>
+<h3 id="auxchecktap-exit-status">auxchecktap exit status</h3>
+<p>auxchecktap completes with an exit status of 0 if no errors are detected and no failed of missing unit test results were uncovered. It completes with a non-zero status is there were any usage errors, or if any fail uni tests were reported, or if missing unit tests were uncovered.</p>
+<h3 id="auxchecktap-description">auxchecktap description</h3>
+<p><em>auxchecktap</em> is an executable bash script which scans TAP format unit test results read from either standard input or one or more files. It outputs a summary of the scan to standard output also in TAP format.</p>
+<p>auxchecktap is part of the auxilium installation package.</p>
+<h3 id="auxchecktap-examples">auxchecktap examples</h3>
+<p>Here are some examples of using auxchecktap.</p>
+<ul>
+<li><p>Scanning a unit test results log file:</p>
+<pre><code>$ auxchecktap auxilium.taplog
+1..1
+ok 1 /home/ericc/github/auxilium/test/auxilium.taplog: 85 tests.
+$ echo &quot;$?&quot;
+0</code></pre></li>
+<li><p>Scanning multiple unit test result log files:</p>
+<pre><code>$ auxchecktap tmp*.taplog
+1..3
+ok 1 /home/ericc/github/auxilium/test/tmp1.taplog: 85 tests.
+ok 2 /home/ericc/github/auxilium/test/tmp2.taplog: 80 tests.
+ok 3 /home/ericc/github/auxilium/test/tmp3.taplog: 90 tests.
+$ echo &quot;$?&quot;
+0</code></pre></li>
+<li><p>Scanning a unit test log file with a failed unit test report in it:</p>
+<pre><code>$ auxchecktap another.taplog
+1..1
+not ok 1 /home/ericc/github/auxilium/test/another.taplog: 85 tests.
+# Found 1 failed test.
+$ echo &quot;$?&quot;
+1</code></pre></li>
+<li><p>Reading TAP output from standard input:</p>
+<pre><code>$ # an example what the bats unit test tool produces.
+$ # (see https://github.com/sstephenson/bats)
+$ bats --tap test-00510-auxenv-insert.bats
+1..4
+ok 1 check auxenv insert before dir
+ok 2 check auxenv insert after dir
+ok 3 check auxenv insert before pos
+ok 4 check auxenv insert after pos
+$ # piping unit test results info auxchecktap...
+$ bats --tap test-00510-auxenv-insert.bats | auxchecktap
+1..1
+ok 1 /dev/stdin: 4 tests.
+$ echo &quot;$?&quot;
+0</code></pre></li>
+</ul>
+<h2 id="auxguid">auxguid</h2>
+<p>auxguid - generate a 32 hex character (128 bit) GUID/UUID</p>
+<h3 id="auxguid-introduction">auxguid introduction</h3>
+<p>An executable script. This script generates a pseudo random 128-bit (32 hex character) GUID (Globally Unique IDentifier) sometimes also known as a UUID (Universally Unique IDentifier). There are some standards for GUID/UUID generation, but none are universal and even the definition of GUID and UUID is under debate (see <a href="https://en.wikipedia.org/wiki/Universally_unique_identifier" class="uri">https://en.wikipedia.org/wiki/Universally_unique_identifier</a>). This script uses its own algorithm to generate the GUID. The GUID is not cryptogrphically random, but it is sufficiently random such that the chances of any two independently generated GUIDs ever being the same (colliding) is astronomically low. Most programming languages have GUID/UUID generation facilities that are probably more standardized, but it is sometimes really convenient to have a good GUID generater that does not need anything but bash.</p>
+<h3 id="auxguid-usage">auxguid usage</h3>
+<pre><code>auxguid [&lt;option&gt;...]
+  -l | --lower    # use lowercase hex letters
+  -u | --upper    # use uppercase hex letters
+  -w | --warn     # display non-fatal warnings to stderr
+  -d | --debug    # output debug info to stderr
+  --uuidgen       # use the uuidgen utility if installed
+  -h | --help     # display help
+  -v | --version  # display version</code></pre>
+<h3 id="auxguid-options">auxguid options</h3>
+<dl>
+<dt>-l | --lower</dt>
+<dd><p>Specifies that lowercase hex characters will be used in the generated GUID/UUID.</p>
+</dd>
+<dt>-u | --upper</dt>
+<dd><p>Specifies that uppercase hex characters will be used in the generated GUID/UUID.</p>
+</dd>
+<dt>-w | --warn</dt>
+<dd><p>Specifies that warning messages about non-fatal conditions should be output to standard error.</p>
+</dd>
+<dt>-d | --debug</dt>
+<dd><p>Specifies that extra debug information should be outrput to standard error.</p>
+</dd>
+<dt>--uuidgen</dt>
+<dd><p>Specifies that the optional Linux program &quot;uuidgen&quot; should be used if it is installed. If uuidgen is not install, auxguid will still generated a GUID/UUID with its internal algorithm.</p>
+</dd>
+<dt>-h | --help</dt>
+<dd><p>Displays a brief auxguid usage summary. If used, this option should be the only option or parameter on the command line.</p>
+</dd>
+<dt>-v | --version</dt>
+<dd><p>Displays auxguid version information. If used, this option should be the only option or parameter on the command line.</p>
+</dd>
+</dl>
+<h3 id="auxguid-exit-status">auxguid exit status</h3>
+<p>auxguid completes with an exit status of 0 if it successfully generates and outputs a GUID/UUID, otherwise a non-zero exit status is returned.</p>
+<h3 id="auxguid-description">auxguid description</h3>
+<p><em>auxguid</em> is an executable bash script which, by default, uses a custom algorithm to generate a 32 hex xharacter 128 bit GUID (Globally Unigue IDentifier) sometimes also called a UUID (Universally Unique IDentifier) using nothing by bash. (See <a href="https://en.wikipedia.org/wiki/Universally_unique_identifier" class="uri">https://en.wikipedia.org/wiki/Universally_unique_identifier</a>).</p>
+<p>Optionally, if the &quot;--uuidgen&quot; option is specified and if the optional Linux program &quot;uuidgen&quot; is installed then that program is used to generate the GUID/UUID.</p>
+<p>auxguid is part of the auxilium installation package.</p>
+<h3 id="auxguid-examples">auxguid examples</h3>
+<p>Here are some examples of using auxguid.</p>
+<ul>
+<li><p>Generate a GUID/UUID:</p>
+<pre><code>$ auxguid
+2c7459630bbf26bc01ee5a33259a215a</code></pre></li>
+<li><p>Generate a lowercase GUID/UUID:</p>
+<pre><code>$ auxguid --lower
+5bb659630c1f28006a2d5a57259a215a</code></pre></li>
+<li><p>Generate an uppercase GUID/UUID:</p>
+<pre><code>$ auxguid --upper
+39EB59630C67184D7E0E5B1E259A215A</code></pre></li>
+</ul>
+<h1 id="authors">Authors</h1>
+<p>Eric Alan Christiansen<br />
+eric@motleybytes.com<br />
+<a href="https://www.linkedin.com/in/ericchristiansen/" class="uri">https://www.linkedin.com/in/ericchristiansen/</a></p>
+<h1 id="legal">Legal</h1>
+<h2 id="copyright">Copyright</h2>
+<p>Copyright © 2017 Eric Alan Christiansen.</p>
+<h2 id="licensing">Licensing</h2>
+<p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to use and/or redistribute it under the conditions of the GNU General Public License v3.0.</p>
+<p>See <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class="uri">https://www.gnu.org/licenses/gpl-3.0.en.html</a></p>
+</body>
+</html>

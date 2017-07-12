@@ -21,6 +21,7 @@ AUXWHERE_TITLE=$(shell head -1 doc/include/auxwhere-title.md)
 AUXALIAS_TITLE=$(shell head -1 doc/include/auxalias-title.md)
 AUXCHECKTAP_TITLE=$(shell head -1 doc/include/auxchecktap-title.md)
 AUXGUID_TITLE=$(shell head -1 doc/include/auxguid-title.md)
+AUXILIUM_TITLE=$(shell head -1 doc/include/auxilium-title.md)
 AUXILIUM_UG_TITLE=$(shell head -1 doc/include/auxilium-user-guide-title.md)
 AUXILIUM_UG_SUBTITLE=Version $(THISREL)
 AUXILIUM_INFO_TITLE=$(shell head -1 doc/include/auxilium-info-page-title.md)
@@ -62,6 +63,7 @@ docs: doc/include/auxenv-aliasing.ppo.md \
     share/man/man1/auxalias.1 \
     share/man/man1/auxchecktap.1 \
     share/man/man1/auxguid.1 \
+    share/man/man1/auxilium.1 \
   share/html/man/man1 \
     share/html/man/man1/auxenv.1.html \
     share/html/man/man1/auxsource.1.html \
@@ -69,6 +71,7 @@ docs: doc/include/auxenv-aliasing.ppo.md \
     share/html/man/man1/auxalias.1.html \
     share/html/man/man1/auxchecktap.1.html \
     share/html/man/man1/auxguid.1.html \
+    share/html/man/man1/auxilium.1.html \
   share/html/auxilium \
     share/html/auxilium/index.html \
     share/html/auxilium/auxilium-user-guide.html \
@@ -104,6 +107,9 @@ doc/man/auxchecktap.ppo.md : doc/man/auxchecktap.ppi.md doc/include
 doc/man/auxguid.ppo.md : doc/man/auxguid.ppi.md doc/include
 	pp $< > $@
 
+doc/man/auxilium.ppo.md : doc/man/auxilium.ppi.md doc/include
+	pp $< > $@
+
 # man in man format stuff
 
 share/man/man1 :
@@ -127,6 +133,9 @@ share/man/man1/auxchecktap.1 : doc/man/auxchecktap.ppo.md
 share/man/man1/auxguid.1 : doc/man/auxguid.ppo.md
 	$(PANDOCMAN) $< --output=$@ -M title=auxguid
 
+share/man/man1/auxilium.1 : doc/man/auxilium.ppo.md
+	$(PANDOCMAN) $< --output=$@ -M title=auxilium
+
 # man in html format stuff
 
 share/html/man/man1 :
@@ -149,6 +158,9 @@ share/html/man/man1/auxchecktap.1.html : doc/man/auxchecktap.ppo.md doc/css doc/
 
 share/html/man/man1/auxguid.1.html : doc/man/auxguid.ppo.md doc/css doc/templates
 	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXGUID_TITLE)"
+
+share/html/man/man1/auxilium.1.html : doc/man/auxilium.ppo.md doc/css doc/templates
+	$(PANDOCHTMLMAN) $< --output=$@ -M title="$(AUXILIUM_TITLE)"
 
 # documentation index page
 
@@ -200,6 +212,7 @@ cleandocs:
 	rm -f doc/man/auxalias.ppo.md
 	rm -f doc/man/auxchecktap.ppo.md
 	rm -f doc/man/auxguid.ppo.md
+	rm -f doc/man/auxilium.ppo.md
 	rm -f share/man/man1/auxenv.1
 	rm -f share/html/man/man1/auxenv.1.html
 	rm -f share/man/man1/auxsource.1
@@ -212,6 +225,8 @@ cleandocs:
 	rm -f share/html/man/man1/auxchecktap.1.html
 	rm -f share/man/man1/auxguid.1
 	rm -f share/html/man/man1/auxguid.1.html
+	rm -f share/man/man1/auxilium.1
+	rm -f share/html/man/man1/auxilium.1.html
 	rm -f doc/html/index.ppo.md
 	rm -f share/html/auxilium/index.html
 	rm -f share/html/auxilium/auxilium-user-guide.html

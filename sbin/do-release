@@ -53,6 +53,410 @@ function aux_notice() {
     echo "NOTICE: $1"
     return 0
 }
+function check_show_version() {
+    if [ "$versionflag" == "y" ]; then
+        echo "$version"
+    fi
+}
+function check_show_help() {
+    if [ "$helpflag" == "y" ]; then
+        echo "Command:"
+        echo "  $cmdname - Make a new GitHub release"
+        echo "Syntax:"
+        echo "  $cmdname -h | --help     # display this help text."
+        echo "  $cmdname -v | --version  # display program version information."
+        echo "  $cmdname [<option>...]   # do a GitHub release."
+        echo "Options:"
+        echo "  -b --verbose  # display extra info."
+        echo "  -w --warn     # output non-fatal warnings to stderr."
+        echo "  -d --debug    # output debug info to stderr."
+    fi
+}
+function check_early_exit() {
+    # exit now if -h or -v
+    #
+    # if --help or --version and no files specified, assume we are done.
+    #
+    if [[ "$versionflag" == "y" || "$helpflag" == "y" ]]; then
+        exit 0
+    fi
+}
+function verify_on_master_branch() {
+    branch=$(git status --porcelain --branch | grep -e '^##\ ' | head -1)
+    branch="${branch:3}"
+    branch="${branch%%\ *}"
+    branchok="n"
+    aux_debug "branch=$branch."
+    if [ "$branch" == "master...origin/master" ]; then
+        branchok="y"
+    elif [ "$branch" == "master" ]; then
+        branchok="y"
+    else
+        aux_error "Unexpected branch ($branch)."
+        exit 1
+    fi
+    aux_info "$branch is the current git branch."
+}
+function verify_makefile_exists() {
+    # make sure makefile exists
+    makefile="$reporoot/Makefile"
+    aux_debug "makefile=$makefile."
+    if [ ! -e "$makefile" ]; then
+       aux_error "Makefile ($makefile) not found."
+       exit 1
+    fi
+    aux_checkpass "Makefile ($makefile) found."
+}
+function get_release_version() {
+    # get this release number
+    nextrel=$("$reporoot/sbin/show-release" --current)
+    if [ -z "$nextrel" ]; then
+        aux_error "current next release could not be read."
+        exit 1
+    fi
+    aux_info "$nextrel is the current release (to be built)."
+}
+function get_local_release_numbers() {
+    # get local release versions
+    localrels=$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
+    readarray -t locrelarr < <(echo "$localrels")
+}
+function get_last_existing_local_release_version() {
+    # get the last existing local release version
+    lastlocalrel=$(echo "$localrels" | tail -1)
+    aux_info "$lastlocalrel is the last local release tag found."
+    if [ "$nextrel" == "lastlocalrel" ]; then
+        aux_error "Next release tag ($nextrel) already used locally."
+        exit 1
+    fi
+}
+function get_remote_release_numbers() {
+    # get remote existing release versions
+    remoterels=$(git ls-remote --tags origin)
+    remoterels=$(echo "$remoterels" | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$')
+    remoterels=$(echo "$remoterels" | sed 's#^.*refs/tags/##')
+    remoterels=$(echo "$remoterels" | sort -V)
+    readarray -t remrelarr < <(echo "$remoterels")
+}
+function get_last_existing_remote_release_version() {
+    # get the last existing remote release number
+    tmpvar=$(git ls-remote --tags origin)
+    tmpvar=$(echo "$tmpvar" | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$')
+    tmpvar=$(echo "$tmpvar" | sed 's#^.*refs/tags/##')
+    tmpvar=$(echo "$tmpvar" | sort -V)
+    lastremoterel=$(echo "$remoterels" | tail -1)
+    aux_info "$lastremoterel is the last remote release tag found."
+    if [ "$nextrel" == "lastremoterel" ]; then
+        aux_error "Next release tag ($nextrel) already used remotely."
+        exit 1
+    fi
+}
+function check_release_version_not_used_on_remote() {
+    # check that nextrel not used on remote
+    usedonrem="n"
+    for rel in "${remrelarr[@]}"; do
+        if [ "$nextrel" == "$rel" ]; then
+            usedonrem="y"
+            break
+        fi
+    done
+    if [ "$usedonrem" == "y" ]; then
+        aux_error "Next release $nextrel already used on git remote."
+        exit 1
+    fi
+    aux_info "Next release $nextrel is not yet used on git remote."
+}
+function check_release_version_not_used_on_local() {
+    # check that nextrel not used on local
+    usedonloc="n"
+    for rel in "${locrelarr[@]}"; do
+        if [ "$nextrel" == "$rel" ]; then
+            usedonloc="y"
+            break
+        fi
+    done
+    if [ "$usedonloc" == "y" ]; then
+        if [ "$interactiveflag" == "y" ]; then
+            aux_notice "Next release $nextrel already used locally, but not remotely."
+            dotagdel="n"
+            while true; do
+                read -p "Do you want to delete the old local $nextrel tagging [yN]? " answer
+                case $answer in
+                    [Yy]* ) dotagdel="y"; break;;
+                    [Nn]* ) dotagdel="n"; break;;
+                    * ) echo "Please answer yes or no.";;
+                esac
+            done
+            if [ "$dotagdel" == "y" ]; then
+                git tag --delete $nextrel
+                if [ "$?" != "0" ]; then
+                    aux_error "git tag --delete completion status problem."
+                    exit 1
+                fi
+                usedonloc="n"  # cleaned up now
+            fi
+        fi
+    fi
+    if [ "$usedonloc" == "y" ]; then
+        aux_error "Next release $nextrel already used locally."
+        exit 1
+    fi
+    aux_info "Next release $nextrel is not now used locally."
+}
+function log_release_attempt() {
+    cd "$reporoot"
+    make log-release-attempt
+    if [ "$?" == "0" ]; then
+        aux_info "This release attempt has been logged."
+    else
+        aux_error "The was a problem trying to log this release attempt."
+        exit 1
+    fi
+}
+function do_make_clean() {
+    cd "$reporoot"
+    make clean
+    if [ "$?" == "0" ]; then
+        aux_info "make clean completed ok."
+    else
+        aux_error "The was a problem trying to do make clean."
+        exit 1
+    fi
+}
+function verify_everything_built_ok() {
+    # make sure we built everything ok
+    cd "$reporoot"
+    tmpvar=$(make build)
+    if [ "$?" != "0" ]; then
+        aux_error "There was a problem doing 'make build'."
+        exit 1
+    fi
+    tmpvar=$(echo "$tmpvar" | tail -1)
+    if [ "$tmpvar" != "[build complete]" ]; then
+        aux_error "Unexpected final build message ($tmpvar)."
+        exit 1
+    fi
+    aux_info "build appears to be successful."
+}
+function verify_unit_tests_ok() {
+    # make sure tests ok
+    cd "$reporoot"
+    tmpvar=$(make checktest | tail -1)
+    if [ "$?" != "0" ]; then
+        aux_error "There was a problem doing 'make checktest'."
+        exit 1
+    fi
+    if [ "${tmpvar:0:3}" != "ok " ]; then
+        aux_error "Unexpected final checktest message ($tmpvar)."
+        exit 1
+    fi
+    aux_info "test appears to be successful."
+}
+function stage_manuals() {
+    cd "$reporoot"
+    make stage-manuals
+    if [ "$?" == "0" ]; then
+        aux_info "stage manuals completed ok."
+    else
+        aux_error "The was a problem trying to do stage manuals."
+        exit 1
+    fi
+}
+function verify_clean_git_status() {
+    # look for clean git status
+    cd "$reporoot"
+    keeplooping="y"
+    while [ "$keeplooping" == "y" ]; do
+        tmpvar=$(git status --porcelain)
+        if [ -z "$tmpvar" ]; then
+            tmpvar2="0"
+        else
+            tmpvar2=$(echo $tmpvar | wc -l)
+        fi
+        aux_debug "$tmpvar2 git status lines found."
+        isclean="y"
+        if [ "$tmpvar2" != "0" ]; then
+            aux_debug "unclean!"
+            if [[ "$debugflag" == "y" ]]; then
+                echo ".${tmpvar}."
+            fi
+            isclean="n"
+            #if [[ $- == *i* ]]; then
+            if [[ "$interactiveflag"=="y" ]]; then
+                # running interactively
+                aux_debug "Interactive!?!?"
+                aux_notice "Git status not clean!"
+                echo "This script can try to clean things up by git adding all untracked and modified files."
+                echo "This script can try to clean things up perfroming a git commit."
+                tryfix="n"
+                while true; do
+                    read -p "Do you want this script to try to clean this up [yN]? " answer
+                    case $answer in
+                        [Yy]* ) tryfix="y"; break;;
+                        [Nn]* ) tryfix="n"; break;;
+                        * ) echo "Please answer yes or no.";;
+                    esac
+                done
+                if [ "$tryfix" == "n" ]; then
+                    keeplooping="n"
+                elif [ "$tryfix" == "y" ]; then
+                    git add .
+                    echo "Untracked and modified files have been added to git."
+                    read -p "Please enter a comment for the git commit: " comment
+                    git commit -m "$comment"
+                else
+                    keeplooping="n"
+                fi
+            else
+                aux_debug "Not interactive!?!?"
+                # running non-interactively, give up
+                keeplooping="n"
+            fi
+        else
+            aux_debug "No lines of uncleanliness."
+            keeplooping="n"
+        fi
+    done
+    if [ "$isclean" == "n" ]; then
+        errmsg="Git status not clean, 'git add' or 'git commit' required."
+        aux_error "$errmsg"
+        exit 1
+    fi
+    aux_info "git status appear to be clean, for now."
+}
+function do_git_pull() {
+    # try a git pull and check it
+    gitpullout=$(git pull origin master 2>/dev/null)
+    if [ "$?" != 0 ]; then
+        aux_error "Command status problem with git pull"
+        exit 1
+    fi
+    gitpulllastline=$(echo "$gitpullout" | tail -1)
+    if [ "$gitpulllastline" != "Already up-to-date." ]; then
+        aux_error "git pull indicates some possible issues."
+        exit 1
+    fi
+    aux_info "git pull did not reveal any new issues."
+}
+function do_git_push() {
+    # push changes if needed
+    gitstatout=$(git status)
+    grepout=$(echo "$gitstatout" | grep "use" | grep "git push" | grep "publish" | grep "local commits")
+    if [ ! -z "$grepout" ]; then
+        aux_debug "$grepout"
+        aux_notice "Looks like some local changes need to be pushed to remote origin."
+        aux_notice "Pushing changes to remote origin..."
+        git push origin master 2>/dev/null
+        if [ "$?" != "0" ]; then
+            aux_error "git push completion status problem."
+            exit 1
+        fi
+        gitstatout=$(git status)
+        grepout=$(echo "$gitstatout" | grep "use" | grep "git push" | grep "publish" | grep "local commits")
+        if [ ! -z "$grepout" ]; then
+            aux_error "Unable to get in sync with remote origin, see git status."
+            exit 1
+        fi
+    fi
+    aux_info "Local git appears to be in sync with remote git."
+}
+function tag_local_files() {
+    # tag local files
+    dotag="y"
+    if [ "$interactiveflag" == "y" ]; then
+        dotag="n"
+        while true; do
+            read -p "Do you want to tag local files with '$nextrel' [yN]? " answer
+            case $answer in
+                [Yy]* ) dotag="y"; break;;
+                [Nn]* ) dotag="n"; break;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
+    fi
+    if [ "$dotag" == "y" ]; then
+        git tag $nextrel
+        if [ "$?" != "0" ]; then
+            aux_error "git tag completion status problem."
+            exit 1
+        fi
+    else
+        aux_error "exiting early (at local tag phase) by user selection."
+        exit 1
+    fi
+    aux_info "Local files tagged with '$nextrel'."
+}
+function create_runtime_tarball() {
+    # now make the run-time distribution tar file
+    cd "$reporoot"
+    make clean-runtime-dist > /dev/null
+    if [ "$?" != "0" ]; then
+        aux_error "make clean-runtime-dist completion status was not 0."
+        exit 1
+    fi
+    make runtime-dist > /dev/null
+    if [ "$?" != "0" ]; then
+        aux_error "make runtime-dist completion status was not 0."
+        exit 1
+    fi
+    tarfile="${reporoot}/dist/auxilium-run-${nextrel}.tar.gz"
+    if [ ! -e  "$tarfile" ]; then
+        aux_error "File not found ($tarfile)."
+        exit 1
+    fi
+    aux_info "Run-tine distribution tar file created ($tarfile)."
+}
+function unit_test_runtime_staging_area() {
+    # test what was copied to release runtime staging area
+    cd "${reporoot}"   # TBD! is this correct? Not in staging area!
+    make -f Makefile.test.mak checktest
+    if [ "$?" != "0" ]; then
+        aux_error "Unit tests on release working copy failed."
+        exit 1
+    fi
+    aux_info "Unit tests on release working copy passed."
+}
+function push_tag_to_remote() {
+    # now push the tag to the remote git server
+    dotag="y"
+    if [ "$interactiveflag" == "y" ]; then
+        dotag="n"
+        while true; do
+            read -p "Do you want to tag remote files with '$nextrel' [yN]? " answer
+            case $answer in
+                [Yy]* ) dotag="y"; break;;
+                [Nn]* ) dotag="n"; break;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
+    fi
+    if [ "$dotag" == "y" ]; then
+        git push origin $nextrel
+        if [ "$?" != "0" ]; then
+            aux_error "git push origin $nextrel completion status problem."
+            exit 1
+        fi
+    else
+        aux_error "exiting early (at remote tag phase) by user selection."
+        exit 1
+    fi
+    aux_info "Remote files tagged with '$nextrel'."
+}
+function create_devtime_tarball() {
+    # make dev distribution
+    cd "$reporoot"
+    make devtime-dist > /dev/null
+    if [ "$?" != "0" ]; then
+        aux_error "make devtime-dist completion status was not 0."
+        exit 1
+    fi
+    tarfile2="${reporoot}/dist/auxilium-dev-${nextrel}.tar.gz"
+    if [ ! -e  "$tarfile2" ]; then
+        aux_error "File not found ($tarfile2)."
+        exit 1
+    fi
+    aux_info "Dev-time distribution tar file created ($tarfile)."
+}
 #
 # begin main program
 #
@@ -97,33 +501,9 @@ while [ $# -gt 0 ]; do
         exit 1
     fi
 done
-#
-# show version if it was requested
-#
-if [ "$versionflag" == "y" ]; then
-    echo "$version"
-fi
-#
-# show help if it was requested
-#
-if [ "$helpflag" == "y" ]; then
-    echo "Command:"
-    echo "  $cmdname - Make a new GitHub release"
-    echo "Syntax:"
-    echo "  $cmdname -h | --help     # display this help text."
-    echo "  $cmdname -v | --version  # display program version information."
-    echo "  $cmdname [<option>...]   # do a GitHub release."
-    echo "Options:"
-    echo "  -b --verbose  # display extra info."
-    echo "  -w --warn     # output non-fatal warnings to stderr."
-    echo "  -d --debug    # output debug info to stderr."
-fi
-#
-# if --help or --version and no files specified, assume we are done.
-#
-if [[ "$versionflag" == "y" || "$helpflag" == "y" ]]; then
-    exit 0
-fi
+check_show_version  # show version if it was requested
+check_show_help     # show help if it was requested
+check_early_exit    # exit now if -h or -v
 #
 # do release
 #
@@ -131,315 +511,28 @@ aux_debug "cmdfile=$cmdfile."
 aux_debug "cmddir=$cmddir."
 aux_debug "reporoot=$reporoot."
 aux_debug "cmdname=$cmdname."
-# make sure we are on master branch
-branch=$(git status --porcelain --branch | grep -e '^##\ ' | head -1)
-branch="${branch:3}"
-branch="${branch%%\ *}"
-branchok="n"
-aux_debug "branch=$branch."
-if [ "$branch" == "master...origin/master" ]; then
-    branchok="y"
-elif [ "$branch" == "master" ]; then
-    branchok="y"
-else
-    aux_error "Unexpected branch ($branch)."
-    exit 1
-fi
-aux_info "$branch is the current git branch."
-# make sure makefile exists
-makefile="$reporoot/Makefile"
-aux_debug "makefile=$makefile."
-if [ ! -e "$makefile" ]; then
-   aux_error "Makefile ($makefile) not found."
-   exit 1
-fi
-aux_checkpass "Makefile ($makefile) found."
-# get this release number
-nextrel=$("$reporoot/sbin/show-release" --current)
-if [ -z "$nextrel" ]; then
-    aux_error "current next release could not be read."
-    exit 1
-fi
-aux_info "$nextrel is the current release (to be built)."
-# get local release versions
-localrels=$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
-readarray -t locrelarr < <(echo "$localrels")
-# get the last existing local release version
-lastlocalrel=$(echo "$localrels" | tail -1)
-aux_info "$lastlocalrel is the last local release tag found."
-if [ "$nextrel" == "lastlocalrel" ]; then
-    aux_error "Next release tag ($nextrel) already used locally."
-    exit 1
-fi
-# get remote existing release versions
-remoterels=$(git ls-remote --tags origin)
-remoterels=$(echo "$remoterels" | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$')
-remoterels=$(echo "$remoterels" | sed 's#^.*refs/tags/##')
-remoterels=$(echo "$remoterels" | sort -V)
-readarray -t remrelarr < <(echo "$remoterels")
-# get the last existing remote release number
-tmpvar=$(git ls-remote --tags origin)
-tmpvar=$(echo "$tmpvar" | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$')
-tmpvar=$(echo "$tmpvar" | sed 's#^.*refs/tags/##')
-tmpvar=$(echo "$tmpvar" | sort -V)
-lastremoterel=$(echo "$remoterels" | tail -1)
-aux_info "$lastremoterel is the last remote release tag found."
-if [ "$nextrel" == "lastremoterel" ]; then
-    aux_error "Next release tag ($nextrel) already used remotely."
-    exit 1
-fi
-# check that nextrel not used on remote
-usedonrem="n"
-for rel in "${remrelarr[@]}"; do
-    if [ "$nextrel" == "$rel" ]; then
-        usedonrem="y"
-        break
-    fi
-done
-if [ "$usedonrem" == "y" ]; then
-    aux_error "Next release $nextrel already used on git remote."
-    exit 1
-fi
-aux_info "Next release $nextrel is not yet used on git remote."
-# check that nextrel not used on remote
-usedonloc="n"
-for rel in "${locrelarr[@]}"; do
-    if [ "$nextrel" == "$rel" ]; then
-        usedonloc="y"
-        break
-    fi
-done
-if [ "$usedonloc" == "y" ]; then
-    if [ "$interactiveflag" == "y" ]; then
-        aux_notice "Next release $nextrel already used locally, but not remotely."
-        dotagdel="n"
-        while true; do
-            read -p "Do you want to delete the old local $nextrel tagging [yN]? " answer
-            case $answer in
-                [Yy]* ) dotagdel="y"; break;;
-                [Nn]* ) dotagdel="n"; break;;
-                * ) echo "Please answer yes or no.";;
-            esac
-        done
-        if [ "$dotagdel" == "y" ]; then
-            git tag --delete $nextrel
-            if [ "$?" != "0" ]; then
-                aux_error "git tag --delete completion status problem."
-                exit 1
-            fi
-            usedonloc="n"  # cleaned up now
-        fi
-    fi
-fi
-if [ "$usedonloc" == "y" ]; then
-    aux_error "Next release $nextrel already used locally."
-    exit 1
-fi
-aux_info "Next release $nextrel is not now used locally."
-# make sure we built everything ok
-cd "$reporoot"
-tmpvar=$(make build)
-if [ "$?" != "0" ]; then
-    aux_error "There was a problem doing 'make build'."
-    exit 1
-fi
-tmpvar=$(echo "$tmpvar" | tail -1)
-if [ "$tmpvar" != "[build complete]" ]; then
-    aux_error "Unexpected final build message ($tmpvar)."
-    exit 1
-fi
-aux_info "build appears to be successful."
-# make sure tests ok
-cd "$reporoot"
-tmpvar=$(make checktest | tail -1)
-if [ "$?" != "0" ]; then
-    aux_error "There was a problem doing 'make checktest'."
-    exit 1
-fi
-if [ "${tmpvar:0:3}" != "ok " ]; then
-    aux_error "Unexpected final checktest message ($tmpvar)."
-    exit 1
-fi
-aux_info "test appears to be successful."
-# look for clean git status
-cd "$reporoot"
-keeplooping="y"
-while [ "$keeplooping" == "y" ]; do
-    tmpvar=$(git status --porcelain)
-    if [ -z "$tmpvar" ]; then
-        tmpvar2="0"
-    else
-        tmpvar2=$(echo $tmpvar | wc -l)
-    fi
-    aux_debug "$tmpvar2 git status lines found."
-    isclean="y"
-    if [ "$tmpvar2" != "0" ]; then
-        aux_debug "unclean!"
-        if [[ "$debugflag" == "y" ]]; then
-            echo ".${tmpvar}."
-        fi
-        isclean="n"
-        #if [[ $- == *i* ]]; then
-        if [[ "$interactiveflag"=="y" ]]; then
-            # running interactively
-            aux_debug "Interactive!?!?"
-            aux_notice "Git status not clean!"
-            echo "This script can try to clean things up by git adding all untracked and modified files."
-            echo "This script can try to clean things up perfroming a git commit."
-            tryfix="n"
-            while true; do
-                read -p "Do you want this script to try to clean this up [yN]? " answer
-                case $answer in
-                    [Yy]* ) tryfix="y"; break;;
-                    [Nn]* ) tryfix="n"; break;;
-                    * ) echo "Please answer yes or no.";;
-                esac
-            done
-            if [ "$tryfix" == "n" ]; then
-                keeplooping="n"
-            elif [ "$tryfix" == "y" ]; then
-                git add .
-                echo "Untracked and modified files have been added to git."
-                read -p "Please enter a comment for the git commit: " comment
-                git commit -m "$comment"
-            else
-                keeplooping="n"
-            fi
-        else
-            aux_debug "Not interactive!?!?"
-            # running non-interactively, give up
-            keeplooping="n"
-        fi
-    else
-        aux_debug "No lines of uncleanliness."
-        keeplooping="n"
-    fi
-done
-if [ "$isclean" == "n" ]; then
-    errmsg="Git status not clean, 'git add' or 'git commit' required."
-    aux_error "$errmsg"
-    exit 1
-fi
-aux_info "git status appear to be clean, for now."
-# try a git pull and check it
-gitpullout=$(git pull origin master 2>/dev/null)
-if [ "$?" != 0 ]; then
-    aux_error "Command status problem with git pull"
-    exit 1
-fi
-gitpulllastline=$(echo "$gitpullout" | tail -1)
-if [ "$gitpulllastline" != "Already up-to-date." ]; then
-    aux_error "git pull indicates some possible issues."
-    exit 1
-fi
-aux_info "git pull did not reveal any new issues."
-# push changes if needed
-gitstatout=$(git status)
-grepout=$(echo "$gitstatout" | grep "use" | grep "git push" | grep "publish" | grep "local commits")
-if [ ! -z "$grepout" ]; then
-    aux_debug "$grepout"
-    aux_notice "Looks like some local changes need to be pushed to remote origin."
-    aux_notice "Pushing changes to remote origin..."
-    git push origin master 2>/dev/null
-    if [ "$?" != "0" ]; then
-        aux_error "git push completion status problem."
-        exit 1
-    fi
-    gitstatout=$(git status)
-    grepout=$(echo "$gitstatout" | grep "use" | grep "git push" | grep "publish" | grep "local commits")
-    if [ ! -z "$grepout" ]; then
-        aux_error "Unable to get in sync with remote origin, see git status."
-        exit 1
-    fi
-fi
-aux_info "Local git appears to be in sync with remote git."
-# tag local files
-dotag="y"
-if [ "$interactiveflag" == "y" ]; then
-    dotag="n"
-    while true; do
-        read -p "Do you want to tag local files with '$nextrel' [yN]? " answer
-        case $answer in
-            [Yy]* ) dotag="y"; break;;
-            [Nn]* ) dotag="n"; break;;
-            * ) echo "Please answer yes or no.";;
-        esac
-    done
-fi
-if [ "$dotag" == "y" ]; then
-    git tag $nextrel
-    if [ "$?" != "0" ]; then
-        aux_error "git tag completion status problem."
-        exit 1
-    fi
-else
-    aux_error "exiting early (at local tag phase) by user selection."
-    exit 1
-fi
-aux_info "Local files tagged with '$nextrel'."
-# now make the run-time distribution tar file
-cd "$reporoot"
-make clean-runtime-dist > /dev/null
-if [ "$?" != "0" ]; then
-    aux_error "make clean-runtime-dist completion status was not 0."
-    exit 1
-fi
-make runtime-dist > /dev/null
-if [ "$?" != "0" ]; then
-    aux_error "make runtime-dist completion status was not 0."
-    exit 1
-fi
-tarfile="${reporoot}/dist/auxilium-run-${nextrel}.tar.gz"
-if [ ! -e  "$tarfile" ]; then
-    aux_error "File not found ($tarfile)."
-    exit 1
-fi
-aux_info "Run-tine distribution tar file created ($tarfile)."
-# test what was copied to release runtime staging area
-cd "${reporoot}"
-make -f Makefile.test.mak checktest
-if [ "$?" != "0" ]; then
-    aux_error "Unit tests on release working copy failed."
-    exit 1
-fi
-aux_info "Unit tests on release working copy passed."
-# now push the tag to the remote git server
-dotag="y"
-if [ "$interactiveflag" == "y" ]; then
-    dotag="n"
-    while true; do
-        read -p "Do you want to tag remote files with '$nextrel' [yN]? " answer
-        case $answer in
-            [Yy]* ) dotag="y"; break;;
-            [Nn]* ) dotag="n"; break;;
-            * ) echo "Please answer yes or no.";;
-        esac
-    done
-fi
-if [ "$dotag" == "y" ]; then
-    git push origin $nextrel
-    if [ "$?" != "0" ]; then
-        aux_error "git push origin $nextrel completion status problem."
-        exit 1
-    fi
-else
-    aux_error "exiting early (at remote tag phase) by user selection."
-    exit 1
-fi
-aux_info "Remote files tagged with '$nextrel'."
-# make dev distribution
-cd "$reporoot"
-make devtime-dist > /dev/null
-if [ "$?" != "0" ]; then
-    aux_error "make devtime-dist completion status was not 0."
-    exit 1
-fi
-tarfile2="${reporoot}/dist/auxilium-dev-${nextrel}.tar.gz"
-if [ ! -e  "$tarfile2" ]; then
-    aux_error "File not found ($tarfile2)."
-    exit 1
-fi
-aux_info "Dev-tine distribution tar file created ($tarfile)."
+verify_on_master_branch    # make sure we are on master branch
+verify_makefile_exists     # make sure makefile exists
+get_release_version
+get_local_release_numbers
+get_last_existing_local_release_version
+get_remote_release_numbers
+get_last_existing_remote_release_version
+check_release_version_not_used_on_remote
+check_release_version_not_used_on_local
+log_release_attempt
+do_make_clean
+verify_everything_built_ok
+verify_unit_tests_ok
+stage_manuals
+verify_clean_git_status
+do_git_pull
+do_git_push
+tag_local_files
+create_runtime_tarball
+unit_test_runtime_staging_area
+push_tag_to_remote
+create_devtime_tarball
 # script hard work done
 aux_notice "Looks like this script finished nicely, congratulations."
 aux_notice "You still need to:"

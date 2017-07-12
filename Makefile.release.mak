@@ -11,6 +11,7 @@ helprel:
 	@echo "  make show-remote-release-tags # release tags on GitHub server."
 	@echo "  make show-local-release-tags  # release tags on local server."
 	@echo "  make log-release-attempt      # log release attempt and datetime."
+	@echo "  make stage-manuals            # stage manuals for upload to web."
 	@echo "  make clean-runtime-dist       # clean distribution area."
 	@echo "  make runtime-dist             # create distribution and tarball."
 	@echo "  make runtime-test             # test distribution copy."
@@ -54,7 +55,9 @@ helprelcheck:
 	@echo "  # Verify your change:"
 	@echo "    make -f $(THISFILE) show-this-release."
 	@echo "  # log that your are starting a release
-	@echo "    make log-release-attempt."
+	@echo "    make log-release-attempt"
+	@echo "  # stage manuals for upload to web at next git push."
+	@echo "    make -f $(THISFILE) stage-manuals"
 	@echo "  # Optional: Make sure the runtime distribution area is clean."
 	@echo "    make -f $(THISFILE) clean-runtime-dist"
 	@echo "  # Make the runtime-only distribution tarball."
@@ -98,6 +101,11 @@ show-remote-release-tags:
 log-release-attempt:
 	touch $(RELLOGFILE)
 	echo "$(THISREL)|$(USER)|$(CURDATETIME)" >> $(RELLOGFILE)
+
+.PHONY: stage-manuals
+stage-manuals:
+	cp share/share/html/auxilium/auxilium-user-guide.html docs/
+	cp share/share/html/auxilium/auxilium-user-guide.pdf  docs/
 
 .PHONY: runtime-dist
 runtime-dist: \

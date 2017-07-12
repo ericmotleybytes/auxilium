@@ -45,4 +45,4 @@
 
 ## SEE ALSO
 
-auxwhere(1), auxsource(1)
+auxilium(1), auxwhere(1), auxsource(1)

@@ -26,6 +26,7 @@ install : installinfo \
   $(PREFIX)/share/man/man1/auxalias.1 \
   $(PREFIX)/share/man/man1/auxchecktap.1 \
   $(PREFIX)/share/man/man1/auxguid.1 \
+  $(PREFIX)/share/man/man1/auxilium.1 \
   $(PREFIX)/share/html \
   $(PREFIX)/share/html/man \
   $(PREFIX)/share/html/man/man1 \
@@ -35,6 +36,7 @@ install : installinfo \
   $(PREFIX)/share/html/man/man1/auxalias.1.html \
   $(PREFIX)/share/html/man/man1/auxchecktap.1.html \
   $(PREFIX)/share/html/man/man1/auxguid.1.html \
+  $(PREFIX)/share/html/man/man1/auxilium.1.html \
   $(PREFIX)/share/html/auxilium \
   $(PREFIX)/share/html/auxilium/index.html \
   $(PREFIX)/share/html/auxilium/auxilium-user-guide.html \
@@ -118,6 +120,10 @@ $(PREFIX)/share/man/man1/auxguid.1: share/man/man1/auxguid.1
 	cp -a "$<" "$@"
 	chmod $(SRCMODE) "$@"
 
+$(PREFIX)/share/man/man1/auxilium.1: share/man/man1/auxilium.1
+	cp -a "$<" "$@"
+	chmod $(SRCMODE) "$@"
+
 $(PREFIX)/share/html:
 	mkdir "$@"
 	chmod $(DIRMODE) "$@"
@@ -151,6 +157,10 @@ $(PREFIX)/share/html/man/man1/auxchecktap.1.html: share/html/man/man1/auxcheckta
 	chmod $(SRCMODE) "$@"
 
 $(PREFIX)/share/html/man/man1/auxguid.1.html: share/html/man/man1/auxguid.1.html
+	cp -a "$<" "$@"
+	chmod $(SRCMODE) "$@"
+
+$(PREFIX)/share/html/man/man1/auxilium.1.html: share/html/man/man1/auxilium.1.html
 	cp -a "$<" "$@"
 	chmod $(SRCMODE) "$@"
 
@@ -194,12 +204,14 @@ uninstall:
 	rm -f $(PREFIX)/share/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/man/man1/auxchecktap.1
 	rm -f $(PREFIX)/share/man/man1/auxguid.1
+	rm -f $(PREFIX)/share/man/man1/auxilium.1
 	rm -f $(PREFIX)/share/html/man/man1/auxenv.1
 	rm -f $(PREFIX)/share/html/man/man1/auxsource.1
 	rm -f $(PREFIX)/share/html/man/man1/auxwhere.1
 	rm -f $(PREFIX)/share/html/man/man1/auxalias.1
 	rm -f $(PREFIX)/share/html/man/man1/auxchecktap.1
 	rm -f $(PREFIX)/share/html/man/man1/auxguid.1
+	rm -f $(PREFIX)/share/html/man/man1/auxilium.1
 	rm -f $(PREFIX)/share/html/auxilium/index.html
 	rm -f $(PREFIX)/share/html/auxilium/auxilium-user-guide.html
 	rm -f $(PREFIX)/share/html/auxilium/auxilium-user-guide.pdf

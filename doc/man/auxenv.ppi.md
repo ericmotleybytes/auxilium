@@ -48,4 +48,4 @@
 
 ## SEE ALSO
 
-auxalias(1), auxsource(1)
+auxilium(1), auxalias(1), auxsource(1)

@@ -58,12 +58,16 @@
 <div id="TOC">
 <h2 class="toc">Table of Contents</h2>
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#released-downloads">Released Downloads</a></li>
+<li><a href="#auxilium-introduction">Auxilium Introduction</a></li>
+<li><a href="#auxilium-released-downloads">Auxilium Released Downloads</a></li>
+<li><a href="#auxilium-prerequisites">Auxilium Prerequisites</a></li>
+<li><a href="#auxilium-runtime-install">Auxilium Runtime Install</a></li>
+<li><a href="#additional-documentation">Additional Documentation</a></li>
+<li><a href="#auxilium-runtime-uninstall">Auxilium Runtime Uninstall</a></li>
 <li><a href="#see-also">See Also</a></li>
 </ul>
 </div>
-<h2 id="introduction">Introduction</h2>
+<h2 id="auxilium-introduction">Auxilium Introduction</h2>
 <p>This is the Auxilium information and download page.</p>
 <p><em>Auxilium</em> is the latin word for <em>support</em>. The &quot;auxilium&quot; package is an open-source project which contains a collection of bash shell executable and sourceable scripts which support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are written in *bash&quot;, the standard Linux interpretive shell language. This facilitates portability (between bash platforms) and ease of installation. Auxilium has no run-time prerequisites other than bash version 4.2 or higher.</p>
 <p>The core auxilium utilities include:</p>
@@ -75,7 +79,7 @@
 <li><p><strong>auxchecktap</strong>. Scans and checks TAP format unit test result logs, producing a summarized TAP test results log.</p></li>
 <li><p><strong>auxguid</strong>. Generates a pseudo random 128-bit (32 hex character) GUID/UUID.</p></li>
 </ul>
-<h2 id="released-downloads">Released Downloads</h2>
+<h2 id="auxilium-released-downloads">Auxilium Released Downloads</h2>
 <table class="relinfo">
 <thead class="relinfo">
 <tr class="relinfo">
@@ -122,8 +126,85 @@ prerelease
 </tr>
 </tbody>
 </table>
+<h2 id="auxilium-prerequisites">Auxilium Prerequisites</h2>
+<p>All version of auxilium require bash version 4.2 or higher.</p>
+<h2 id="auxilium-runtime-install">Auxilium Runtime Install</h2>
+<p>Runtime installation is relatively easy. As an example, below is a sample installation of auxilium 0.1.3, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
+<ol style="list-style-type: decimal">
+<li><p>Download the runtime distribution. There are at least two ways of doing this:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Primary download method: Right-click on the &quot;0.1.3&quot; link on this page at <a href="https://ericmotleybytes.github.io/auxilium/" class="uri">https://ericmotleybytes.github.io/auxilium/</a> and select &quot;save link as...&quot;.</p></li>
+<li><p>Alternate download method: Use the &quot;wget&quot; program to get the tar file.</p>
+<pre><code>wget https://github.com/ericmotleybytes/auxilium/releases/download/0.1.3/auxilium-run-0.1.3.tar.gz</code></pre>
+<p>This will create the file &quot;auxilium-run-0.1.3.tar.gz&quot;.</p></li>
+</ol></li>
+<li><p>Unpack the tar file.</p>
+<pre><code>tar -xzf auxilium-run-0.1.3.tar.gz</code></pre>
+<p>This will create a sub-directory called &quot;auxilium-run-0.1.3&quot; which contains additional files and directories.</p></li>
+<li><p>Set the default directory to the &quot;auxilium-run-0.1.3&quot; sub-directory.</p>
+<pre><code>cd auxilium-run-0.1.3</code></pre></li>
+<li><p>Use make to install auxilium under your desired directory prefix.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Personal install: To install auxilium under a personal directory, for example under the ~/local directory, issue the following command:</p>
+<pre><code>make install PREFIX=~/local</code></pre>
+<p>This installs executable scripts in ~/local/bin, man pages in ~/local/man/man1, html files in ~/local/share/html, and so forth.</p></li>
+<li><p>System install: To install auxilium under a shared system-wide directory, for example under the /usr/local directory, issue the following command:</p>
+<pre><code>sudo make install PREFIX=/usr/local</code></pre></li>
+</ol></li>
+<li><p>Optionally, although this is highly recommended, setup automatic auxilium alias definitions in the appropriate login script.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Personal setup: Edit your ~/.bashrc file and add the line:</p>
+<pre><code>source ~/local/bin/auxalias</code></pre></li>
+<li><p>System setup: Edit the /etc/bash/bashrc file and add the line:</p>
+<pre><code>source /usr/local/bin/auxalias</code></pre></li>
+</ol></li>
+</ol>
+<p>Congratulations! You have now installed auxilium!</p>
+<p>If your MANPATH is defined resonably you should be able to see an overview of auxilium by typing:</p>
+<pre><code>man auxilium</code></pre>
+<h2 id="additional-documentation">Additional Documentation</h2>
+<p>Version specific auxilium manuals are installed in the &lt;PREFIX&gt;/share/html/auxilium directory. The auxilium user guide is available in that directory in both HTML format (auxilium-user-guide.html) and pdf format (auxilium-user-guide.pdf).</p>
+<p>For convenience the latest version of the user guide is also available online in both HTML and PDF formats:</p>
+<ul>
+<li><a href="Auxilium%20User%20Guide%20(html)">https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.html</a></li>
+<li><a href="Auxilium%20User%20Guide%20(pdf)">https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.pdf</a></li>
+</ul>
+<h2 id="auxilium-runtime-uninstall">Auxilium Runtime Uninstall</h2>
+<p>You can also easily uninstall auxilium. As an example, below is a sample uninstall of auxilium 0.1.3, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
+<ol style="list-style-type: decimal">
+<li><p>Set the default directory to the &quot;auxilium-run-0.1.3&quot; sub-directory.</p>
+<pre><code>cd auxilium-run-0.1.3</code></pre></li>
+<li><p>Use make to uninstall auxilium under your desired directory prefix.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Personal uninstall: To uninstall auxilium from under a personal directory where it was previously installed, for example under the ~/local directory, issue the following command:</p>
+<pre><code>make install PREFIX=~/local</code></pre>
+<p>This remove only auxilium installed files.</p></li>
+<li><p>System install: To uninstall auxilium under a shared system-wide directory where it was previously installed, for example under the /usr/local directory, issue the following command:</p>
+<pre><code>sudo make uninstall PREFIX=/usr/local</code></pre></li>
+</ol></li>
+<li><p>Optionally, if you edited a login script during installation, your might want to delete or comment out the line you added.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Personal setup: Edit your ~/.bashrc file and remove or comment the line:</p>
+<pre><code>source ~/local/bin/auxalias</code></pre>
+<p>If commented, the line will then look like:</p>
+<pre><code>#source ~/local/bin/auxalias</code></pre></li>
+<li><p>System setup: Edit the /etc/bash/bashrc file and remove or comment the line:</p>
+<pre><code>source /usr/local/bin/auxalias</code></pre>
+<p>If commented, the line will then look like:</p>
+<pre><code>#source /usr/local/bin/auxalias</code></pre></li>
+</ol></li>
+<li><p>Set the default directory to the original download directory and delete the tar distribution file and the unpacked files.</p>
+<pre><code>cd &lt;download-directory&gt;
+rm auxilium-run-0.1.3.tar.gz
+rm -rf auxilium-run-0.1.3</code></pre></li>
+</ol>
+<p>You have now uninstalled auxilium.</p>
 <h2 id="see-also">See Also</h2>
-<p>TBD</p>
+<ul>
+<li><p><a href="https://github.com/ericmotleybytes/auxilium" class="uri">https://github.com/ericmotleybytes/auxilium</a> : The master auxilium GitHub repository. You can also report bugs, describe issues, and request enhancements here.</p></li>
+<li><p><a href="https://github.com/ericmotleybytes/auxilium" class="uri">https://github.com/ericmotleybytes/auxilium</a> : The master GitHub repository page for Auxilium.</p></li>
+<li><p><a href="https://testanything.org/" class="uri">https://testanything.org/</a> : A description of TAP, the unit testing Test Anything protocol.</p></li>
+</ul>
 <p class="auxdate">Updated 2017-07-11</p>
 </body>
 </html>
