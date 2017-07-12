@@ -32,7 +32,6 @@ help:
 	@echo "  make helpbuild     # help building sources."
 	@echo "  make helpgit       # help common git tasks."
 	@echo "  make helprel       # help common GitHub release tasks."
-	@echo "  make helprelcheck  # help GitHub release checklist."
 
 include Makefile.build.mak
 include Makefile.test.mak

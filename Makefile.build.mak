@@ -76,7 +76,7 @@ docs: doc/include/auxenv-aliasing.ppo.md \
     share/html/auxilium/index.html \
     share/html/auxilium/auxilium-user-guide.html \
     share/html/auxilium/auxilium-user-guide.pdf \
-  docs/index.html
+  doc/docs/index.html
 
 doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md
 	pp -D AUXCMD=auxenv $< > $@
@@ -197,7 +197,7 @@ doc/docs/index.ppo.md : doc/docs/index.ppi.md \
 
 # github pages stuff
 
-docs/index.html : doc/docs/index.ppo.md \
+doc/docs/index.html : doc/docs/index.ppo.md \
   doc/css \
   doc/templates
 	$(PANDOCHTMLINFO) $< --output=$@ -M title="$(AUXILIUM_INFO_TITLE)"

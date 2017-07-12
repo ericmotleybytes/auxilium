@@ -6,7 +6,6 @@
 helprel:
 	@echo "Common Help for release actions:"
 	@echo "  make helprel                  # display this screen."
-	@echo "  make helprelcheck             # see a release checklist."
 	@echo "  make show-this-release        # version being built to be released next."
 	@echo "  make show-remote-release-tags # release tags on GitHub server."
 	@echo "  make show-local-release-tags  # release tags on local server."
@@ -19,67 +18,17 @@ helprel:
 	@echo "  make local-release-tag        # tag files locally."
 	@echo "  make push-release-tag         # tag files on remote."
 	@echo "  make devtime-dist             # create dev  distribution and tarball."
+	@echo "  make do-release               # run the full sbin/do-release script."
+	@echo "Note:"
+	@echo "  It is STRONGLY recommended to do releases via 'make do-release' or by"
+	@echo "  executing the 'sbin/do-release' script (which is all 'make do-release'"
+	@echo "  does anyway). From an interactive terminal this action is interactive."
+	@echo "  The script displays critical information, makes checks, and prompts"
+	@echo "  for user confirmation at key points in the release process."
 
-.PHONY: helprelcheck
-helprelcheck:
-	@echo "Release help:"
-	@echo "  make helprelcheck             # display this screen."
-	@echo "  make helprel                  # abbreviate release help."
-	@echo "Before releasing checklist:"
-	@echo "  make build     # make sure all software docs built."
-	@echo "  make checktest # make sure all unit tests pass."
-	@echo "  make -f $(GITMAK) status # look for clean status."
-	@echo "    # make sure all proper 'git add <file>' commands issued"
-	@echo "    # make sure all proper 'git commit ...' commands issued."
-	@echo "  make -f $(GITMAK) pull # pull down any remote changes made since your pull."
-	@echo "  make -f $(GITMAK) status # look for clean status again."
-	@echo "  make -f $(GITMAK) push   # do a normal push to the remote."
-	@echo "Release Checklist:"
-	@echo "  # View previous release tags on remote..."
-	@echo "    make -f $(THISFILE) show-remote-release-tags"
-	@echo "      # if you see a remote release tag that WAS NOT ACTUALLY RELEASED,"
-	@echo "      # you might want to (but probably should not) delete the remote tag."
-	@echo "        git push --delete origin <release-tag>"
-	@echo "      # decide what the new next release version should be and remember it."
-	@echo "  # View existing local release tags..."
-	@echo "    make -f $(THISFILE) show-local-release-tags"
-	@echo "      # Make sure the new next release version not already been used."
-	@echo "      # If you really want to reuse a version which is only locally tagged,"
-	@echo "      # you could delete the old tag definition tag locally."
-	@echo "        git tag --delete <release-tag>."
-	@echo "  # View the currently configured this release version number."
-	@echo "    make -f $(THISFILE) show-this-release."
-	@echo "  # If needed, edit $(RELDATAFILE) and find the 'THISREL=...' line."
-	@echo "  # Edit/change this release version to the new release version you picked."
-	@echo "  # Save the edited file."
-	@echo "  # Verify your change:"
-	@echo "    make -f $(THISFILE) show-this-release."
-	@echo "  # log that your are starting a release
-	@echo "    make log-release-attempt"
-	@echo "  # stage manuals for upload to web at next git push."
-	@echo "    make -f $(THISFILE) stage-manuals"
-	@echo "  # Optional: Make sure the runtime distribution area is clean."
-	@echo "    make -f $(THISFILE) clean-runtime-dist"
-	@echo "  # Make the runtime-only distribution tarball."
-	@echo "    make -f $(THISFILE) runtime-dist"
-	@echo "  # Verify the contents of the runtime tarball."
-	@echo "    make -f $(THISFILE) list-runtime-dist"
-	@echo "  # Tag local files source files with the release tag."
-	@echo "    make -f $(THISFILE) local-release-tag"
-	@echo "  # Push the release tag to the remote."
-	@echo "    make -f $(THISFILE) push-release-tag"
-	@echo "  # make the development distribution tarball."
-	@echo "    # wait 15 seconds while github absorbs tag push."
-	@echo "    make -f $(THISFILE) runtime-dist"
-	@echo "  # With a web browser goto the GitHub repository page."
-	@echo "    # Using the GitHub web interface:"
-	@echo "      # Create/edit new tagged release."
-	@echo "      # Upload the runtime tarball dist/$(RUNTIME).tar.gz."
-	@echo "      # Upload the devtime tarball dist/$(DEVTIME).tar.gz."
-	@echo "      # Publish the release."
-	@echo "Scripted Alternative:"
-	@echo "  To make all this easier, you might want to consider using"
-	@echo "  the 'sbin/do-release' script."
+.PHONY: do-release
+do-release:
+	sbin/do-release
 
 #### GitHub Release Stuff
 .PHONY: show-this-release
@@ -106,6 +55,7 @@ log-release-attempt:
 stage-manuals:
 	cp share/html/auxilium/auxilium-user-guide.html docs/
 	cp share/html/auxilium/auxilium-user-guide.pdf  docs/
+	cp doc/docs/index.html docs/
 
 .PHONY: runtime-dist
 runtime-dist: \
