@@ -270,11 +270,11 @@ function verify_unit_tests_ok() {
     local timestamp=$(date +%Y-%m-%dT%H:%M:%S%z)
     cd "$reporoot"
     aux_info "unit testing beginning at $timestamp; this might take a few minutes."
-    tmpvar=$(make checktest | tail -1)
+    local checkoutput=$(make checktest)
     zero_or_die "$?" "There was a problem doing 'make checktest'."
-    if [ "${tmpvar:0:3}" != "ok " ]; then
-        aux_error "Unexpected final checktest message ($tmpvar)."
-        exit 1
+    local checktail=$(echo "$checkoutput" | tail -1)
+    if [ "${checktail:0:3}" != "ok " ]; then
+        aux_die "Unexpected final checktest message ($tmpvar)."
     fi
     timestamp=$(date +%Y-%m-%dT%H:%M:%S%z)
     aux_info "unit testing finished at $timestamp."
@@ -367,99 +367,70 @@ function do_git_push() {
     fi
     aux_info "Local git appears to be in sync with remote git."
 }
-function tag_local_files() {
-    # tag local files
-    dotag="y"
-    if [ "$interactiveflag" == "y" ]; then
-        dotag="n"
-        while true; do
-            read -p "Do you want to tag local files with '$thisrel' [yN]? " answer
-            case $answer in
-                [Yy]* ) dotag="y"; break;;
-                [Nn]* ) dotag="n"; break;;
-                * ) echo "Please answer yes or no.";;
-            esac
-        done
+function create_devtime_tarball() {
+    # make dev distribution
+    cd "$reporoot"
+    make devtime-dist > /dev/null
+    zero_or_die "$?" "make devtime-dist completion status was not 0."
+    local tarfile2="${reporoot}/dist/auxilium-dev-${thisrel}.tar.gz"
+    if [ ! -e  "$tarfile2" ]; then
+        aux_die "File not found ($tarfile2)."
     fi
-    if [ "$dotag" == "y" ]; then
-        git tag $thisrel
-        if [ "$?" != "0" ]; then
-            aux_error "git tag completion status problem."
-            exit 1
-        fi
-    else
-        aux_error "exiting early (at local tag phase) by user selection."
-        exit 1
-    fi
-    aux_info "Local files tagged with '$thisrel'."
+    aux_info "Dev-time distribution tar file created ($tarfile)."
 }
 function create_runtime_tarball() {
     # now make the run-time distribution tar file
     cd "$reporoot"
     make clean-runtime-dist > /dev/null
-    if [ "$?" != "0" ]; then
-        aux_error "make clean-runtime-dist completion status was not 0."
-        exit 1
-    fi
+    zero_or_die "$?" "make clean-runtime-dist completion status was not 0."
     make runtime-dist > /dev/null
-    if [ "$?" != "0" ]; then
-        aux_error "make runtime-dist completion status was not 0."
-        exit 1
-    fi
-    tarfile="${reporoot}/dist/auxilium-run-${thisrel}.tar.gz"
+    zero_or_die "$?" "make runtime-dist completion status was not 0."
+    local tarfile="${reporoot}/dist/auxilium-run-${thisrel}.tar.gz"
     if [ ! -e  "$tarfile" ]; then
-        aux_error "File not found ($tarfile)."
-        exit 1
+        aux_die "File not found ($tarfile)."
     fi
     aux_info "Run-tine distribution tar file created ($tarfile)."
 }
 function unit_test_runtime_staging_area() {
-    # test what was copied to release runtime staging area
-    cd "${reporoot}"
-    make runtime-test
-    zero_or_die "$?" "Unit tests on release working copy failed."
-    aux_info "Unit tests on release working copy passed."
+    # unit test what was copied to release runtime staging area
+    local timestamp=$(date +%Y-%m-%dT%H:%M:%S%z)
+    cd "$reporoot"
+    aux_info "runtime unit testing beginning at $timestamp; this might take a few minutes."
+    local checkoutput=$(make runtime-test)
+    zero_or_die "$?" "There was a problem doing 'make runtime-test'."
+    local checktail=$(echo "$checkoutput" | tail -1)
+    if [ "${checktail:0:3}" != "ok " ]; then
+        aux_die "Unexpected final runtime checktest message ($checktail)."
+    fi
+    timestamp=$(date +%Y-%m-%dT%H:%M:%S%z)
+    aux_info "runtime unit testing finished at $timestamp."
+    aux_info "runtime unit tests appear to be successful."
+}
+function tag_local_files() {
+    # tag local files
+    local dotag="y"
+    ask_yn "y" "Do you want to tag local files with '$thisrel'?"
+    dotag="$yn_answer"
+    if [ "$dotag" == "y" ]; then
+        git tag $thisrel
+        zero_or_die "$?" "git tag completion status problem."
+    else
+        aux_die "exiting early (at local tag phase) by user selection."
+    fi
+    aux_info "Local files tagged with '$thisrel'."
 }
 function push_tag_to_remote() {
     # now push the tag to the remote git server
-    dotag="y"
-    if [ "$interactiveflag" == "y" ]; then
-        dotag="n"
-        while true; do
-            read -p "Do you want to tag remote files with '$thisrel' [yN]? " answer
-            case $answer in
-                [Yy]* ) dotag="y"; break;;
-                [Nn]* ) dotag="n"; break;;
-                * ) echo "Please answer yes or no.";;
-            esac
-        done
-    fi
+    local dotag="y"
+    ask_yn "y" "Do you want to tag remote files with '$thisrel'?"
+    dotag="$yn_answer"
     if [ "$dotag" == "y" ]; then
         git push origin $thisrel
-        if [ "$?" != "0" ]; then
-            aux_error "git push origin $thisrel completion status problem."
-            exit 1
-        fi
+        zero_or_die "$?" "git push origin $thisrel completion status problem."
     else
-        aux_error "exiting early (at remote tag phase) by user selection."
-        exit 1
+        aux_die "exiting early (at remote tag phase) by user selection."
     fi
     aux_info "Remote files tagged with '$thisrel'."
-}
-function create_devtime_tarball() {
-    # make dev distribution
-    cd "$reporoot"
-    make devtime-dist > /dev/null
-    if [ "$?" != "0" ]; then
-        aux_error "make devtime-dist completion status was not 0."
-        exit 1
-    fi
-    tarfile2="${reporoot}/dist/auxilium-dev-${thisrel}.tar.gz"
-    if [ ! -e  "$tarfile2" ]; then
-        aux_error "File not found ($tarfile2)."
-        exit 1
-    fi
-    aux_info "Dev-time distribution tar file created ($tarfile)."
 }
 #
 # begin main program
@@ -524,7 +495,7 @@ get_remote_release_numbers
 get_last_existing_remote_release_version
 check_release_version_not_used_on_remote
 check_release_version_not_used_on_local
-#TBD#do_make_clean
+do_make_clean
 verify_everything_built_ok
 verify_unit_tests_ok
 log_release_attempt
@@ -532,7 +503,6 @@ stage_manuals
 verify_clean_git_status
 do_git_pull
 do_git_push
-aux_die "TBD DEBUG"
 create_devtime_tarball
 create_runtime_tarball
 unit_test_runtime_staging_area
