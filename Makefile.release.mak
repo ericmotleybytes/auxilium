@@ -10,6 +10,7 @@ helprel:
 	@echo "  make show-this-release        # version being built to be released next."
 	@echo "  make show-remote-release-tags # release tags on GitHub server."
 	@echo "  make show-local-release-tags  # release tags on local server."
+	@echo "  make log-release-attempt      # log release attempt and datetime."
 	@echo "  make clean-runtime-dist       # clean distribution area."
 	@echo "  make runtime-dist             # create distribution and tarball."
 	@echo "  make runtime-test             # test distribution copy."
@@ -52,6 +53,8 @@ helprelcheck:
 	@echo "  # Save the edited file."
 	@echo "  # Verify your change:"
 	@echo "    make -f $(THISFILE) show-this-release."
+	@echo "  # log that your are starting a release
+	@echo "    make log-release-attempt."
 	@echo "  # Optional: Make sure the runtime distribution area is clean."
 	@echo "    make -f $(THISFILE) clean-runtime-dist"
 	@echo "  # Make the runtime-only distribution tarball."
@@ -62,10 +65,14 @@ helprelcheck:
 	@echo "    make -f $(THISFILE) local-release-tag"
 	@echo "  # Push the release tag to the remote."
 	@echo "    make -f $(THISFILE) push-release-tag"
+	@echo "  # make the development distribution tarball."
+	@echo "    # wait 15 seconds while github absorbs tag push."
+	@echo "    make -f $(THISFILE) runtime-dist"
 	@echo "  # With a web browser goto the GitHub repository page."
 	@echo "    # Using the GitHub web interface:"
 	@echo "      # Create/edit new tagged release."
-	@echo "      # Upload the runtime tarbar dist/$(RUNTIME).tar.gz."
+	@echo "      # Upload the runtime tarball dist/$(RUNTIME).tar.gz."
+	@echo "      # Upload the devtime tarball dist/$(DEVTIME).tar.gz."
 	@echo "      # Publish the release."
 	@echo "Scripted Alternative:"
 	@echo "  To make all this easier, you might want to consider using"
@@ -87,10 +94,10 @@ show-remote-release-tags:
   sed 's#^.*refs/tags/##' | \
   sort -V
 
-.PHONY: clean-runtime-dist
-clean-runtime-dist:
-	rm  -f dist/$(RUNTIME).tar.gz
-	rm -rf dist/$(RUNTIME)
+.PHONY: log-release-attempt
+log-release-attempt:
+	touch $(RELLOGFILE)
+	echo "$(THISREL)|$(USER)|$(CURDATETIME)" >> $(RELLOGFILE)
 
 .PHONY: runtime-dist
 runtime-dist: \
@@ -135,7 +142,8 @@ dist/$(RUNTIME).tar.gz : dist \
   dist/$(RUNTIME)/share/man/man1 \
   dist/$(RUNTIME)/share/html/man/man1
 	cd dist ; \
-  tar --exclude='$(RUNTIME)/test' --exclude='Makefile.test.mak' -czf $(RUNTIME).tar.gz $(RUNTIME)
+  tar --exclude='$(RUNTIME)/test' --exclude='Makefile.test.mak' \
+    -czf $(RUNTIME).tar.gz $(RUNTIME)
 
 .PHONY: list-runtime-dist
 list-runtime-dist:
@@ -153,7 +161,26 @@ local-release-tag:
 push-release-tag:
 	git push origin $(THISREL)
 
-#.PHONY: devtime-dist
-#devtime-dist:
-#	cd dist; wget https://github.com/ericmotleybytes/auxilium/archive/$(THISREL).tar.gz
-#	cd dist; mv $(THISREL).tar.gz auxilium-dev-$(THISREL).tar.gz
+.PHONY: devtime-dist
+devtime-dist: dist/$(DEVTIME).tar.gz
+
+dist/$(DEVTIME).tar.gz : dist/$(DEVTIME)/README.md
+	cd dist; tar -czf $(DEVTIME).tar.gz $(DEVTIME)
+
+dist/$(DEVTIME)/README.md : dist/$(DEVTIME)
+	cd dist/$(DEVTIME) ; \
+          tar --strip-components=1 -xzf ../$(THISREL).tar.gz
+
+dist/$(DEVTIME) : dist/$(THISREL).tar.gz
+	mkdir -p "$@"
+
+dist/$(THISREL).tar.gz :
+	cd dist; wget https://github.com/ericmotleybytes/auxilium/archive/$(THISREL).tar.gz
+
+.PHONY: clean-runtime-dist
+clean-runtime-dist:
+	rm  -f dist/$(RUNTIME).tar.gz
+	rm -rf dist/$(RUNTIME)
+	rm  -f dist/$(DEVTIME).tar.gz
+	rm  -f dist/$(THISREL).tar.gz
+	rm -rf dist/$(DEVTIME)

@@ -4,9 +4,9 @@ This is the Auxilium information and download page.
 
 !include(../include/auxilium-introduction.ppi.md)
 
-## Releases
+## Released Downloads
 
-TBD
+!exec(sbin/show-rels-html)
 
 ## See Also
 

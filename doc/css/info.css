@@ -33,4 +33,12 @@ p.auxdate{
   background-color: #EEEEEE;
   text-align: right;
 }
+table.relinfo{
+  border-collapse: collapse;
+}
+th.relinfo,td.relinfo{
+  border-style: solid;
+  border-width: 1px;
+  padding: 5px;
+}
 </style>

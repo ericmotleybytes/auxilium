@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# This script display the current (next) release.
+# This script displays the current (next) release.
 # It facilitates making a new GitHub release.
 #
 # usage:

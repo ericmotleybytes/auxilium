@@ -1,0 +1,232 @@
+#!/usr/bin/env bash
+##############################################################################
+# This script displays all recorded releases, their associated
+# date, download locations, and other pertinent information.
+# The output is an html table, which can be included
+# in markdown to be used for html generation.
+# It is used to produce markdown output for inclusion into
+# the git pages Auxilium Information and Downloads page.
+#
+# usage:
+#     show-rels-md [options]
+# options:
+#     -h --help    # display help info
+#     -v --version # display version info
+#     -d --debug   # output extra debug info to stderr
+##############################################################################
+#
+# define functions
+#
+function put_debug() {
+    msg="$1"
+    if [ "$debugflag" == "y" ]; then
+        echo "DEBUG: $msg" >&2
+    fi
+}
+#
+# begin main program
+#
+cmdfile=$(readlink -f "$0")
+cmddir=$(dirname "$cmdfile")
+reporoot=$(readlink -f "$cmddir/..")
+datadir=$(readlink -f "$cmddir/../data")
+cmdname="${cmdfile##*/}"
+version="$cmdname version 1.0 (2017-07-11)"
+versionflag="n"
+helpflag="n"
+debugflag="n"
+while [ $# -gt 0 ]; do
+    param="$1"
+    shift
+    if   [[ "$param" == "-v" || "$param" == "--version" ]]; then
+        versionflag="y"
+    elif [[ "$param" == "-h" || "$param" == "--help"    ]]; then
+        helpflag="y"
+    elif [[ "$param" == "-d" || "$param" == "--debug"   ]]; then
+        debugflag="y"
+    else
+        echo "ERROR: bad command line option ($param)." >&2
+        exit 1
+    fi
+done
+#
+# show version if it was requested
+#
+if [ "$versionflag" == "y" ]; then
+    echo "$version"
+fi
+#
+# show help if it was requested
+#
+if [ "$helpflag" == "y" ]; then
+    echo "Command:"
+    echo "  $cmdname - display recorded release in markdown"
+    echo "Syntax:"
+    echo "  $cmdname [option...]   # display recorded releaSES."
+    echo "    -h | --help          # display help text."
+    echo "    -v | --version       # display version information."
+fi
+#
+# if --help or --version and no files specified, assume we are done.
+#
+if [[ "$versionflag" == "y" || "$helpflag" == "y" ]]; then
+    exit 0
+fi
+#
+# get release characteristics
+#
+thisrel=$("$cmddir"/show-release --current)
+stabrel=$("$cmddir"/show-release --stable)
+lastrel=$("$cmddir"/show-release --last)
+#
+# get history info from releases.log
+#
+datafile="$datadir/releases.dat"
+histfile="$datadir/releases.log"
+if [ ! -e "$datafile" ]; then
+    echo "ERROR: file not found ($datafile)." >&2
+    exit 1
+fi
+if [ ! -e "$histfile" ]; then
+    echo "ERROR: file not found ($histfile)." >&2
+    exit 1
+fi
+#
+# read file data (parsed) into array buffers
+#
+declare -A relhash=()
+relvers=()
+reldates=()
+reltypes=()
+relruntimeurls=()
+reldevtimeurls=()
+relnoteurls=()
+relruntimenames=()
+reldevtimenames=()
+relnotenames=()
+relverlbl="Release<br/>Version"
+reldatelbl="Release<br/>Date"
+reltypelbl="Release<br/>Type"
+relruntimelbl="Runtime<br/>Tarball"
+reldevtimelbl="Sources<br/>Tarball"
+relnotelbl="Release<br/>Notes"
+declare -a histlines
+tac "$histfile" | readarray histlines  # tac reverses line order
+readarray -t histlines <<< $(tac "$histfile")  # tac reverses line order
+oldifs="$IFS"
+IFS="|"
+for line in "${histlines[@]}"; do
+    put_debug "line=[$line]"
+    relver=""
+    reluser=""
+    reldatetime=""
+    reldate=""
+    cnt=$((0))
+    for fld in $line; do
+        cnt=$(($cnt+1))
+        put_debug "field $cnt=[$fld]"
+        if [ "$cnt" == "1" ]; then
+            relver="$fld"
+        elif [ "$cnt" == "2" ]; then
+            reluser="$fld"
+        elif [ "$cnt" == "3" ]; then
+            reldatetime="$fld"
+        else
+            echo "ERROR: too many fields in $histfile ($line)." >&2
+            exit 1
+        fi
+    done
+    # check that we process all three fields
+    if [ "$cnt" != "3" ]; then
+        echo "ERROR: wrong field count in $histfile ($line)." >&2
+        exit 1
+    fi
+    # check if we already read a hist for this rel
+    if [ ${relhash[$relver]+x} ]; then
+        continue; # we already processed a more recent entry for this rel
+    fi
+    reldate="${reldatetime:0:10}"
+    relhash[$relver]="$reldate"
+    reltype=""
+    if [ "${relver:0:2}" == "0." ]; then
+        reltype="prerelease"
+    elif [ "$relver" == "$stabrel" ]; then
+        reltype="stable"
+    fi
+    runtimename="${relver} Runtime"
+    runtimelink="https://github.com/ericmotleybytes/auxilium"
+    runtimelink="${runtimelink}/releases/download"
+    runtimelink="${runtimelink}/${relver}"
+    runtimelink="${runtimelink}/auxilium-run-${relver}.tar.gz"
+    devtimename="${relver} Sources"
+    devtimelink="https://github.com/ericmotleybytes/auxilium"
+    devtimelink="${devtimelink}/releases/download"
+    devtimelink="${devtimelink}/${relver}"
+    devtimelink="${devtimelink}/auxilium-dev-${relver}.tar.gz"
+    relnotename="${relver} Notes"
+    relnotelink="https://github.com/ericmotleybytes/auxilium"
+    relnotelink="${relnotelink}/releases/tag"
+    relnotelink="${relnotelink}/${relver}"
+    relvers+=("$relver")
+    reldates+=("$reldate")
+    reltypes+=("$reltype")
+    relruntimeurls+=("$runtimelink")
+    reldevtimeurls+=("$devtimelink")
+    relnoteurls+=("$relnotelink")
+    relruntimenames+=("$runtimename")
+    reldevtimenames+=("$devtimename")
+    relnotenames+=("$relnotename")
+done
+#
+# output release table
+#
+# begin table
+echo "<table class=\"relinfo\">"
+# begin header
+echo "<thead class=\"relinfo\">"
+echo "<tr class=\"relinfo\">"
+# fields
+echo "<th class=\"relinfo\">$relverlbl</th>"
+echo "<th class=\"relinfo\">$reldatelbl</th>"
+echo "<th class=\"relinfo\">$reltypelbl</th>"
+echo "<th class=\"relinfo\">$relruntimelbl</th>"
+echo "<th class=\"relinfo\">$reldevtimelbl</th>"
+echo "<th class=\"relinfo\">$relnotelbl</th>"
+# end header
+echo "</thead>"
+echo "</tr>"
+# begin table body
+echo "<tbody class=\"relinfo\">"
+#
+# loop through release entries, outputting release rows
+#
+relcnt="${#relvers[@]}"
+for n in $(seq 1 $relcnt); do
+    idx=$(($n-1))  # array index
+    # begin release row
+    echo "<tr class=\"relinfo\">"
+    # output fields
+    echo "<td class=\"relinfo\">${relvers[$idx]}</td>"
+    echo "<td class=\"relinfo\">${reldates[$idx]}</td>"
+    echo "<td class=\"relinfo\">${reltypes[$idx]}</td>"
+    runtimelink="<a class=\"relinfo\" href=\"${relruntimeurls[$idx]}\">"
+    runtimelink="${runtimelink}${relruntimenames[$idx]}</a>"
+    echo "<td class=\"relinfo\">$runtimelink</td>"
+    devtimelink="<a class=\"relinfo\" href=\"${reldevtimeurls[$idx]}\">"
+    devtimelink="${devtimelink}${reldevtimenames[$idx]}</a>"
+    echo "<td class=\"relinfo\">$devtimelink</td>"
+    relnotelink="<a class=\"relinfo\" href=\"${relnoteurls[$idx]}\""
+    relnotelink="${relnotelink} target=_blank>"
+    relnotelink="${relnotelink}${relnotenames[$idx]}</a>"
+    echo "<td class=\"relinfo\">$relnotelink</td>"
+    # end table row
+    echo "</tr>"
+done
+# end table body
+echo "</tbody>"
+# end table
+echo "</table>"
+#
+# all done
+#
+exit 0

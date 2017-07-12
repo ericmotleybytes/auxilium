@@ -200,7 +200,7 @@ if [ "$usedonrem" == "y" ]; then
     aux_error "Next release $nextrel already used on git remote."
     exit 1
 fi
-aux_info "Next release $nextrel in not yet used on git remote."
+aux_info "Next release $nextrel is not yet used on git remote."
 # check that nextrel not used on remote
 usedonloc="n"
 for rel in "${locrelarr[@]}"; do
@@ -235,7 +235,7 @@ if [ "$usedonloc" == "y" ]; then
     aux_error "Next release $nextrel already used locally."
     exit 1
 fi
-aux_info "Next release $nextrel in not now used locally."
+aux_info "Next release $nextrel is not now used locally."
 # make sure we built everything ok
 cd "$reporoot"
 tmpvar=$(make build)
@@ -427,14 +427,29 @@ else
     exit 1
 fi
 aux_info "Remote files tagged with '$nextrel'."
-#
+# make dev distribution
+cd "$reporoot"
+make devtime-dist > /dev/null
+if [ "$?" != "0" ]; then
+    aux_error "make devtime-dist completion status was not 0."
+    exit 1
+fi
+tarfile2="${reporoot}/dist/auxilium-dev-${nextrel}.tar.gz"
+if [ ! -e  "$tarfile2" ]; then
+    aux_error "File not found ($tarfile2)."
+    exit 1
+fi
+aux_info "Dev-tine distribution tar file created ($tarfile)."
+# script hard work done
 aux_notice "Looks like this script finished nicely, congratulations."
 aux_notice "You still need to:"
 aux_notice "  - Log onto the GitHub web site."
 aux_notice "  - Create the release from the now-existing tag."
-aux_notice "  - Upload the run time tar file ($tarfile) "
-aux_notice "      to the release binart attachment area."
+aux_notice "  - Upload the runtime tar file ($tarfile),"
+aux_notice "      and the devtime tar file ($tarfile2),"
+aux_notice "      to the release binary attachment area."
 aux_notice "  - Edit the online release notes for the release."
 aux_notice "  - Check the 'pre-release' box if applicable."
+aux_notice "  - Click the Publish Release button."
 aux_notice "Good luck!"
 exit 0

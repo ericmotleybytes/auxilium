@@ -12,8 +12,9 @@ PANDOCHTMLINFO1=$(PANDOCHTML) --toc -H doc/css/info.css -M auxdate="$(CURDATE)"
 PANDOCHTMLINFO=$(PANDOCHTMLINFO1) --template=doc/templates/info.html.pandoc.template
 PANDOCPDF1=$(PANDOCSTD) --to=latex -M papersize=letter -M colorlinks
 PANDOCPDF2=$(PANDOCPDF1) -M margin-left=1in -M margin-right=1in
-PANDOCPDF=$(PANDOCPDF2) -M margin-top=1in -M margin-bottom=1in
-PANDOCPDFMANUAL=$(PANDOCPDF2) --toc -M toc-depth=3 
+PANDOCPDF3=$(PANDOCPDF2) -M margin-top=1in -M margin-bottom=1in
+PANDOCPDF=$(PANDOCPDF3) --template=doc/templates/info.latex.pandoc.template
+PANDOCPDFMANUAL=$(PANDOCPDF) --toc -M toc-depth=3 
 AUXENV_TITLE=$(shell head -1 doc/include/auxenv-title.md)
 AUXSOURCE_TITLE=$(shell head -1 doc/include/auxsource-title.md)
 AUXWHERE_TITLE=$(shell head -1 doc/include/auxwhere-title.md)
@@ -21,6 +22,7 @@ AUXALIAS_TITLE=$(shell head -1 doc/include/auxalias-title.md)
 AUXCHECKTAP_TITLE=$(shell head -1 doc/include/auxchecktap-title.md)
 AUXGUID_TITLE=$(shell head -1 doc/include/auxguid-title.md)
 AUXILIUM_UG_TITLE=$(shell head -1 doc/include/auxilium-user-guide-title.md)
+AUXILIUM_UG_SUBTITLE=Version $(THISREL)
 AUXILIUM_INFO_TITLE=$(shell head -1 doc/include/auxilium-info-page-title.md)
 
 .PHONY: helpbuild
@@ -167,17 +169,25 @@ doc/manuals/auxilium-user-guide.ppo.md : doc/manuals/auxilium-user-guide.ppi.md 
 share/html/auxilium/auxilium-user-guide.html : \
   doc/manuals/auxilium-user-guide.ppo.md \
   doc/css doc/templates
-	$(PANDOCHTMLMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)"
+	$(PANDOCHTMLMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)" \
+          -M subtitle="$(AUXILIUM_UG_SUBTITLE)"
 
 share/html/auxilium/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.ppo.md
-	$(PANDOCPDFMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)"
+	$(PANDOCPDFMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)" \
+          -M date="Version $(THISREL)"
 
-doc/docs/index.ppo.md : doc/docs/index.ppi.md
+doc/docs/index.ppo.md : doc/docs/index.ppi.md \
+  data/releases.dat \
+  data/releases.log \
+  sbin/show-rels-html \
+  doc/include
 	pp $< > $@
 
 # github pages stuff
 
-docs/index.html : doc/docs/index.ppo.md doc/css doc/templates
+docs/index.html : doc/docs/index.ppo.md \
+  doc/css \
+  doc/templates
 	$(PANDOCHTMLINFO) $< --output=$@ -M title="$(AUXILIUM_INFO_TITLE)"
 
 #### Cleaning built stuff ####

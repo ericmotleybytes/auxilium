@@ -41,6 +41,14 @@
     background-color: #EEEEEE;
     text-align: right;
   }
+  table.relinfo{
+    border-collapse: collapse;
+  }
+  th.relinfo,td.relinfo{
+    border-style: solid;
+    border-width: 1px;
+    padding: 5px;
+  }
   </style>
 </head>
 <body>
@@ -51,7 +59,7 @@
 <h2 class="toc">Table of Contents</h2>
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#releases">Releases</a></li>
+<li><a href="#released-downloads">Released Downloads</a></li>
 <li><a href="#see-also">See Also</a></li>
 </ul>
 </div>
@@ -60,17 +68,62 @@
 <p><em>Auxilium</em> is the latin word for <em>support</em>. The &quot;auxilium&quot; package is an open-source project which contains a collection of bash shell executable and sourceable scripts which support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are written in *bash&quot;, the standard Linux interpretive shell language. This facilitates portability (between bash platforms) and ease of installation. Auxilium has no run-time prerequisites other than bash version 4.2 or higher.</p>
 <p>The core auxilium utilities include:</p>
 <ul>
-<li><p><strong>auxenv</strong>. Setup, manipulation, and optimization of path-like environment variables such as <em>PATH</em>, <em>MANPATH&quot;, </em>LD_LIBRARY_PATH*</p></li>
-<li><p><strong>auxwhere</strong>. Find files by filename search through path-like environment varible directories.</p></li>
+<li><p><strong>auxenv</strong>. Setup, manipulation, and optimization of path-like environment variables such as <em>PATH</em>, <em>MANPATH</em>, and <em>LD_LIBRARY_PATH</em>.</p></li>
+<li><p><strong>auxwhere</strong>. Find files by filename search through path-like environment variable directories.</p></li>
 <li><p><strong>auxsource</strong>. An extended version of the bash built-in <em>source</em> command.</p></li>
 <li><p><strong>auxalias</strong>. Creates static or dynamic aliases for all auxilium sourceable scripts.</p></li>
 <li><p><strong>auxchecktap</strong>. Scans and checks TAP format unit test result logs, producing a summarized TAP test results log.</p></li>
 <li><p><strong>auxguid</strong>. Generates a pseudo random 128-bit (32 hex character) GUID/UUID.</p></li>
 </ul>
-<h2 id="releases">Releases</h2>
-<p>TBD</p>
+<h2 id="released-downloads">Released Downloads</h2>
+<table class="relinfo">
+<thead class="relinfo">
+<tr class="relinfo">
+<th class="relinfo">
+Release<br />Version
+</th>
+<th class="relinfo">
+Release<br />Date
+</th>
+<th class="relinfo">
+Release<br />Type
+</th>
+<th class="relinfo">
+Runtime<br />Tarball
+</th>
+<th class="relinfo">
+Sources<br />Tarball
+</th>
+<th class="relinfo">
+Release<br />Notes
+</th>
+</thead>
+</tr>
+<tbody class="relinfo">
+<tr class="relinfo">
+<td class="relinfo">
+0.1.3
+</td>
+<td class="relinfo">
+2017-07-11
+</td>
+<td class="relinfo">
+prerelease
+</td>
+<td class="relinfo">
+<a class="relinfo" href="https://github.com/ericmotleybytes/auxilium/releases/download/0.1.3/auxilium-run-0.1.3.tar.gz">0.1.3 Runtime</a>
+</td>
+<td class="relinfo">
+<a class="relinfo" href="https://github.com/ericmotleybytes/auxilium/releases/download/0.1.3/auxilium-dev-0.1.3.tar.gz">0.1.3 Sources</a>
+</td>
+<td class="relinfo">
+<a class="relinfo" href="https://github.com/ericmotleybytes/auxilium/releases/tag/0.1.3" target="_blank">0.1.3 Notes</a>
+</td>
+</tr>
+</tbody>
+</table>
 <h2 id="see-also">See Also</h2>
 <p>TBD</p>
-<p class="auxdate">Updated 2017-07-10</p>
+<p class="auxdate">Updated 2017-07-11</p>
 </body>
 </html>
