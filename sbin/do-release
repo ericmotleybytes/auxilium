@@ -341,15 +341,11 @@ function verify_clean_git_status() {
 }
 function do_git_pull() {
     # try a git pull and check it
-    gitpullout=$(git pull origin master 2>/dev/null)
-    if [ "$?" != 0 ]; then
-        aux_error "Command status problem with git pull"
-        exit 1
-    fi
-    gitpulllastline=$(echo "$gitpullout" | tail -1)
+    local gitpullout=$(git pull origin master 2>/dev/null)
+    zero_or_die "$?" "Command status problem with git pull"
+    local gitpulllastline=$(echo "$gitpullout" | tail -1)
     if [ "$gitpulllastline" != "Already up-to-date." ]; then
-        aux_error "git pull indicates some possible issues."
-        exit 1
+        aux_die "git pull indicates some possible issues."
     fi
     aux_info "git pull did not reveal any new issues."
 }
@@ -538,8 +534,8 @@ verify_unit_tests_ok
 log_release_attempt
 stage_manuals
 verify_clean_git_status
-aux_die "TBD DEBUG"
 do_git_pull
+aux_die "TBD DEBUG"
 do_git_push
 tag_local_files
 create_runtime_tarball
