@@ -5,3 +5,6 @@
 share/*
 scratch/*
 extdoc/*
+# ignore emacs temp files
+.\#*
+\#*\#

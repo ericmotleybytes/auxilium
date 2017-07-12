@@ -45,12 +45,66 @@ function aux_error() {
     echo "ERROR: ($errorcnt) $1" >&2
     return 0
 }
+function aux_die() {
+    msg="$1"
+    aux_error "$msg"
+    exit 1
+}
 function aux_info() {
     echo "INFO: $1"
     return 0
 }
 function aux_notice() {
     echo "NOTICE: $1"
+    return 0
+}
+function ask_yn() {
+    yn_answer="$1"    # auto answer
+    local question="$2"
+    local answer=""
+    if [ -z "$yn_answer" ]; then
+        yn_answer="n"
+    fi
+    if [[ "$yn_answer" != "y" && "$yn_answer" != "n" ]]; then
+        aux_die "Auto answer specified is not y or n."
+    fi
+    if [ "$interactiveflag" == "y" ]; then
+        while true; do
+            read -p "$question [yn]: " answer
+            case $answer in
+                [Yy]* ) yn_answer="y"; break;;
+                [Nn]* ) yn_answer="n"; break;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
+    else
+        aux_info "$question [yn]? was auto answered with $yn_answer."
+    fi
+    return 0
+}
+function zero_or_die() {
+    local zod_stat="$1"
+    local zod_msg="$2"
+    if [ -z "$zod_msg" ]; then
+        zod_msg="Status '$zod_stat' is not '0'."
+    fi
+    if [ "$zod_stat" != "0" ]; then
+        aux_die "$zod_msg"
+    fi
+    return 0
+}
+function y_or_die() {
+    local yod_val="$1"
+    local yod_msg="$2"
+    if [ -z "$yod_val" ]; then
+        yod_val="$yn_answer"  # yn_answer set by ask_yn function
+    fi
+    if [ -z "$yod_msg" ]; then
+        yod_msg="Value '$yod_val' is not 'y'."
+    fi
+    if [ "$yod_val" != "y" ]; then
+        aux_die "$yod_msg"
+    fi
     return 0
 }
 function check_show_version() {
@@ -60,16 +114,14 @@ function check_show_version() {
 }
 function check_show_help() {
     if [ "$helpflag" == "y" ]; then
-        echo "Command:"
-        echo "  $cmdname - Make a new GitHub release"
         echo "Syntax:"
-        echo "  $cmdname -h | --help     # display this help text."
-        echo "  $cmdname -v | --version  # display program version information."
         echo "  $cmdname [<option>...]   # do a GitHub release."
         echo "Options:"
         echo "  -b --verbose  # display extra info."
         echo "  -w --warn     # output non-fatal warnings to stderr."
         echo "  -d --debug    # output debug info to stderr."
+        echo "  -h --help     # display help"
+        echo "  -v --version  # display version"
     fi
 }
 function check_early_exit() {
@@ -92,8 +144,7 @@ function verify_on_master_branch() {
     elif [ "$branch" == "master" ]; then
         branchok="y"
     else
-        aux_error "Unexpected branch ($branch)."
-        exit 1
+        aux_die "Unexpected branch ($branch)."
     fi
     aux_info "$branch is the current git branch."
 }
@@ -102,19 +153,17 @@ function verify_makefile_exists() {
     makefile="$reporoot/Makefile"
     aux_debug "makefile=$makefile."
     if [ ! -e "$makefile" ]; then
-       aux_error "Makefile ($makefile) not found."
-       exit 1
+       aux_die "Makefile ($makefile) not found."
     fi
     aux_checkpass "Makefile ($makefile) found."
 }
 function get_release_version() {
     # get this release number
-    nextrel=$("$reporoot/sbin/show-release" --current)
-    if [ -z "$nextrel" ]; then
-        aux_error "current next release could not be read."
-        exit 1
+    thisrel=$("$reporoot/sbin/show-release" --current)
+    if [ -z "$thisrel" ]; then
+        aux_die "current this release could not be read."
     fi
-    aux_info "$nextrel is the current release (to be built)."
+    aux_info "$thisrel is the current release (to be built)."
 }
 function get_local_release_numbers() {
     # get local release versions
@@ -125,9 +174,8 @@ function get_last_existing_local_release_version() {
     # get the last existing local release version
     lastlocalrel=$(echo "$localrels" | tail -1)
     aux_info "$lastlocalrel is the last local release tag found."
-    if [ "$nextrel" == "lastlocalrel" ]; then
-        aux_error "Next release tag ($nextrel) already used locally."
-        exit 1
+    if [ "$thisrel" == "lastlocalrel" ]; then
+        aux_die "This release tag ($thisrel) already used locally."
     fi
 }
 function get_remote_release_numbers() {
@@ -146,183 +194,150 @@ function get_last_existing_remote_release_version() {
     tmpvar=$(echo "$tmpvar" | sort -V)
     lastremoterel=$(echo "$remoterels" | tail -1)
     aux_info "$lastremoterel is the last remote release tag found."
-    if [ "$nextrel" == "lastremoterel" ]; then
-        aux_error "Next release tag ($nextrel) already used remotely."
+    if [ "$thisrel" == "lastremoterel" ]; then
+        aux_die "This release tag ($thisrel) already used remotely."
         exit 1
     fi
 }
 function check_release_version_not_used_on_remote() {
-    # check that nextrel not used on remote
+    # check that thisrel not used on remote
     usedonrem="n"
     for rel in "${remrelarr[@]}"; do
-        if [ "$nextrel" == "$rel" ]; then
+        if [ "$thisrel" == "$rel" ]; then
             usedonrem="y"
             break
         fi
     done
     if [ "$usedonrem" == "y" ]; then
-        aux_error "Next release $nextrel already used on git remote."
+        aux_die "This release $thisrel already used on git remote."
         exit 1
     fi
-    aux_info "Next release $nextrel is not yet used on git remote."
+    aux_info "This release $thisrel is not yet used on git remote."
 }
 function check_release_version_not_used_on_local() {
-    # check that nextrel not used on local
+    # check that thisrel not used on local
     usedonloc="n"
     for rel in "${locrelarr[@]}"; do
-        if [ "$nextrel" == "$rel" ]; then
+        if [ "$thisrel" == "$rel" ]; then
             usedonloc="y"
             break
         fi
     done
     if [ "$usedonloc" == "y" ]; then
-        if [ "$interactiveflag" == "y" ]; then
-            aux_notice "Next release $nextrel already used locally, but not remotely."
-            dotagdel="n"
-            while true; do
-                read -p "Do you want to delete the old local $nextrel tagging [yN]? " answer
-                case $answer in
-                    [Yy]* ) dotagdel="y"; break;;
-                    [Nn]* ) dotagdel="n"; break;;
-                    * ) echo "Please answer yes or no.";;
-                esac
-            done
-            if [ "$dotagdel" == "y" ]; then
-                git tag --delete $nextrel
-                if [ "$?" != "0" ]; then
-                    aux_error "git tag --delete completion status problem."
-                    exit 1
-                fi
-                usedonloc="n"  # cleaned up now
-            fi
+        aux_notice "This release $thisrel already used locally, but not remotely."
+        ask_yn "y" "Do you want to delete the old local $thisrel tagging?"
+        dotagdel="$yn_answer"
+        if [ "$dotagdel" == "y" ]; then
+            git tag --delete $thisrel
+            zero_or_die "$?" "git tag --delete completion status problem."
+            usedonloc="n"  # cleaned up now
         fi
     fi
     if [ "$usedonloc" == "y" ]; then
-        aux_error "Next release $nextrel already used locally."
-        exit 1
+        aux_die "This release $thisrel already used locally."
     fi
-    aux_info "Next release $nextrel is not now used locally."
-}
-function log_release_attempt() {
-    cd "$reporoot"
-    make log-release-attempt
-    if [ "$?" == "0" ]; then
-        aux_info "This release attempt has been logged."
-    else
-        aux_error "The was a problem trying to log this release attempt."
-        exit 1
-    fi
+    aux_info "This release $thisrel is not now used locally."
 }
 function do_make_clean() {
     cd "$reporoot"
-    make clean
-    if [ "$?" == "0" ]; then
-        aux_info "make clean completed ok."
-    else
-        aux_error "The was a problem trying to do make clean."
-        exit 1
-    fi
+    make clean > /dev/null
+    zero_or_die "$?" "There was a problem trying to do make clean."
+    aux_info "make clean completed ok."
 }
 function verify_everything_built_ok() {
     # make sure we built everything ok
     cd "$reporoot"
-    tmpvar=$(make build)
-    if [ "$?" != "0" ]; then
-        aux_error "There was a problem doing 'make build'."
-        exit 1
+    local buildoutput=$(make build)
+    zero_or_die "$?" "There was a problem doing 'make build'."
+    local lastline=$(echo "$buildoutput" | tail -1)
+    if [ "$lastline" != "[build complete]" ]; then
+        aux_die "Unexpected final build message ($lastline)."
     fi
-    tmpvar=$(echo "$tmpvar" | tail -1)
-    if [ "$tmpvar" != "[build complete]" ]; then
-        aux_error "Unexpected final build message ($tmpvar)."
-        exit 1
-    fi
+    # check for some error messages that do not set bad status
+    local grepoutput
+    local errstring
+    local errstrings=("ERROR:" "syntax error")
+    for errstring in "${errstrings[@]}"; do
+        grepoutput=$(echo "$buildoutput" | grep "$errstring")
+        if [ ! -z "$grepoutput" ]; then
+            aux_die "build output contained bad string ($errstring)."
+        fi
+    done
     aux_info "build appears to be successful."
 }
 function verify_unit_tests_ok() {
     # make sure tests ok
+    local timestamp=$(date +%Y-%m-%dT%H:%M:%S%z)
     cd "$reporoot"
+    aux_info "unit testing beginning at $timestamp; this might take a few minutes."
     tmpvar=$(make checktest | tail -1)
-    if [ "$?" != "0" ]; then
-        aux_error "There was a problem doing 'make checktest'."
-        exit 1
-    fi
+    zero_or_die "$?" "There was a problem doing 'make checktest'."
     if [ "${tmpvar:0:3}" != "ok " ]; then
         aux_error "Unexpected final checktest message ($tmpvar)."
         exit 1
     fi
-    aux_info "test appears to be successful."
+    timestamp=$(date +%Y-%m-%dT%H:%M:%S%z)
+    aux_info "unit testing finished at $timestamp."
+    aux_info "unit tests appear to be successful."
+}
+function log_release_attempt() {
+    cd "$reporoot"
+    make log-release-attempt
+    zero_or_die "$?" "There was a problem trying to log this release attempt."
+    aux_info "This release ($thisrel) attempt has been logged."
 }
 function stage_manuals() {
     cd "$reporoot"
-    make stage-manuals
-    if [ "$?" == "0" ]; then
-        aux_info "stage manuals completed ok."
-    else
-        aux_error "The was a problem trying to do stage manuals."
-        exit 1
+    make stage-manuals > /dev/null
+    zero_or_die "$?" "There was a problem trying to do stage manuals."
+    aux_info "stage manuals completed ok."
+}
+function do_git_add_and_commit() {
+    local commitmsg="$1"
+    if [ -z "$commitmsg" ]; then
+        commitmsg="creating release $thisrel"
     fi
+    cd "$reporoot"
+    git add .
+    git commit -m "$commitmsg"
+}
+function is_git_clean() {
+    # look for clean git status
+    git_clean_yn="n"
+    local gitoutput
+    local gitlinecnt
+    cd "$reporoot"
+    gitoutput=$(git status --porcelain)
+    if [ -z "$gitoutput" ]; then
+        gitlinecnt="0"
+    else
+        gitlinecnt=$(echo $tmpvar | wc -l)
+    fi
+    if [ "$gitlinecnt" == "0" ]; then
+        git_clean_yn="y"
+    else
+        git_clean_yn="n"
+    fi
+    return 0
 }
 function verify_clean_git_status() {
     # look for clean git status
     cd "$reporoot"
-    keeplooping="y"
+    local keeplooping="y"
     while [ "$keeplooping" == "y" ]; do
-        tmpvar=$(git status --porcelain)
-        if [ -z "$tmpvar" ]; then
-            tmpvar2="0"
-        else
-            tmpvar2=$(echo $tmpvar | wc -l)
-        fi
-        aux_debug "$tmpvar2 git status lines found."
-        isclean="y"
-        if [ "$tmpvar2" != "0" ]; then
-            aux_debug "unclean!"
-            if [[ "$debugflag" == "y" ]]; then
-                echo ".${tmpvar}."
-            fi
-            isclean="n"
-            #if [[ $- == *i* ]]; then
-            if [[ "$interactiveflag"=="y" ]]; then
-                # running interactively
-                aux_debug "Interactive!?!?"
-                aux_notice "Git status not clean!"
-                echo "This script can try to clean things up by git adding all untracked and modified files."
-                echo "This script can try to clean things up perfroming a git commit."
-                tryfix="n"
-                while true; do
-                    read -p "Do you want this script to try to clean this up [yN]? " answer
-                    case $answer in
-                        [Yy]* ) tryfix="y"; break;;
-                        [Nn]* ) tryfix="n"; break;;
-                        * ) echo "Please answer yes or no.";;
-                    esac
-                done
-                if [ "$tryfix" == "n" ]; then
-                    keeplooping="n"
-                elif [ "$tryfix" == "y" ]; then
-                    git add .
-                    echo "Untracked and modified files have been added to git."
-                    read -p "Please enter a comment for the git commit: " comment
-                    git commit -m "$comment"
-                else
-                    keeplooping="n"
-                fi
-            else
-                aux_debug "Not interactive!?!?"
-                # running non-interactively, give up
-                keeplooping="n"
-            fi
-        else
-            aux_debug "No lines of uncleanliness."
+        is_git_clean
+        if [ "$git_clean_yn" == "y" ]; then
             keeplooping="n"
+            aux_info "git status appear to be clean, for now."
+        else
+            ask_yn "y" "git status not yet clean, do git add and commit?"
+            if [ "$yn_answer" == "y" ]; then
+                do_git_add_and_commit
+            else
+                aux_die "git status not clean."
+            fi
         fi
     done
-    if [ "$isclean" == "n" ]; then
-        errmsg="Git status not clean, 'git add' or 'git commit' required."
-        aux_error "$errmsg"
-        exit 1
-    fi
-    aux_info "git status appear to be clean, for now."
 }
 function do_git_pull() {
     # try a git pull and check it
@@ -366,7 +381,7 @@ function tag_local_files() {
     if [ "$interactiveflag" == "y" ]; then
         dotag="n"
         while true; do
-            read -p "Do you want to tag local files with '$nextrel' [yN]? " answer
+            read -p "Do you want to tag local files with '$thisrel' [yN]? " answer
             case $answer in
                 [Yy]* ) dotag="y"; break;;
                 [Nn]* ) dotag="n"; break;;
@@ -375,7 +390,7 @@ function tag_local_files() {
         done
     fi
     if [ "$dotag" == "y" ]; then
-        git tag $nextrel
+        git tag $thisrel
         if [ "$?" != "0" ]; then
             aux_error "git tag completion status problem."
             exit 1
@@ -384,7 +399,7 @@ function tag_local_files() {
         aux_error "exiting early (at local tag phase) by user selection."
         exit 1
     fi
-    aux_info "Local files tagged with '$nextrel'."
+    aux_info "Local files tagged with '$thisrel'."
 }
 function create_runtime_tarball() {
     # now make the run-time distribution tar file
@@ -399,7 +414,7 @@ function create_runtime_tarball() {
         aux_error "make runtime-dist completion status was not 0."
         exit 1
     fi
-    tarfile="${reporoot}/dist/auxilium-run-${nextrel}.tar.gz"
+    tarfile="${reporoot}/dist/auxilium-run-${thisrel}.tar.gz"
     if [ ! -e  "$tarfile" ]; then
         aux_error "File not found ($tarfile)."
         exit 1
@@ -408,12 +423,9 @@ function create_runtime_tarball() {
 }
 function unit_test_runtime_staging_area() {
     # test what was copied to release runtime staging area
-    cd "${reporoot}"   # TBD! is this correct? Not in staging area!
-    make -f Makefile.test.mak checktest
-    if [ "$?" != "0" ]; then
-        aux_error "Unit tests on release working copy failed."
-        exit 1
-    fi
+    cd "${reporoot}"
+    make runtime-test
+    zero_or_die "$?" "Unit tests on release working copy failed."
     aux_info "Unit tests on release working copy passed."
 }
 function push_tag_to_remote() {
@@ -422,7 +434,7 @@ function push_tag_to_remote() {
     if [ "$interactiveflag" == "y" ]; then
         dotag="n"
         while true; do
-            read -p "Do you want to tag remote files with '$nextrel' [yN]? " answer
+            read -p "Do you want to tag remote files with '$thisrel' [yN]? " answer
             case $answer in
                 [Yy]* ) dotag="y"; break;;
                 [Nn]* ) dotag="n"; break;;
@@ -431,16 +443,16 @@ function push_tag_to_remote() {
         done
     fi
     if [ "$dotag" == "y" ]; then
-        git push origin $nextrel
+        git push origin $thisrel
         if [ "$?" != "0" ]; then
-            aux_error "git push origin $nextrel completion status problem."
+            aux_error "git push origin $thisrel completion status problem."
             exit 1
         fi
     else
         aux_error "exiting early (at remote tag phase) by user selection."
         exit 1
     fi
-    aux_info "Remote files tagged with '$nextrel'."
+    aux_info "Remote files tagged with '$thisrel'."
 }
 function create_devtime_tarball() {
     # make dev distribution
@@ -450,7 +462,7 @@ function create_devtime_tarball() {
         aux_error "make devtime-dist completion status was not 0."
         exit 1
     fi
-    tarfile2="${reporoot}/dist/auxilium-dev-${nextrel}.tar.gz"
+    tarfile2="${reporoot}/dist/auxilium-dev-${thisrel}.tar.gz"
     if [ ! -e  "$tarfile2" ]; then
         aux_error "File not found ($tarfile2)."
         exit 1
@@ -511,8 +523,8 @@ aux_debug "cmdfile=$cmdfile."
 aux_debug "cmddir=$cmddir."
 aux_debug "reporoot=$reporoot."
 aux_debug "cmdname=$cmdname."
-verify_on_master_branch    # make sure we are on master branch
-verify_makefile_exists     # make sure makefile exists
+verify_on_master_branch
+verify_makefile_exists
 get_release_version
 get_local_release_numbers
 get_last_existing_local_release_version
@@ -520,12 +532,13 @@ get_remote_release_numbers
 get_last_existing_remote_release_version
 check_release_version_not_used_on_remote
 check_release_version_not_used_on_local
-log_release_attempt
-do_make_clean
+#TBD#do_make_clean
 verify_everything_built_ok
 verify_unit_tests_ok
+log_release_attempt
 stage_manuals
 verify_clean_git_status
+aux_die "TBD DEBUG"
 do_git_pull
 do_git_push
 tag_local_files

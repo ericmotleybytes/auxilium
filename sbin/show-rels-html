@@ -110,11 +110,11 @@ reltypelbl="Release<br/>Type"
 relruntimelbl="Runtime<br/>Tarball"
 reldevtimelbl="Sources<br/>Tarball"
 relnotelbl="Release<br/>Notes"
+orgifs="$IFS"
 declare -a histlines
-tac "$histfile" | readarray histlines  # tac reverses line order
-readarray -t histlines <<< $(tac "$histfile")  # tac reverses line order
-oldifs="$IFS"
-IFS="|"
+IFS=$'\n'
+readarray -t histlines < <(tac "$histfile")  # tac reverses line order
+IFS="$orgifs"
 for line in "${histlines[@]}"; do
     put_debug "line=[$line]"
     relver=""
@@ -122,6 +122,7 @@ for line in "${histlines[@]}"; do
     reldatetime=""
     reldate=""
     cnt=$((0))
+    IFS="|"
     for fld in $line; do
         cnt=$(($cnt+1))
         put_debug "field $cnt=[$fld]"
@@ -136,6 +137,7 @@ for line in "${histlines[@]}"; do
             exit 1
         fi
     done
+    IFS="$orgifs"
     # check that we process all three fields
     if [ "$cnt" != "3" ]; then
         echo "ERROR: wrong field count in $histfile ($line)." >&2
@@ -202,7 +204,8 @@ echo "<tbody class=\"relinfo\">"
 #
 relcnt="${#relvers[@]}"
 for n in $(seq 1 $relcnt); do
-    idx=$(($n-1))  # array index
+    idx="$(($n-1))"  # array index
+    put_debug "idx=[$idx]"
     # begin release row
     echo "<tr class=\"relinfo\">"
     # output fields

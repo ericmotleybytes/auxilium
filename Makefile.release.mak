@@ -104,8 +104,8 @@ log-release-attempt:
 
 .PHONY: stage-manuals
 stage-manuals:
-	cp share/share/html/auxilium/auxilium-user-guide.html docs/
-	cp share/share/html/auxilium/auxilium-user-guide.pdf  docs/
+	cp share/html/auxilium/auxilium-user-guide.html docs/
+	cp share/html/auxilium/auxilium-user-guide.pdf  docs/
 
 .PHONY: runtime-dist
 runtime-dist: \
