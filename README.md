@@ -35,7 +35,7 @@ At the moment, auxilium is only tested on Linux systems.
 
 ## Credits
 
-The run-time auxilium scripts are written purely in the bash scripting
+The runtime auxilium scripts are written purely in the bash scripting
 language. All that is needed to run them is a standard bash shell
 version 4 or higher.
 

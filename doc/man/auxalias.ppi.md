@@ -28,7 +28,7 @@
 
 ## PREREQUISITES
 
-* bash 4.2 or higher.
+!include(../include/auxilium-prerequisites.md)
 
 ## AUTHORS
 

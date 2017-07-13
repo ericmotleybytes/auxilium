@@ -14,7 +14,7 @@ PANDOCPDF1=$(PANDOCSTD) --to=latex -M papersize=letter -M colorlinks
 PANDOCPDF2=$(PANDOCPDF1) -M margin-left=1in -M margin-right=1in
 PANDOCPDF3=$(PANDOCPDF2) -M margin-top=1in -M margin-bottom=1in
 PANDOCPDF=$(PANDOCPDF3) --template=doc/templates/info.latex.pandoc.template
-PANDOCPDFMANUAL=$(PANDOCPDF) --toc -M toc-depth=3 
+PANDOCPDFMANUAL=$(PANDOCPDF) --toc
 AUXENV_TITLE=$(shell head -1 doc/include/auxenv-title.md)
 AUXSOURCE_TITLE=$(shell head -1 doc/include/auxsource-title.md)
 AUXWHERE_TITLE=$(shell head -1 doc/include/auxwhere-title.md)
@@ -182,11 +182,11 @@ share/html/auxilium/auxilium-user-guide.html : \
   doc/manuals/auxilium-user-guide.ppo.md \
   doc/css doc/templates
 	$(PANDOCHTMLMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)" \
-          -M subtitle="$(AUXILIUM_UG_SUBTITLE)"
+          -M subtitle="$(AUXILIUM_UG_SUBTITLE)" --toc-depth=2
 
 share/html/auxilium/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.ppo.md
 	$(PANDOCPDFMANUAL) $< --output=$@ -M title="$(AUXILIUM_UG_TITLE)" \
-          -M date="Version $(THISREL)"
+          -M date="Version $(THISREL)" --toc-depth=2
 
 doc/docs/index.ppo.md : doc/docs/index.ppi.md \
   data/releases.dat \

@@ -1,5 +1,5 @@
 ###
-# Makefile for auxilium run-time distribution
+# Makefile for auxilium runtime distribution
 ###
 # define default target installation prefix for shared system installation.
 SYS_PREFIX=/usr/local

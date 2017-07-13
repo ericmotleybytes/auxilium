@@ -8,14 +8,14 @@ distribution tar file which includes only items in the git source code
 repository tagged with the corresponding release version tag. However,
 to install auxilium from source requires some special tools, such as "Bats"
 for unit testing, "pandoc" for document generation, etc. Many users just
-want to use the synamically generated run-time files and would prefer to
+want to use the synamically generated runtime files and would prefer to
 not have to install additional development tools.
 
-To support the run-time-only end-user, auxilium generates a special run-time
+To support the runtime-only end-user, auxilium generates a special runtime
 only distribution tar file which is easier to install and does not require
 building from sources. This tar file has the corresponding release version
 number in the filename. This tar file is generally not placed under git
 source code control (it can be dynamically regenerated). However, the file
 is uploaded as a "binary attachment" to the GitHub release. Users looking
 to download auxilium from a GitHub release can then choose between downloading
-the source distribution or the run-time distribution.
+the source distribution or the runtime distribution.

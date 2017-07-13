@@ -1,16 +1,16 @@
-# Introduction to auxilium
+# Auxilium Introduction
 
 !include(../include/auxilium-introduction.ppi.md)
 
-# Installation of auxilium run-time distribution
+# Auxilium Installation
 
-TBD
+## Install of auxilium runtime distribution
 
-This section describes the run-time auxilium installation, which is
-appropriate for end-users
-who just want to use auxilium utilities, not modify them. For information
-on how to install a development installation and contribute changes to
-this open source project see TBD.
+!include(../include/runtime-install.ppi.md)
+
+## Uninstall of auxilium runtime distribution
+
+!include(../include/runtime-uninstall.ppi.md)
 
 # Utilities
 
@@ -211,3 +211,12 @@ this open source project see TBD.
 ## Licensing
 
 !include(../include/license.md)
+
+# See Also
+
+* <https://github.com/ericmotleybytes/auxilium> : The master auxilium
+  GitHub repository. You can also report bugs, describe issues, and
+  request enhancements here.
+
+* <https://testanything.org/> : A description of TAP,
+  the unit testing Test Anything Protocol.

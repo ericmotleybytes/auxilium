@@ -2,7 +2,7 @@
 project which contains a collection of bash shell executable and sourceable scripts which
 support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are
 written in *bash", the standard Linux interpretive shell language. This facilitates
-portability (between bash platforms) and ease of installation. Auxilium has no run-time
+portability (between bash platforms) and ease of installation. Auxilium has no runtime
 prerequisites other than bash version 4.2 or higher.
 
 The core auxilium utilities include:

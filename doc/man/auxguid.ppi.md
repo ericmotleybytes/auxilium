@@ -24,7 +24,8 @@
 
 ## PREREQUISITES
 
-* bash 4.2 or higher.
+!include(../include/auxilium-prerequisites.md)
+
 * The separate "uuidgen" program is optional.
 
 ## AUTHORS
