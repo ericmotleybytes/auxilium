@@ -48,7 +48,8 @@ depends: doc/man/auxenv.ppi.md.dep \
   doc/include/template-aliasing.ppi.md.dep \
   doc/html/index.ppi.md.dep \
   doc/manuals/auxilium-user-guide.ppi.md.dep \
-  doc/docs/index.ppi.md.dep
+  doc/docs/index.ppi.md.dep \
+  doc/readme/readme.ppi.md.dep
 
 doc/man/auxenv.ppi.md.dep : doc/man/auxenv.ppi.md
 	sbin/pp-dep $< > $@
@@ -83,6 +84,9 @@ doc/manuals/auxilium-user-guide.ppi.md.dep : doc/manuals/auxilium-user-guide.ppi
 doc/docs/index.ppi.md.dep : doc/docs/index.ppi.md
 	sbin/pp-dep $< > $@
 
+doc/readme/readme.ppi.md.dep : doc/readme/readme.ppi.md
+	sbin/pp-dep $< > $@
+
 #### Building stuff #####
 
 .PHONY: build
@@ -113,7 +117,10 @@ docs: doc/include/auxenv-aliasing.ppo.md \
     share/html/auxilium/index.html \
     share/html/auxilium/auxilium-user-guide.html \
     share/html/auxilium/auxilium-user-guide.pdf \
-  doc/docs/index.html
+  doc/docs/index.html \
+  doc/readme/readme.ppo.md \
+  doc/readme/readme.html \
+  doc/readme/README.md
 
 doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md \
   $(shell sbin/pp-putdep doc/include/template-aliasing.ppi.md.dep)
@@ -299,6 +306,26 @@ doc/docs/index.html : doc/docs/index.ppo.md \
           -H doc/css/info.css \
           --template=doc/templates/info.html.pandoc.template
 
+# README.md stuff
+
+doc/readme/readme.ppo.md : doc/readme/readme.ppi.md \
+  $(shell sbin/pp-putdep doc/readme/readme.ppi.md.dep)
+	pp $< > $@
+
+doc/readme/readme.html : doc/readme/readme.ppo.md \
+  doc/include/auxilium-title.md \
+  doc/css/man.css \
+  doc/templates/man.html.pandoc.template
+	$(PANDOCHTMLMAN) $< --output=$@ \
+          -M title="$(shell head -1 doc/include/auxilium-title.md)" \
+          --template=doc/templates/man.html.pandoc.template \
+          -H doc/css/man.css
+
+doc/readme/README.md : doc/readme/readme.ppo.md
+	pandoc -s --from=markdown --to=markdown_github \
+          --toc $< --output=$@ \
+          -M title="$(shell head -1 doc/include/auxilium-title.md)"
+
 #### Cleaning built stuff ####
 
 .PHONY: cleandocs
@@ -314,6 +341,7 @@ cleandocs:
 	rm -f doc/html/index.ppi.md.dep
 	rm -f doc/manuals/auxilium-user-guide.ppi.md.dep
 	rm -f doc/docs/index.ppi.md.dep
+	rm -f doc/readme/readme.ppi.md.dep
 	rm -f doc/man/auxenv.ppo.md
 	rm -f doc/man/auxsource.ppo.md
 	rm -f doc/man/auxwhere.ppo.md
@@ -341,6 +369,9 @@ cleandocs:
 	rm -f share/html/auxilium/auxilium-user-guide.pdf
 	rm -f doc/docs/index.ppo.md
 	rm -f doc/docs/index.html
+	rm -f doc/readme/readme.ppo.md
+	rm -f doc/readme/readme.html
+	rm -f doc/readme/README.md
 
 #### Aggregate stuff ####
 

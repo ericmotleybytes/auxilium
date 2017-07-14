@@ -35,6 +35,16 @@ and pdf format (auxilium-user-guide.pdf).
 
 !include(../include/runtime-uninstall.ppi.md)
 
+## Authors
+
+!include(../include/authors.md)
+
+## Legal
+
+!include(../include/copyright.ppi.md)
+
+!include(../include/license.md)
+
 ## See Also
 
 * <https://github.com/ericmotleybytes/auxilium> : The master auxilium
