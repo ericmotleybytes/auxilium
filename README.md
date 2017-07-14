@@ -1,54 +1,67 @@
-# Auxilium : Auxiliary support for path-like environment variables.
+-   [Auxilium](#auxilium)
+-   [Introduction](#introduction)
+-   [Runtime Auxilium Downloads](#runtime-auxilium-downloads)
+-   [Documentation](#documentation)
+-   [Authors](#authors)
+-   [Legal](#legal)
+-   [See Also](#see-also)
 
-Auxilium is designed to provide a way to easily and flexibly manage and manipulate
-directory list environment variables such as PATH, MANPATH, LD_LIBRARY_PATH, and so
-forth. Directories can easily be added and removed in whatever order is appropriate.
-Optionally, duplicate and non-existent directories can also be purged from the list,
-thereby helping performance and maintainability.
+Auxilium
+========
 
-System administrators can easily develop and share small sourcable scripts to robustly
-configure default environment variables settings. End-users can more safely customize
-these environment variables to suit their personal needs and preferences.
+Shell utilities for paths, sourcing, aliasing, GUIDs, and unit test summaries
 
-## auxenv
+Introduction
+============
 
-The primary auxilium tool is a sourcable script called "auxenv". Because it is used to
-manipulate environment variables within the context of the current process, the script
-needs to be source'd, not executed as a command in a subprocess. Generally, a bash alias
-is defined to abbreviate this. auxenv can display and manipulate list environment
-variables with great power and flexibility.
+*Auxilium* is the latin word for *support*. The "auxilium" package is an open-source project which contains a collection of bash shell executable and sourceable scripts which support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are written in \*bash", the standard Linux interpretive shell language. This facilitates portability (between bash platforms) and ease of installation. Auxilium has no runtime prerequisites other than bash version 4.2 or higher.
 
-## auxsource
+The core auxilium utilities include:
 
-It is common to develop small configuration scripts with auxenv commands to configure
-diferent environments. Just like the auxenv script, these scripts must also be invoked
-via the "source" built-in bash command. Using the standard source command is fine,
-but the full location of the source file must be specified.
+-   **auxenv**. Setup, manipulation, and optimization of path-like environment variables such as *PATH*, *MANPATH*, and *LD\_LIBRARY\_PATH*.
 
-In some environments it is helpful to find trhe custom configuration scripts based on
-a list of directories to search through. The auxilium sourceable script "auxsource"
-does this based on a list of directories in the "AUXSOURCE_PATH" envirnment variable.
+-   **auxwhere**. Find files by filename search through path-like environment variable directories.
 
-## Supported Systems
+-   **auxsource**. An extended version of the bash built-in *source* command.
 
-At the moment, auxilium is only tested on Linux systems.
+-   **auxalias**. Creates static or dynamic aliases for all auxilium sourceable scripts.
 
-## Credits
+-   **auxchecktap**. Scans and checks TAP format unit test result logs, producing a summarized TAP test results log.
 
-The runtime auxilium scripts are written purely in the bash scripting
-language. All that is needed to run them is a standard bash shell
-version 4 or higher.
+-   **auxguid**. Generates a pseudo random 128-bit (32 hex character) GUID/UUID.
 
-Running the auxilium unit tests is not required for end-users. However, for developers or
-others who want to run these unit tests the "Bats" (Bash Automated Testing System) is
-required. "Bats" is available at https://github.com/sstephenson/bats .
+Runtime Auxilium Downloads
+==========================
 
-Conversion of markoff files to html and man formatted documentation is also not usually
-required for end-users because the generated documentation is generally included in
-auxilium distributions. However, for those who wish to be able to regenerate the (possibly
-revised) documentation, the "Ronn" markdown to man/html system is required. "Ronn" is
-available at https://github.com/rtomayko/ronn .
+Please see <https://ericmotleybytes.github.io/auxilium/> for available runtime download and runtime installation instructions.
 
-The auxchecktap utility will use "uuidgen" if it is available, but will work even if uuidgen
-is not available. The uuidgen program is part of the util-linux package and is availble
-from https://www.kernel.org/pub/linux/utils/util-linux/ .
+Documentation
+=============
+
+For convenience the latest version of the user guide is also available online in both HTML and PDF formats:
+
+-   [Auxilium User Guide (html)](https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.html)
+-   [Auxilium User Guide (pdf)](https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.pdf)
+
+Authors
+=======
+
+Eric Alan Christiansen
+eric@motleybytes.com
+<https://www.linkedin.com/in/ericchristiansen/>
+
+Legal
+=====
+
+Copyright © 2017 Eric Alan Christiansen.
+
+This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to use and/or redistribute it under the conditions of the GNU General Public License v3.0.
+
+See <https://www.gnu.org/licenses/gpl-3.0.en.html>
+
+See Also
+========
+
+-   <https://ericmotleybytes.github.io/auxilium/> : The official auxilium information and download page.
+
+-   <https://testanything.org/> : A description of TAP, the unit testing Test Anything Protocol.

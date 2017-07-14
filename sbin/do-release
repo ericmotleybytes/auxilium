@@ -292,6 +292,12 @@ function stage_manuals() {
     zero_or_die "$?" "There was a problem trying to do stage manuals."
     aux_info "stage manuals completed ok."
 }
+function stage_readme() {
+    cd "$reporoot"
+    make stage-readme > /dev/null
+    zero_or_die "$?" "There was a problem trying to do stage README.md."
+    aux_info "stage readme (README.md) completed ok."
+}
 function do_git_add_and_commit() {
     local commitmsg="$1"
     if [ -z "$commitmsg" ]; then
@@ -505,6 +511,7 @@ verify_everything_built_ok
 verify_unit_tests_ok
 log_release_attempt
 stage_manuals
+stage_readme
 verify_clean_git_status
 do_git_pull
 do_git_push

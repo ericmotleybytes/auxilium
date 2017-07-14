@@ -11,6 +11,7 @@ helprel:
 	@echo "  make show-local-release-tags  # release tags on local server."
 	@echo "  make log-release-attempt      # log release attempt and datetime."
 	@echo "  make stage-manuals            # stage manuals for upload to web."
+	@echo "  make stage-readme             # stage README.md for upload to web."
 	@echo "  make clean-runtime-dist       # clean distribution area."
 	@echo "  make runtime-dist             # create distribution and tarball."
 	@echo "  make runtime-test             # test distribution copy."
@@ -64,6 +65,13 @@ docs/auxilium-user-guide.pdf : share/html/auxilium/auxilium-user-guide.pdf
 	cp $< $@
 
 docs/index.html : doc/docs/index.html
+	cp $< $@
+
+.PHONY: stage-readme
+stage-readme: README.md
+	@echo "[README.md staged.]"
+
+README.md : doc/readme/README.md
 	cp $< $@
 
 .PHONY: runtime-dist
