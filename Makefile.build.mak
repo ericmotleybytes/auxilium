@@ -35,10 +35,58 @@ helpbuild:
 	@echo "  make sysuninstall  # delete files installed under $(SYS_PREFIX) as root."
 	@echo "  make uninstall PREFIX=<prefix> # custom uninstall files."
 
+#### Dependency stuff ####
+
+.PHONY: depends
+depends: doc/man/auxenv.ppi.md.dep \
+  doc/man/auxsource.ppi.md.dep \
+  doc/man/auxalias.ppi.md.dep \
+  doc/man/auxwhere.ppi.md.dep \
+  doc/man/auxchecktap.ppi.md.dep \
+  doc/man/auxguid.ppi.md.dep \
+  doc/man/auxilium.ppi.md.dep \
+  doc/include/template-aliasing.ppi.md.dep \
+  doc/html/index.ppi.md.dep \
+  doc/manuals/auxilium-user-guide.ppi.md.dep \
+  doc/docs/index.ppi.md.dep
+
+doc/man/auxenv.ppi.md.dep : doc/man/auxenv.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/man/auxsource.ppi.md.dep : doc/man/auxsource.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/man/auxalias.ppi.md.dep : doc/man/auxalias.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/man/auxwhere.ppi.md.dep : doc/man/auxwhere.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/man/auxchecktap.ppi.md.dep : doc/man/auxchecktap.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/man/auxguid.ppi.md.dep : doc/man/auxguid.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/man/auxilium.ppi.md.dep : doc/man/auxilium.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/include/template-aliasing.ppi.md.dep : doc/include/template-aliasing.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/html/index.ppi.md.dep : doc/html/index.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/manuals/auxilium-user-guide.ppi.md.dep : doc/manuals/auxilium-user-guide.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/docs/index.ppi.md.dep : doc/docs/index.ppi.md
+	sbin/pp-dep $< > $@
+
 #### Building stuff #####
 
 .PHONY: build
-build: docs
+build: depends docs
 	@echo "[build complete]"
 
 .PHONY: docs
@@ -68,45 +116,45 @@ docs: doc/include/auxenv-aliasing.ppo.md \
   doc/docs/index.html
 
 doc/include/auxenv-aliasing.ppo.md : doc/include/template-aliasing.ppi.md \
-  $(shell sbin/pp-dep doc/include/template-aliasing.ppi.md)
+  $(shell sbin/pp-putdep doc/include/template-aliasing.ppi.md.dep)
 	pp -D AUXCMD=auxenv $< > $@
 
 doc/include/auxsource-aliasing.ppo.md : doc/include/template-aliasing.ppi.md \
-  $(shell sbin/pp-dep doc/include/template-aliasing.ppi.md)
+  $(shell sbin/pp-putdep doc/include/template-aliasing.ppi.md.dep)
 	pp -D AUXCMD=auxsource $< > $@
 
 doc/include/auxalias-aliasing.ppo.md : doc/include/template-aliasing.ppi.md \
-  $(shell sbin/pp-dep doc/include/template-aliasing.ppi.md)
+  $(shell sbin/pp-putdep doc/include/template-aliasing.ppi.md.dep)
 	pp -D AUXCMD=auxalias $< > $@
 
 # generic man stuff
 
 doc/man/auxenv.ppo.md : doc/man/auxenv.ppi.md \
-  $(shell sbin/pp-dep doc/man/auxenv.ppi.md)
+  $(shell sbin/pp-putdep doc/man/auxenv.ppi.md.dep)
 	pp $< > $@
 
 doc/man/auxsource.ppo.md : doc/man/auxsource.ppi.md \
-  $(shell sbin/pp-dep doc/man/auxsource.ppi.md)
+  $(shell sbin/pp-putdep doc/man/auxsource.ppi.md.dep)
 	pp $< > $@
 
 doc/man/auxwhere.ppo.md : doc/man/auxwhere.ppi.md \
-  $(shell sbin/pp-dep doc/man/auxwhere.ppi.md)
+  $(shell sbin/pp-putdep doc/man/auxwhere.ppi.md.dep)
 	pp $< > $@
 
 doc/man/auxalias.ppo.md : doc/man/auxalias.ppi.md \
-  $(shell sbin/pp-dep doc/man/auxalias.ppi.md)
+  $(shell sbin/pp-putdep doc/man/auxalias.ppi.md.dep)
 	pp $< > $@
 
 doc/man/auxchecktap.ppo.md : doc/man/auxchecktap.ppi.md \
-  $(shell sbin/pp-dep doc/man/auxchecktap.ppi.md)
+  $(shell sbin/pp-putdep doc/man/auxchecktap.ppi.md.dep)
 	pp $< > $@
 
 doc/man/auxguid.ppo.md : doc/man/auxguid.ppi.md \
-  $(shell sbin/pp-dep doc/man/auxguid.ppi.md)
+  $(shell sbin/pp-putdep doc/man/auxguid.ppi.md.dep)
 	pp $< > $@
 
 doc/man/auxilium.ppo.md : doc/man/auxilium.ppi.md \
-  $(shell sbin/pp-dep doc/man/auxilium.ppi.md)
+  $(shell sbin/pp-putdep doc/man/auxilium.ppi.md.dep)
 	pp $< > $@
 
 # man in man format stuff
@@ -202,7 +250,7 @@ share/html/auxilium :
 	mkdir -p $@
 
 doc/html/index.ppo.md : doc/html/index.ppi.md \
-  $(shell sbin/pp-dep doc/html/index.ppi.md)
+  $(shell sbin/pp-putdep doc/html/index.ppi.md.dep)
 	pp $< > $@
 
 share/html/auxilium/index.html : doc/html/index.ppo.md \
@@ -214,7 +262,7 @@ share/html/auxilium/index.html : doc/html/index.ppo.md \
 # users guide
 
 doc/manuals/auxilium-user-guide.ppo.md : doc/manuals/auxilium-user-guide.ppi.md \
-  $(shell sbin/pp-dep doc/manuals/auxilium-user-guide.ppi.md)
+  $(shell sbin/pp-putdep doc/manuals/auxilium-user-guide.ppi.md.dep)
 	pp $< > $@
 
 share/html/auxilium/auxilium-user-guide.html : \
@@ -237,7 +285,7 @@ doc/docs/index.ppo.md : doc/docs/index.ppi.md \
   data/releases.dat \
   data/releases.log \
   sbin/show-rels-html \
-  $(shell sbin/pp-dep doc/docs/index.ppi.md)
+  $(shell sbin/pp-putdep doc/docs/index.ppi.md.dep)
 	pp $< > $@
 
 # github pages stuff
@@ -255,6 +303,17 @@ doc/docs/index.html : doc/docs/index.ppo.md \
 
 .PHONY: cleandocs
 cleandocs:
+	rm -f doc/man/auxenv.ppi.md.dep
+	rm -f doc/man/auxsource.ppi.md.dep
+	rm -f doc/man/auxalias.ppi.md.dep
+	rm -f doc/man/auxwhere.ppi.md.dep
+	rm -f doc/man/auxchecktap.ppi.md.dep
+	rm -f doc/man/auxguid.ppi.md.dep
+	rm -f doc/man/auxilium.ppi.md.dep
+	rm -f doc/include/template-aliasing.ppi.md.dep
+	rm -f doc/html/index.ppi.md.dep
+	rm -f doc/manuals/auxilium-user-guide.ppi.md.dep
+	rm -f doc/docs/index.ppi.md.dep
 	rm -f doc/man/auxenv.ppo.md
 	rm -f doc/man/auxsource.ppo.md
 	rm -f doc/man/auxwhere.ppo.md

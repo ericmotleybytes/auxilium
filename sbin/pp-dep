@@ -10,7 +10,7 @@
 # directory are output.
 #
 # usage:
-#     show-pp-depends [options] [--] <file>
+#     pp-dep [options] [--] <file>
 #
 # options:
 #     -r <dir> --root=<dir>  # root directory where Makefile works from.
@@ -43,7 +43,7 @@ function aux_die() {
 function show_help() {
     echo "$CmdName - show pandoc preprocessor dependencies"
     echo "usage:"
-    echo "  show-pp-depends [options] [--] <file...>"
+    echo "  $CmdName [options] [--] <file...>"
     echo "  options:"
     echo "    -b <dir> --base=<dir>  # base directory where Makefile works from."
     echo "                           # this default to the parent directory of"
@@ -156,8 +156,6 @@ function get_source_file_to_scan() {
     aux_debug "(gsftx end) NotYetScanned=[$NotYetScanned]"
     return 0
 }
-
-
 #
 # begin main program
 #
@@ -213,6 +211,9 @@ while [ $# -gt 0 ]; do
         fi
     fi
 done
+if [ -z "$TopSourceFile" ]; then
+    aux_die "No top command line source file specified."
+fi
 #
 # loop through source files
 #
