@@ -340,6 +340,7 @@ cleandocs:
 	rm -f share/html/auxilium/auxilium-user-guide.html
 	rm -f share/html/auxilium/auxilium-user-guide.pdf
 	rm -f doc/docs/index.ppo.md
+	rm -f doc/docs/index.html
 
 #### Aggregate stuff ####
 
