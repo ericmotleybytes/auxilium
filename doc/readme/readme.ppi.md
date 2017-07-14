@@ -19,6 +19,28 @@ available online in both HTML and PDF formats:
 * [Auxilium User Guide (html)](https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.html)
 * [Auxilium User Guide (pdf)](https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.pdf)
 
+# Examples
+
+## auxenv examples
+
+!include(../include/auxenv-examples.md)
+
+## auxsource examples
+
+!include(../include/auxsource-examples.md)
+
+## auxalias examples
+
+!include(../include/auxalias-examples.md)
+
+## auxwhere examples
+
+!include(../include/auxwhere-examples.md)
+
+## auxchecktap examples
+
+!include(../include/auxchecktap-examples.md)
+
 # Authors
 
 !include(../include/authors.md)
