@@ -35,6 +35,28 @@ and pdf format (auxilium-user-guide.pdf).
 
 !include(../include/runtime-uninstall.ppi.md)
 
+## Usage Examples
+
+### auxenv examples
+
+!include(../include/auxenv-examples.md)
+
+### auxsource examples
+
+!include(../include/auxsource-examples.md)
+
+### auxalias examples
+
+!include(../include/auxalias-examples.md)
+
+### auxwhere examples
+
+!include(../include/auxwhere-examples.md)
+
+### auxchecktap examples
+
+!include(../include/auxchecktap-examples.md)
+
 ## Authors
 
 !include(../include/authors.md)
