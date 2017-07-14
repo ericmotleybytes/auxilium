@@ -25,7 +25,7 @@
   code{
     white-space: pre;
     font-family: "Courier New", Courier, monospace;
-    font-size: 1.25em;
+    font-size: 1em;
   }
   pre{
     background-color: #F9F9F9;
@@ -45,71 +45,29 @@
 </div>
 <div id="TOC">
 <ul>
-<li><a href="#introduction-to-auxilium">Introduction to auxilium</a></li>
-<li><a href="#installation-of-auxilium-run-time-distribution">Installation of auxilium run-time distribution</a></li>
+<li><a href="#auxilium-introduction">Auxilium Introduction</a></li>
+<li><a href="#auxilium-installation">Auxilium Installation</a><ul>
+<li><a href="#install-of-auxilium-runtime-distribution">Install of auxilium runtime distribution</a></li>
+<li><a href="#uninstall-of-auxilium-runtime-distribution">Uninstall of auxilium runtime distribution</a></li>
+</ul></li>
 <li><a href="#utilities">Utilities</a><ul>
-<li><a href="#auxenv">auxenv</a><ul>
-<li><a href="#auxenv-introduction">auxenv introduction</a></li>
-<li><a href="#auxenv-usage">auxenv usage</a></li>
-<li><a href="#auxenv-options">auxenv options</a></li>
-<li><a href="#auxenv-commands">auxenv commands</a></li>
-<li><a href="#auxenv-exit-status">auxenv exit status</a></li>
-<li><a href="#auxenv-description">auxenv description</a></li>
-<li><a href="#auxenv-examples">auxenv examples</a></li>
-<li><a href="#auxenv-notes">auxenv notes</a></li>
-</ul></li>
-<li><a href="#auxwhere">auxwhere</a><ul>
-<li><a href="#auxwhere-introduction">auxwhere introduction</a></li>
-<li><a href="#auxwhere-usage">auxwhere usage</a></li>
-<li><a href="#auxwhere-options">auxwhere options</a></li>
-<li><a href="#auxwhere-exit-status">auxwhere exit status</a></li>
-<li><a href="#auxwhere-description">auxwhere description</a></li>
-<li><a href="#auxwhere-examples">auxwhere examples</a></li>
-</ul></li>
-<li><a href="#auxsource">auxsource</a><ul>
-<li><a href="#auxsource-introduction">auxsource introduction</a></li>
-<li><a href="#auxsource-usage">auxsource usage</a></li>
-<li><a href="#auxsource-options">auxsource options</a></li>
-<li><a href="#auxsource-exit-status">auxsource exit status</a></li>
-<li><a href="#auxsource-description">auxsource description</a></li>
-<li><a href="#auxsource-examples">auxsource examples</a></li>
-<li><a href="#auxsource-notes">auxsource notes</a></li>
-</ul></li>
-<li><a href="#auxalias">auxalias</a><ul>
-<li><a href="#auxalias-introduction">auxalias introduction</a></li>
-<li><a href="#auxalias-usage">auxalias usage</a></li>
-<li><a href="#auxalias-options">auxalias options</a></li>
-<li><a href="#auxalias-exit-status">auxalias exit status</a></li>
-<li><a href="#auxalias-description">auxalias description</a></li>
-<li><a href="#auxalias-examples">auxalias examples</a></li>
-<li><a href="#auxalias-notes">auxalias notes</a></li>
-</ul></li>
-<li><a href="#auxchecktap">auxchecktap</a><ul>
-<li><a href="#auxchecktap-introduction">auxchecktap introduction</a></li>
-<li><a href="#auxchecktap-usage">auxchecktap usage</a></li>
-<li><a href="#auxchecktap-options">auxchecktap options</a></li>
-<li><a href="#auxchecktap-exit-status">auxchecktap exit status</a></li>
-<li><a href="#auxchecktap-description">auxchecktap description</a></li>
-<li><a href="#auxchecktap-examples">auxchecktap examples</a></li>
-</ul></li>
-<li><a href="#auxguid">auxguid</a><ul>
-<li><a href="#auxguid-introduction">auxguid introduction</a></li>
-<li><a href="#auxguid-usage">auxguid usage</a></li>
-<li><a href="#auxguid-options">auxguid options</a></li>
-<li><a href="#auxguid-exit-status">auxguid exit status</a></li>
-<li><a href="#auxguid-description">auxguid description</a></li>
-<li><a href="#auxguid-examples">auxguid examples</a></li>
-</ul></li>
+<li><a href="#auxenv">auxenv</a></li>
+<li><a href="#auxwhere">auxwhere</a></li>
+<li><a href="#auxsource">auxsource</a></li>
+<li><a href="#auxalias">auxalias</a></li>
+<li><a href="#auxchecktap">auxchecktap</a></li>
+<li><a href="#auxguid">auxguid</a></li>
 </ul></li>
 <li><a href="#authors">Authors</a></li>
 <li><a href="#legal">Legal</a><ul>
 <li><a href="#copyright">Copyright</a></li>
 <li><a href="#licensing">Licensing</a></li>
 </ul></li>
+<li><a href="#see-also">See Also</a></li>
 </ul>
 </div>
-<h1 id="introduction-to-auxilium">Introduction to auxilium</h1>
-<p><em>Auxilium</em> is the latin word for <em>support</em>. The &quot;auxilium&quot; package is an open-source project which contains a collection of bash shell executable and sourceable scripts which support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are written in *bash&quot;, the standard Linux interpretive shell language. This facilitates portability (between bash platforms) and ease of installation. Auxilium has no run-time prerequisites other than bash version 4.2 or higher.</p>
+<h1 id="auxilium-introduction">Auxilium Introduction</h1>
+<p><em>Auxilium</em> is the latin word for <em>support</em>. The &quot;auxilium&quot; package is an open-source project which contains a collection of bash shell executable and sourceable scripts which support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are written in *bash&quot;, the standard Linux interpretive shell language. This facilitates portability (between bash platforms) and ease of installation. Auxilium has no runtime prerequisites other than bash version 4.2 or higher.</p>
 <p>The core auxilium utilities include:</p>
 <ul>
 <li><p><strong>auxenv</strong>. Setup, manipulation, and optimization of path-like environment variables such as <em>PATH</em>, <em>MANPATH</em>, and <em>LD_LIBRARY_PATH</em>.</p></li>
@@ -119,9 +77,73 @@
 <li><p><strong>auxchecktap</strong>. Scans and checks TAP format unit test result logs, producing a summarized TAP test results log.</p></li>
 <li><p><strong>auxguid</strong>. Generates a pseudo random 128-bit (32 hex character) GUID/UUID.</p></li>
 </ul>
-<h1 id="installation-of-auxilium-run-time-distribution">Installation of auxilium run-time distribution</h1>
-<p>TBD</p>
-<p>This section describes the run-time auxilium installation, which is appropriate for end-users who just want to use auxilium utilities, not modify them. For information on how to install a development installation and contribute changes to this open source project see TBD.</p>
+<h1 id="auxilium-installation">Auxilium Installation</h1>
+<h2 id="install-of-auxilium-runtime-distribution">Install of auxilium runtime distribution</h2>
+<p>Runtime installation is relatively easy. As an example, below is a sample installation of auxilium 0.1.5, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
+<ol style="list-style-type: decimal">
+<li><p>Download the runtime distribution. There are at least two ways of doing this:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Primary download method: Right-click on the &quot;0.1.5&quot; link on this page at <a href="https://ericmotleybytes.github.io/auxilium/" class="uri">https://ericmotleybytes.github.io/auxilium/</a> and select &quot;save link as...&quot;.</p></li>
+<li><p>Alternate download method: Use the &quot;wget&quot; program to get the tar file.</p>
+<pre><code>$ wget https://github.com/ericmotleybytes/auxilium\
+/releases/download/0.1.5\
+/auxilium-run-0.1.5.tar.gz</code></pre>
+<p>This will create the file &quot;auxilium-run-0.1.5.tar.gz&quot;.</p></li>
+</ol></li>
+<li><p>Unpack the tar file.</p>
+<pre><code>$ tar -xzf auxilium-run-0.1.5.tar.gz</code></pre>
+<p>This will create a sub-directory called &quot;auxilium-run-0.1.5&quot; which contains additional files and directories.</p></li>
+<li><p>Set the default directory to the &quot;auxilium-run-0.1.5&quot; sub-directory.</p>
+<pre><code>$ cd auxilium-run-0.1.5</code></pre></li>
+<li><p>Use make to install auxilium under your desired directory prefix.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Personal install: To install auxilium under a personal directory, for example under the ~/local directory, issue the following command:</p>
+<pre><code>$ make install PREFIX=~/local</code></pre>
+<p>This installs executable scripts in ~/local/bin, man pages in ~/local/man/man1, html files in ~/local/share/html, and so forth.</p></li>
+<li><p>System install: To install auxilium under a shared system-wide directory, for example under the /usr/local directory, issue the following command:</p>
+<pre><code>$ sudo make install PREFIX=/usr/local</code></pre></li>
+</ol></li>
+<li><p>Optionally, although this is highly recommended, setup automatic auxilium alias definitions in the appropriate login script.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Personal setup: Edit your ~/.bashrc file and add the line:</p>
+<pre><code>source ~/local/bin/auxalias</code></pre></li>
+<li><p>System setup: Edit the /etc/bash/bashrc file and add the line:</p>
+<pre><code>source /usr/local/bin/auxalias</code></pre></li>
+</ol></li>
+</ol>
+<p>Congratulations! You have now installed auxilium!</p>
+<p>If your MANPATH is defined resonably you should be able to see an overview of auxilium by typing:</p>
+<pre><code>$ man auxilium</code></pre>
+<h2 id="uninstall-of-auxilium-runtime-distribution">Uninstall of auxilium runtime distribution</h2>
+<p>You can also easily uninstall auxilium. As an example, below is a sample uninstall of auxilium 0.1.5, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
+<ol style="list-style-type: decimal">
+<li><p>Set the default directory to the &quot;auxilium-run-0.1.5&quot; sub-directory.</p>
+<pre><code>$ cd auxilium-run-0.1.5</code></pre></li>
+<li><p>Use make to uninstall auxilium under your desired directory prefix.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Personal uninstall: To uninstall auxilium from under a personal directory where it was previously installed, for example under the ~/local directory, issue the following command:</p>
+<pre><code>$ make install PREFIX=~/local</code></pre>
+<p>This remove only auxilium installed files.</p></li>
+<li><p>System install: To uninstall auxilium under a shared system-wide directory where it was previously installed, for example under the /usr/local directory, issue the following command:</p>
+<pre><code>$ sudo make uninstall PREFIX=/usr/local</code></pre></li>
+</ol></li>
+<li><p>Optionally, if you edited a login script during installation, your might want to delete or comment out the line you added.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Personal setup: Edit your ~/.bashrc file and remove or comment the line:</p>
+<pre><code>source ~/local/bin/auxalias</code></pre>
+<p>If commented, the line will then look like:</p>
+<pre><code>#source ~/local/bin/auxalias</code></pre></li>
+<li><p>System setup: Edit the /etc/bash/bashrc file and remove or comment the line:</p>
+<pre><code>source /usr/local/bin/auxalias</code></pre>
+<p>If commented, the line will then look like:</p>
+<pre><code>#source /usr/local/bin/auxalias</code></pre></li>
+</ol></li>
+<li><p>Set the default directory to the original download directory and delete the tar distribution file and the unpacked files.</p>
+<pre><code>$ cd &lt;download-directory&gt;
+$ rm auxilium-run-0.1.5.tar.gz
+$ rm -rf auxilium-run-0.1.5</code></pre></li>
+</ol>
+<p>You have now uninstalled auxilium.</p>
 <h1 id="utilities">Utilities</h1>
 <h2 id="auxenv">auxenv</h2>
 <p>auxenv - manipulate path-like environment variables</p>
@@ -575,5 +597,10 @@ eric@motleybytes.com<br />
 <h2 id="licensing">Licensing</h2>
 <p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to use and/or redistribute it under the conditions of the GNU General Public License v3.0.</p>
 <p>See <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class="uri">https://www.gnu.org/licenses/gpl-3.0.en.html</a></p>
+<h1 id="see-also">See Also</h1>
+<ul>
+<li><p><a href="https://github.com/ericmotleybytes/auxilium" class="uri">https://github.com/ericmotleybytes/auxilium</a> : The master auxilium GitHub repository. You can also report bugs, describe issues, and request enhancements here.</p></li>
+<li><p><a href="https://testanything.org/" class="uri">https://testanything.org/</a> : A description of TAP, the unit testing Test Anything Protocol.</p></li>
+</ul>
 </body>
 </html>

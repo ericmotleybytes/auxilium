@@ -61,15 +61,24 @@
 <li><a href="#auxilium-introduction">Auxilium Introduction</a></li>
 <li><a href="#auxilium-released-downloads">Auxilium Released Downloads</a></li>
 <li><a href="#auxilium-prerequisites">Auxilium Prerequisites</a></li>
+<li><a href="#documentation">Documentation</a></li>
 <li><a href="#auxilium-runtime-install">Auxilium Runtime Install</a></li>
-<li><a href="#additional-documentation">Additional Documentation</a></li>
 <li><a href="#auxilium-runtime-uninstall">Auxilium Runtime Uninstall</a></li>
+<li><a href="#usage-examples">Usage Examples</a><ul>
+<li><a href="#auxenv-examples">auxenv examples</a></li>
+<li><a href="#auxsource-examples">auxsource examples</a></li>
+<li><a href="#auxalias-examples">auxalias examples</a></li>
+<li><a href="#auxwhere-examples">auxwhere examples</a></li>
+<li><a href="#auxchecktap-examples">auxchecktap examples</a></li>
+</ul></li>
+<li><a href="#authors">Authors</a></li>
+<li><a href="#legal">Legal</a></li>
 <li><a href="#see-also">See Also</a></li>
 </ul>
 </div>
 <h2 id="auxilium-introduction">Auxilium Introduction</h2>
-<p>This is the Auxilium information and download page.</p>
-<p><em>Auxilium</em> is the latin word for <em>support</em>. The &quot;auxilium&quot; package is an open-source project which contains a collection of bash shell executable and sourceable scripts which support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are written in *bash&quot;, the standard Linux interpretive shell language. This facilitates portability (between bash platforms) and ease of installation. Auxilium has no run-time prerequisites other than bash version 4.2 or higher.</p>
+<p>This is the auxilium information and download page.</p>
+<p><em>Auxilium</em> is the latin word for <em>support</em>. The &quot;auxilium&quot; package is an open-source project which contains a collection of bash shell executable and sourceable scripts which support, and make easier, many common Unix/Linux user tasks. All auxilium utilities are written in *bash&quot;, the standard Linux interpretive shell language. This facilitates portability (between bash platforms) and ease of installation. Auxilium has no runtime prerequisites other than bash version 4.2 or higher.</p>
 <p>The core auxilium utilities include:</p>
 <ul>
 <li><p><strong>auxenv</strong>. Setup, manipulation, and optimization of path-like environment variables such as <em>PATH</em>, <em>MANPATH</em>, and <em>LD_LIBRARY_PATH</em>.</p></li>
@@ -104,6 +113,26 @@ Release<br />Notes
 </thead>
 </tr>
 <tbody class="relinfo">
+<tr class="relinfo">
+<td class="relinfo">
+0.1.5
+</td>
+<td class="relinfo">
+2017-07-14
+</td>
+<td class="relinfo">
+prerelease
+</td>
+<td class="relinfo">
+<a class="relinfo" href="https://github.com/ericmotleybytes/auxilium/releases/download/0.1.5/auxilium-run-0.1.5.tar.gz">0.1.5 Runtime</a>
+</td>
+<td class="relinfo">
+<a class="relinfo" href="https://github.com/ericmotleybytes/auxilium/releases/download/0.1.5/auxilium-dev-0.1.5.tar.gz">0.1.5 Sources</a>
+</td>
+<td class="relinfo">
+<a class="relinfo" href="https://github.com/ericmotleybytes/auxilium/releases/tag/0.1.5" target="_blank">0.1.5 Notes</a>
+</td>
+</tr>
 <tr class="relinfo">
 <td class="relinfo">
 0.1.4
@@ -147,7 +176,16 @@ prerelease
 </tbody>
 </table>
 <h2 id="auxilium-prerequisites">Auxilium Prerequisites</h2>
-<p>All version of auxilium require bash version 4.2 or higher.</p>
+<ul>
+<li>Requires bash version 4.2 or higher.</li>
+</ul>
+<h2 id="documentation">Documentation</h2>
+<p>For convenience the latest version of the user guide is also available online in both HTML and PDF formats:</p>
+<ul>
+<li><a href="https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.html">Auxilium User Guide (html)</a></li>
+<li><a href="https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.pdf">Auxilium User Guide (pdf)</a></li>
+</ul>
+<p>Version specific auxilium manuals are included in the version specific runtime distribution tar file and also get installed in the &lt;PREFIX&gt;/share/html/auxilium directory. The auxilium user guide is available in that directory in both HTML format (auxilium-user-guide.html) and pdf format (auxilium-user-guide.pdf).</p>
 <h2 id="auxilium-runtime-install">Auxilium Runtime Install</h2>
 <p>Runtime installation is relatively easy. As an example, below is a sample installation of auxilium 0.1.5, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
 <ol style="list-style-type: decimal">
@@ -155,21 +193,23 @@ prerelease
 <ol style="list-style-type: lower-alpha">
 <li><p>Primary download method: Right-click on the &quot;0.1.5&quot; link on this page at <a href="https://ericmotleybytes.github.io/auxilium/" class="uri">https://ericmotleybytes.github.io/auxilium/</a> and select &quot;save link as...&quot;.</p></li>
 <li><p>Alternate download method: Use the &quot;wget&quot; program to get the tar file.</p>
-<pre><code>wget https://github.com/ericmotleybytes/auxilium/releases/download/0.1.5/auxilium-run-0.1.5.tar.gz</code></pre>
+<pre><code>$ wget https://github.com/ericmotleybytes/auxilium\
+/releases/download/0.1.5\
+/auxilium-run-0.1.5.tar.gz</code></pre>
 <p>This will create the file &quot;auxilium-run-0.1.5.tar.gz&quot;.</p></li>
 </ol></li>
 <li><p>Unpack the tar file.</p>
-<pre><code>tar -xzf auxilium-run-0.1.5.tar.gz</code></pre>
+<pre><code>$ tar -xzf auxilium-run-0.1.5.tar.gz</code></pre>
 <p>This will create a sub-directory called &quot;auxilium-run-0.1.5&quot; which contains additional files and directories.</p></li>
 <li><p>Set the default directory to the &quot;auxilium-run-0.1.5&quot; sub-directory.</p>
-<pre><code>cd auxilium-run-0.1.5</code></pre></li>
+<pre><code>$ cd auxilium-run-0.1.5</code></pre></li>
 <li><p>Use make to install auxilium under your desired directory prefix.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Personal install: To install auxilium under a personal directory, for example under the ~/local directory, issue the following command:</p>
-<pre><code>make install PREFIX=~/local</code></pre>
+<pre><code>$ make install PREFIX=~/local</code></pre>
 <p>This installs executable scripts in ~/local/bin, man pages in ~/local/man/man1, html files in ~/local/share/html, and so forth.</p></li>
 <li><p>System install: To install auxilium under a shared system-wide directory, for example under the /usr/local directory, issue the following command:</p>
-<pre><code>sudo make install PREFIX=/usr/local</code></pre></li>
+<pre><code>$ sudo make install PREFIX=/usr/local</code></pre></li>
 </ol></li>
 <li><p>Optionally, although this is highly recommended, setup automatic auxilium alias definitions in the appropriate login script.</p>
 <ol style="list-style-type: lower-alpha">
@@ -181,26 +221,19 @@ prerelease
 </ol>
 <p>Congratulations! You have now installed auxilium!</p>
 <p>If your MANPATH is defined resonably you should be able to see an overview of auxilium by typing:</p>
-<pre><code>man auxilium</code></pre>
-<h2 id="additional-documentation">Additional Documentation</h2>
-<p>Version specific auxilium manuals are installed in the &lt;PREFIX&gt;/share/html/auxilium directory. The auxilium user guide is available in that directory in both HTML format (auxilium-user-guide.html) and pdf format (auxilium-user-guide.pdf).</p>
-<p>For convenience the latest version of the user guide is also available online in both HTML and PDF formats:</p>
-<ul>
-<li><a href="https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.html">Auxilium User Guide (html)</a></li>
-<li><a href="https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.pdf">Auxilium User Guide (pdf)</a></li>
-</ul>
+<pre><code>$ man auxilium</code></pre>
 <h2 id="auxilium-runtime-uninstall">Auxilium Runtime Uninstall</h2>
 <p>You can also easily uninstall auxilium. As an example, below is a sample uninstall of auxilium 0.1.5, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
 <ol style="list-style-type: decimal">
 <li><p>Set the default directory to the &quot;auxilium-run-0.1.5&quot; sub-directory.</p>
-<pre><code>cd auxilium-run-0.1.5</code></pre></li>
+<pre><code>$ cd auxilium-run-0.1.5</code></pre></li>
 <li><p>Use make to uninstall auxilium under your desired directory prefix.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Personal uninstall: To uninstall auxilium from under a personal directory where it was previously installed, for example under the ~/local directory, issue the following command:</p>
-<pre><code>make install PREFIX=~/local</code></pre>
+<pre><code>$ make install PREFIX=~/local</code></pre>
 <p>This remove only auxilium installed files.</p></li>
 <li><p>System install: To uninstall auxilium under a shared system-wide directory where it was previously installed, for example under the /usr/local directory, issue the following command:</p>
-<pre><code>sudo make uninstall PREFIX=/usr/local</code></pre></li>
+<pre><code>$ sudo make uninstall PREFIX=/usr/local</code></pre></li>
 </ol></li>
 <li><p>Optionally, if you edited a login script during installation, your might want to delete or comment out the line you added.</p>
 <ol style="list-style-type: lower-alpha">
@@ -214,17 +247,159 @@ prerelease
 <pre><code>#source /usr/local/bin/auxalias</code></pre></li>
 </ol></li>
 <li><p>Set the default directory to the original download directory and delete the tar distribution file and the unpacked files.</p>
-<pre><code>cd &lt;download-directory&gt;
-rm auxilium-run-0.1.5.tar.gz
-rm -rf auxilium-run-0.1.5</code></pre></li>
+<pre><code>$ cd &lt;download-directory&gt;
+$ rm auxilium-run-0.1.5.tar.gz
+$ rm -rf auxilium-run-0.1.5</code></pre></li>
 </ol>
 <p>You have now uninstalled auxilium.</p>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="auxenv-examples">auxenv examples</h3>
+<p>Here are some examples of using auxenv.</p>
+<ul>
+<li><p>Displaying a pathlike environment variable:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv show DEMOPATH
+DEMOPATH is set to:
+/dir1:/dir2:/dir3
+Item breakdown:
+  1=/dir1
+  2=/dir2
+  3=/dir3
+$ auxenv dump DEMOPATH
+/dir1
+/dir2
+/dir3</code></pre></li>
+<li><p>Prepending a directory:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv prepend DEMOPATH /dir0
+$ echo &quot;$DEMOPATH&quot;
+/dir0:/dir1:/dir2:/dir3</code></pre></li>
+<li><p>Inserting a directory:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv insert DEMOPATH &quot;/dir1a&quot; before &quot;/dir2&quot;
+$ echo &quot;$DEMOPATH&quot;
+/dir1:/dir1a:/dir2:/dir3</code></pre></li>
+<li><p>Erasing a directory by name:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv erase DEMOPATH &quot;/dir2&quot;
+$ echo &quot;$DEMOPATH&quot;
+/dir1:/dir3</code></pre></li>
+<li><p>Erasing a directory by position:</p>
+<pre><code>$ export DEMOPATH=&quot;/dir1:/dir2:/dir3&quot;
+$ auxenv erase DEMOPATH @2
+$ echo &quot;$DEMOPATH&quot;
+/dir1:/dir3</code></pre></li>
+<li><p>Working with alternate separators:</p>
+<pre><code>$ export DEMOPATH=&quot;red|green|blue&quot;
+$ auxenv --ifs=&quot;|&quot; show DEMOPATH
+DEMOPATH is set to:
+red|green|blue
+Item breakdown:
+  1=red
+  2=green
+  3=blue</code></pre></li>
+</ul>
+<h3 id="auxsource-examples">auxsource examples</h3>
+<p>Here are some examples of using auxsource.</p>
+<ul>
+<li><p>Sourcing a file somewhere in a PATH directory:</p>
+<pre><code>$ auxsource myfile</code></pre></li>
+<li><p>Sourcing a file somewhere in a PATH directory and passing some parameters:</p>
+<pre><code>$ auxsource myfile say &quot;hello world&quot;</code></pre></li>
+<li><p>Sourcing a file specified by absolute location and passing parameters:</p>
+<pre><code>$ auxsource /home/alice/mything.bash &quot;more&quot; &quot;parameters&quot;</code></pre></li>
+<li><p>Sourcing a file somewhere in a MYPATH directory:</p>
+<pre><code>$ export MYPATH=&quot;/home/alice:/home/bob&quot;
+$ export AUXSOURCE_OPTIONS=&quot;--env=MYPATH&quot;
+$ auxsource myfile &quot;some&quot; &quot;more parameters&quot;</code></pre></li>
+</ul>
+<h3 id="auxalias-examples">auxalias examples</h3>
+<p>Here are some examples of using auxalias.</p>
+<ul>
+<li><p>Setting up static auxilium aliases to installation in /usr/local:</p>
+<pre><code>$ source /usr/local/bin/auxalias
+$ alias auxenv
+alias auxenv='source /usr/local/bin/auxenv'</code></pre></li>
+<li><p>Setting up dynamic auxilium aliases which use PATH:</p>
+<pre><code>$ source /usr/local/bin/auxalias
+$ alias auxenv
+alias auxenv='eval source $(auxwhere auxenv)'</code></pre></li>
+</ul>
+<h3 id="auxwhere-examples">auxwhere examples</h3>
+<p>Here are some examples of using auxwhere.</p>
+<ul>
+<li><p>Finding the first instance of a file somewhere in a PATH directory:</p>
+<pre><code>$ auxwhere myfile
+/some/directory/myfile</code></pre></li>
+<li><p>Finding all instances of a file somewhere in a PATH directory:</p>
+<pre><code>$ auxwhere --all myfile
+/some/directory/myfile
+/some/other/directory/myfile
+/another/directory/myfile</code></pre></li>
+<li><p>Finding the first instance of a file somewhere in a LD_LIBRARY_PATH directory.</p>
+<pre><code>$ auxwhere --env=LD_LIBRARY_PATH libproxy.so.1
+/usr/lib64/libproxy.so.1</code></pre></li>
+<li><p>Finding a file and seeing how the file was found using two path-like environment variables.</p>
+<pre><code>$ auxwhere --all --env=PRIMARYPATH --env=SECONDARYPATH myfile.bash
+/some/directory/myfile.bash    (Found via PRIMARYPATH)
+/another/directory/myfile.bash     (Found via SECONDARYPATH)</code></pre></li>
+<li><p>Finding a file searching multiple file types and a sub-directory.</p>
+<pre><code>$ auxwhere --env=MANPATH --subdir=.man --type=.1 --type=.1.gz awk
+/usr/share/man/man1/awk.1.gz</code></pre></li>
+</ul>
+<h3 id="auxchecktap-examples">auxchecktap examples</h3>
+<p>Here are some examples of using auxchecktap.</p>
+<ul>
+<li><p>Scanning a unit test results log file:</p>
+<pre><code>$ auxchecktap auxilium.taplog
+1..1
+ok 1 /home/ericc/github/auxilium/test/auxilium.taplog: 85 tests.
+$ echo &quot;$?&quot;
+0</code></pre></li>
+<li><p>Scanning multiple unit test result log files:</p>
+<pre><code>$ auxchecktap tmp*.taplog
+1..3
+ok 1 /home/ericc/github/auxilium/test/tmp1.taplog: 85 tests.
+ok 2 /home/ericc/github/auxilium/test/tmp2.taplog: 80 tests.
+ok 3 /home/ericc/github/auxilium/test/tmp3.taplog: 90 tests.
+$ echo &quot;$?&quot;
+0</code></pre></li>
+<li><p>Scanning a unit test log file with a failed unit test report in it:</p>
+<pre><code>$ auxchecktap another.taplog
+1..1
+not ok 1 /home/ericc/github/auxilium/test/another.taplog: 85 tests.
+# Found 1 failed test.
+$ echo &quot;$?&quot;
+1</code></pre></li>
+<li><p>Reading TAP output from standard input:</p>
+<pre><code>$ # an example what the bats unit test tool produces.
+$ # (see https://github.com/sstephenson/bats)
+$ bats --tap test-00510-auxenv-insert.bats
+1..4
+ok 1 check auxenv insert before dir
+ok 2 check auxenv insert after dir
+ok 3 check auxenv insert before pos
+ok 4 check auxenv insert after pos
+$ # piping unit test results info auxchecktap...
+$ bats --tap test-00510-auxenv-insert.bats | auxchecktap
+1..1
+ok 1 /dev/stdin: 4 tests.
+$ echo &quot;$?&quot;
+0</code></pre></li>
+</ul>
+<h2 id="authors">Authors</h2>
+<p>Eric Alan Christiansen<br />
+eric@motleybytes.com<br />
+<a href="https://www.linkedin.com/in/ericchristiansen/" class="uri">https://www.linkedin.com/in/ericchristiansen/</a></p>
+<h2 id="legal">Legal</h2>
+<p>Copyright © 2017 Eric Alan Christiansen.</p>
+<p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to use and/or redistribute it under the conditions of the GNU General Public License v3.0.</p>
+<p>See <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class="uri">https://www.gnu.org/licenses/gpl-3.0.en.html</a></p>
 <h2 id="see-also">See Also</h2>
 <ul>
 <li><p><a href="https://github.com/ericmotleybytes/auxilium" class="uri">https://github.com/ericmotleybytes/auxilium</a> : The master auxilium GitHub repository. You can also report bugs, describe issues, and request enhancements here.</p></li>
-<li><p><a href="https://github.com/ericmotleybytes/auxilium" class="uri">https://github.com/ericmotleybytes/auxilium</a> : The master GitHub repository page for Auxilium.</p></li>
-<li><p><a href="https://testanything.org/" class="uri">https://testanything.org/</a> : A description of TAP, the unit testing Test Anything protocol.</p></li>
+<li><p><a href="https://testanything.org/" class="uri">https://testanything.org/</a> : A description of TAP, the unit testing Test Anything Protocol.</p></li>
 </ul>
-<p class="auxdate">Updated 2017-07-12</p>
+<p class="auxdate">Updated 2017-07-14</p>
 </body>
 </html>
