@@ -1,0 +1,263 @@
+#!/usr/bin/env bash
+##############################################################################
+# This script displays file dependencies in a markdown file with
+# pandoc preprocessor (pp) extensions in it such as the '!include(file)
+# directive. It produces a single line list of file dependencies.
+# See http://cdsoft.fr/pp/ and/or https://github.com/CDSoft/pp for info
+# about the pandoc preprocessor.
+#
+# Usually, relative file specifications relative to the base repository
+# directory are output.
+#
+# usage:
+#     show-pp-depends [options] [--] <file>
+#
+# options:
+#     -r <dir> --root=<dir>  # root directory where Makefile works from.
+#                            # This defaults to the parent directory of
+#                            # wherever this script source file is kept.
+#     -s <char> --sep=<char> # separator character used in output
+#     -d --debug   # output extra debug info to stderr
+#     -v --version # display version info
+#     -h --help    # display help info
+#
+# known limitations:
+#   * Only the '!include(<file>)' directive is scanned for. Abbreviations
+#     such as '!inc(<file>)' are not supported.
+#   * At most only one '!include(<file>)' directive per line supported.
+##############################################################################
+#
+# define functions
+#
+function aux_debug() {
+    msg="$1"
+    if [ "$DebugFlag" == "y" ]; then
+        echo "DEBUG: $msg" >&2
+    fi
+}
+function aux_die() {
+    msg="$1"
+    echo "ERROR: ($CmdName) $msg" >&2
+    exit 1
+}
+function show_help() {
+    echo "$CmdName - show pandoc preprocessor dependencies"
+    echo "usage:"
+    echo "  show-pp-depends [options] [--] <file...>"
+    echo "  options:"
+    echo "    -b <dir> --base=<dir>  # base directory where Makefile works from."
+    echo "                           # this default to the parent directory of"
+    echo "                           # wherever this script source file is kept."
+    echo "    -s <char> --sep=<char> # separator character used in output."
+    echo "    -d --debug   # output extra debug info to stderr."
+    echo "    -v --version # display version info."
+    echo "    -h --help    # display help info."
+    exit 0
+}
+function show_version() {
+    echo "$Version"
+    exit 0
+}
+function check_file_exists() {
+    local file="$1"
+    if [ ! -e "$file" ]; then
+        aux_die "File not found ($file)."
+    fi
+}
+function absolute_spec() {
+    FunctionResult=""
+    local spec="$1"
+    local base="$2"
+    specabs=""
+    if [ "$base" == "" ]; then
+        base="$RootDir"
+    fi
+    check_file_exists "$base"
+    base=$(readlink -f "$base")
+    if [ "${spec:0:1}" == "/" ]; then
+        check_file_exists "$spec"
+        FunctionResult="$spec"
+    elif [ "${spec}" == "." ]; then
+        FunctionResult="${PWD}"
+    elif [ "${spec:0:2}" == "./" ]; then
+        spec="${PWD}$spec{1}"
+        check_file_exists "$spec"
+        FunctionResult="$spec"
+    else
+        spec="$base/$spec"
+        check_file_exists "$spec"
+        FunctionResult=$(readlink -f "$spec")
+    fi
+    aux_debug "absolute_spec 1=[$1] 2=[$2]"
+    aux_debug "absolute_spec end FunctionResult=[$FunctionResult]"
+    return 0
+}
+function relative_spec() {
+    aux_debug "(relspec) beg"
+    local spec="$1"
+    local baseOld="$2"
+    local baseNew="$3"
+    if [ "$baseOld" == "" ]; then
+        baseOld="$RootDir"
+    fi
+    if [ "$baseNew" == "" ]; then
+        baseNew="$RootDir"
+    fi
+    check_file_exists "$baseOld"
+    baseOld=$(readlink -f "$baseOld")
+    check_file_exists "$baseNew"
+    baseNew=$(readlink -f "$baseNew")
+    local baseNewSlash="$baseNew/"
+    aux_debug "(relspec) spec=[$spec]"
+    aux_debug "(relspec) baseOld=[$baseOld]"
+    aux_debug "(relspec) baseNew=[$baseNew]"
+    absolute_spec "$spec" "$baseOld"
+    local specAbs="$FunctionResult"
+    aux_debug "(relspec) specAbs=[$specAbs]"
+    if [ "${specAbs:0:${#baseNewSlash}}" == "${baseNewSlash}" ]; then
+        FunctionResult="${specAbs:${#baseNewSlash}}"
+        if [ -z "$FunctionResult" ]; then
+            FunctionResult="."
+        fi
+    else
+      FunctionResult="$specabs"
+    fi
+    aux_debug "relative_spec 1=[$1] 2=[$2] 3=[$3]"
+    aux_debug "relative_spec end FunctionResult=[$FunctionResult]"
+    return 0
+}
+function add_source_file() {
+    FunctionResult=""
+    local srcfile="$1"
+    if [ ! -e "$srcfile" ]; then
+        aux_die "Source file not found (${srcfile})."
+    fi
+    local srcfileabs=$(readlink -f "$srcfile")
+    if [ ${SourceFileHash["$srcfileabs"]+x} ]; then
+        # repeat source file
+        aux_debug "Already added source file ($srcfileabs)."
+        return 0
+    else
+        # new source file
+        aux_debug "Adding [$srcfileabs=$srcfile]"
+        SourceFileHash["$srcfileabs"]="$srcfile"
+        NotYetScanned="${NotYetScanned}${srcfileabs}|"
+    fi
+    return 0
+}
+function get_source_file_to_scan() {
+    aux_debug "(gsftx beg) NotYetScanned=[$NotYetScanned]"
+    FunctionResult=""
+    if [ ! -z "$NotYetScanned" ]; then
+        FunctionResult="${NotYetScanned%%|*}"
+        NotYetScanned="${NotYetScanned#*|}"
+    fi
+    aux_debug "(gsftx end) FunctionResult=[$FunctionResult]"
+    aux_debug "(gsftx end) NotYetScanned=[$NotYetScanned]"
+    return 0
+}
+
+
+#
+# begin main program
+#
+CmdFile=$(readlink -f "$0")
+CmdName="${CmdFile##*/}"
+CmdDir=$(dirname "$CmdFile")
+RootDir=$(readlink -f "$CmdDir/..")
+Version="$cmdname version 1.0 (2017-07-13)"
+DebugFlag="n"
+Separator=" "
+DashDashFlag="n"
+FunctionResult=""
+TopSourceFile=""
+declare -A SourceFileHash=()  # source abs spec to cmd line spec
+NotYetScanned=""           # | separated abs file string list
+declare -a FileLines=()    # lines from a source file
+while [ $# -gt 0 ]; do
+    param="$1"
+    shift
+    if   [[ "$param" == "-v" || "$param" == "--version" ]]; then
+        show_version
+    elif [[ "$param" == "-h" || "$param" == "--help"    ]]; then
+        show_help
+    elif [[ "$param" == "-d" || "$param" == "--debug"   ]]; then
+        DebugFlag="y"
+    elif [[ "$param" == "-r" ]]; then
+        shift
+        root="$1"
+        RootDir=$(readlink -f "$base")
+    elif [[ "${param:0:7}" == "--root="   ]]; then
+        root="${param:7}"
+        RootDir=$(readlink -f "$base")
+    elif [[ "$param" == "-s" ]]; then
+        shift
+        Separator="$1"
+    elif [[ "${param:0:6}" == "--sep="   ]]; then
+        Separator="${param:6}"
+    elif [[ "$param" == "--" ]]; then
+        DashDashFlag="y"
+    elif [[ "${param:0:1}" == "-" && "$DashDashFlag" == "n" ]]; then
+        aux_die "bad command line option ($param)."
+    else
+        if [ -z "$TopSourceFile" ]; then
+            if [ ! -e "$param" ]; then
+                aux_die "Command line source file not found ($param)."
+            fi
+            spec=$(readlink -f "$param")
+            TopSourceFile="$spec"
+            aux_debug "TopSourceFile=[$TopSourceFile]"
+            add_source_file "$spec"
+        else
+            aux_die "Too many source files on command line!"
+        fi
+    fi
+done
+#
+# loop through source files
+#
+aux_debug "Scanning source files."
+while [ ! -z "$NotYetScanned" ]; do
+    get_source_file_to_scan
+    srcFileAbs="$FunctionResult"
+    aux_debug "Scanning $srcFileAbs..."
+    srcBaseDir=$(dirname "$srcFileAbs")
+    FileLines=()
+    readarray -t FileLines < "$srcFileAbs"
+    linecnt=$((0))
+    for line in "${FileLines[@]}"; do
+        linecnt=$(($linecnt+1))
+        # look for '!include(file)' instances
+        workline=$(echo "$line" | sed s/^.*\!include\(//)
+        if [ "$workline" == "$line" ]; then
+            # !include=( not found, get next line
+            continue
+        fi
+        incFile=$(echo "$workline" | sed s/\).*$//)
+        absolute_spec "$incFile" "$srcBaseDir"
+        incFileAbs="$FunctionResult"
+        add_source_file "$incFileAbs"
+    done
+    aux_debug "$linecnt lines in $srcFileAbs"
+done
+#
+# output dependencies, if any
+#
+aux_debug "Outputting dependencies."
+sep=""
+for dep in "${!SourceFileHash[@]}"; do
+    if [ "$dep" != "$TopSourceFile" ]; then
+        # make dep relative to root
+        relative_spec "$dep"
+        depRel="$FunctionResult"
+        echo -n "$sep$depRel"
+        sep="$Separator"
+    fi
+done
+if [ ! -z "$sep" ]; then
+    echo ""  # end of line
+fi
+#
+# all done
+#
+exit 0
