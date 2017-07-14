@@ -52,10 +52,19 @@ log-release-attempt:
 	echo "$(THISREL)|$(USER)|$(CURDATETIME)" >> $(RELLOGFILE)
 
 .PHONY: stage-manuals
-stage-manuals:
-	cp share/html/auxilium/auxilium-user-guide.html docs/
-	cp share/html/auxilium/auxilium-user-guide.pdf  docs/
-	cp doc/docs/index.html docs/
+stage-manuals: docs/auxilium-user-guide.html \
+  docs/auxilium-user-guide.pdf \
+  docs/index.html
+	@echo "[Manuals staged.]"
+
+docs/auxilium-user-guide.html : share/html/auxilium/auxilium-user-guide.html
+	cp $< $@
+
+docs/auxilium-user-guide.pdf : share/html/auxilium/auxilium-user-guide.pdf
+	cp $< $@
+
+docs/index.html : doc/docs/index.html
+	cp $< $@
 
 .PHONY: runtime-dist
 runtime-dist: \
