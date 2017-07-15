@@ -8,7 +8,15 @@
 
 ## DESCRIPTION
 
-!include(../include/auxilium-introduction.ppi.md)
+!include(../include/auxilium-description.md)
+
+## OPTIONS
+
+!include(../include/auxilium-options.md)
+
+## EXIT STATUS
+
+!include(../include/auxilium-exitstat.md)
 
 ## PREREQUISITES
 
@@ -28,6 +36,8 @@
 !include(../include/license.md)
 
 ## SEE ALSO
+
+auxenv(1), auxsource(1), auxalias(1), auxwhere(1), auxchecktap(1), auxguid(1)
 
 * <https://ericmotleybytes.github.io/auxilium/> : The primary auxilium information
   and download page.

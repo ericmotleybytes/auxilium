@@ -12,7 +12,7 @@ load test_helper
         fi
     done
     [ "$linecnt" == "2" ]
-    [[ "$saveline" =~ ^auxsource\:\ version\ .*$ ]]
+    [[ "$saveline" =~ ^auxsource\ version\ .*$ ]]
 }
 @test "check auxsource version -v" {
     stuff=`source ../bin/auxsource -v`
@@ -26,6 +26,6 @@ load test_helper
         fi
     done
     [ "$linecnt" == "2" ]
-    [[ "$saveline" =~ ^auxsource\:\ version\ .*$ ]]
+    [[ "$saveline" =~ ^auxsource\ version\ .*$ ]]
 }
 # all done

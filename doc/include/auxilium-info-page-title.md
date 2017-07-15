@@ -1,1 +1,1 @@
-Auxilium Information and Download Page
+Auxilium Information and Downloads

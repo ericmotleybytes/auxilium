@@ -55,6 +55,8 @@ log-release-attempt:
 .PHONY: stage-manuals
 stage-manuals: docs/auxilium-user-guide.html \
   docs/auxilium-user-guide.pdf \
+  docs/auxilium-dev-guide.html \
+  docs/auxilium-dev-guide.pdf \
   docs/index.html
 	@echo "[Manuals staged.]"
 
@@ -62,6 +64,12 @@ docs/auxilium-user-guide.html : share/html/auxilium/auxilium-user-guide.html
 	cp $< $@
 
 docs/auxilium-user-guide.pdf : share/html/auxilium/auxilium-user-guide.pdf
+	cp $< $@
+
+docs/auxilium-dev-guide.html : share/html/auxilium/auxilium-dev-guide.html
+	cp $< $@
+
+docs/auxilium-dev-guide.pdf : share/html/auxilium/auxilium-dev-guide.pdf
 	cp $< $@
 
 docs/index.html : doc/docs/index.html

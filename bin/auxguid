@@ -58,7 +58,7 @@ function aux_rev() {
 #
 cmdfile=$(readlink -f "$0")
 cmdname="${cmdfile##*/}"
-version="$cmdname: version 1.0 (2017-06-29)"
+version="$cmdname version 1.0 (2017-06-29)"
 versionflag="n"
 helpflag="n"
 lowerflag="y"

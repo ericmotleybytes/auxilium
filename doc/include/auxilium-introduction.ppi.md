@@ -19,3 +19,5 @@ The core auxilium utilities include:
 !include(auxchecktap-short.md)
 * **auxguid**.
 !include(auxguid-short.md)
+* **auxilium**.
+!include(auxilium-short.md)

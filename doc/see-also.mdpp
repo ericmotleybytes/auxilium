@@ -8,6 +8,7 @@
     * http://pandoc.org/ - Pandoc information page.
 * http://cdsoft.fr/pp/ - pandoc preprocessor
     * https://github.com/CDSoft/pp
+* http://www.tug.org/texlive/ - TeX Live.
 * http://plantuml.com/ - plantuml, uml+ diagrams
 * http://www.graphviz.org/ - Graphviz, general graphs
 * http://ditaa.sourceforge.net/ - ditaa, diagrams through ascii art
@@ -17,6 +18,7 @@ Other:
 * https://github.com/joeyespo/grip - grip GitHub page.
 * https://github.com/axiros/terminal_markdown_viewer
 * http://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/
+* https://help.github.com/articles/fork-a-repo/
 
 Possible Markdown Preprocessors:
 

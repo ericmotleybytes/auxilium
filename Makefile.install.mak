@@ -17,6 +17,7 @@ install : installinfo \
   $(PREFIX)/bin/auxalias \
   $(PREFIX)/bin/auxchecktap \
   $(PREFIX)/bin/auxguid \
+  $(PREFIX)/bin/auxauxilium \
   $(PREFIX)/share \
   $(PREFIX)/share/man \
   $(PREFIX)/share/man/man1 \
@@ -81,6 +82,10 @@ $(PREFIX)/bin/auxchecktap : bin/auxchecktap
 	chmod $(BINMODE) "$@"
 
 $(PREFIX)/bin/auxguid : bin/auxguid
+	cp -a "$<" "$@"
+	chmod $(BINMODE) "$@"
+
+$(PREFIX)/bin/auxilium : bin/auxilium
 	cp -a "$<" "$@"
 	chmod $(BINMODE) "$@"
 
@@ -198,6 +203,7 @@ uninstall:
 	rm -f $(PREFIX)/bin/auxalias
 	rm -f $(PREFIX)/bin/auxchecktap
 	rm -f $(PREFIX)/bin/auxguid
+	rm -f $(PREFIX)/bin/auxilium
 	rm -f $(PREFIX)/share/man/man1/auxenv.1
 	rm -f $(PREFIX)/share/man/man1/auxsource.1
 	rm -f $(PREFIX)/share/man/man1/auxwhere.1

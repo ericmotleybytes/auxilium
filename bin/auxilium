@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+##############################################################################
+# Name:
+#   auxilium - Display information about auxilium installation
+#
+# Introduction:
+#   This program provides information about the auxilium installation.
+# 
+# Usage:
+#   auxilium [options]
+#
+# Options and Commands:
+#   See "help" display in code (or the man page).
+#
+# Copyright:
+#   auxwhere Copyright © 2017 Eric Alan Christiansen.
+#
+# Legal:
+#   This program comes with ABSOLUTELY NO WARRANTY.
+#   This is free software, and you are welcome to use and/or redistribute it
+#   under the conditions of the GNU General Public License v3.0.
+#   (See https://www.gnu.org/licenses/gpl-3.0.en.html)
+#
+# More Information:
+#   - auxilium - See https://github.com/ericmotleybytes/auxilium.
+#
+# Requirements:
+#   - bash version 4.2 or higher.
+##############################################################################
+#
+# define functions
+#
+function aux_debug() {
+    if [ "$DebugFlag" == "y" ]; then
+        echo "DEBUG: $1" >&2
+    fi
+    return 0
+}
+function aux_die() {
+    msg="$1"
+    echo "ERROR: ($CmdName) $msg" >&2
+    exit 1
+}
+function show_help() {
+    echo "$CmdName - show 1 line or filename"
+    echo "usage:"
+    echo "  $CmdName [options] [--] <file...>"
+    echo "  options:"
+    echo "    -v --version # display version info (default)."
+    echo "    -d --debug   # output extra debug info to stderr."
+    echo "    -h --help    # display help info."
+    exit 0
+}
+function show_version() {
+    # show auxilium version
+    echo "$Version" | sed s/\ /\\t/g
+    # show other versions
+    tab=$'\t'
+    set --
+    source "$CmdDir"/auxenv    --version | head -1 | sed s/\ /\\t/g | sed s/auxenv/auxenv\ \ /
+    source "$CmdDir"/auxsource --version | head -1 | sed s/\ /\\t/g
+    source "$CmdDir"/auxalias  --version | head -1 | sed s/\ /\\t/g
+    "$CmdDir"/auxwhere         --version | head -1 | sed s/\ /\\t/g
+    "$CmdDir"/auxchecktap      --version | head -1 | sed s/\ /\\t/g
+    "$CmdDir"/auxguid          --version | head -1 | sed s/\ /\\t/g | sed s/auxguid/auxguid\ /
+    echo "(bindir=$CmdDir)"
+    exit 0
+}
+#
+# begin main program
+#
+CmdFile=$(readlink -f "$0")
+CmdName="${CmdFile##*/}"
+CmdDir=$(dirname "$CmdFile")
+# The following line must have the EXACT format:
+#   Version="$CmdName version n.n.n (yyyy-mm-dd)"
+Version="$CmdName version 1.0.0 (2017-07-14)"
+DebugFlag="n"
+VersionFlag="n"
+HelpFlag="n"
+if [ "$#" == "0" ]; then
+   set -- "--version"    # default option
+fi
+while [ $# -gt 0 ]; do
+    param="$1"
+    shift
+    if   [[ "$param" == "-v" || "$param" == "--version" ]]; then
+        VersionFlag="y"
+    elif [[ "$param" == "-h" || "$param" == "--help"    ]]; then
+        HelpFlag="y"
+    elif [[ "$param" == "-d" || "$param" == "--debug"   ]]; then
+        DebugFlag="y"
+    else
+        aux_die "ERROR: bad command line option ($param)."
+    fi
+done
+if [ "$VersionFlag" == "y" ]; then show_version; fi
+if [ "$HelpFlag"    == "y" ]; then show_help;    fi
+exit 0

@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Auxilium Developer's Guide</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+  body{
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  h1.title{
+    text-align: center;
+    font-size: 2em;
+    background-color: #AED6F1;
+  }
+  h1.subtitle{
+    text-align: center;
+    font-size: 1.5em;
+  }
+  h2{
+    font-size: 1.75em;
+  }
+  code{
+    white-space: pre;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 1em;
+  }
+  pre{
+    background-color: #F9F9F9;
+    border-style: solid;
+    border-width: 1px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 5px;
+  }
+  </style>
+</head>
+<body>
+<div id="header">
+<h1 class="title">Auxilium Developer's Guide</h1>
+<h1 class="subtitle">Version 0.1.6</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#auxilium-developer-introduction">Auxilium Developer Introduction</a></li>
+<li><a href="#auxilium-primary-github-repository">Auxilium Primary GitHub Repository</a></li>
+<li><a href="#recommended-collaborative-development-process">Recommended Collaborative Development Process</a></li>
+<li><a href="#tools">Tools</a></li>
+<li><a href="#platforms">Platforms</a></li>
+<li><a href="#authors">Authors</a></li>
+<li><a href="#legal">Legal</a><ul>
+<li><a href="#copyright">Copyright</a></li>
+<li><a href="#licensing">Licensing</a></li>
+</ul></li>
+<li><a href="#see-also">See Also</a></li>
+</ul>
+</div>
+<h1 id="auxilium-developer-introduction">Auxilium Developer Introduction</h1>
+<p>This manual provides information about helping to maintain and/or extend the capabilities of the Auxilium open source project. The information on how to just get and use Auxilium is avalable at <a href="https://ericmotleybytes.github.io/auxilium/" class="uri">https://ericmotleybytes.github.io/auxilium/</a>, which also has links to the latest Auxilium User Guide in both <a href="https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.html">html</a> and <a href="https://ericmotleybytes.github.io/auxilium/auxilium-user-guide.pdf">pdf</a> formats. Before attempting Auxilium development, or getting too deep into this manual, it is probably wise to look over these end-user resources.</p>
+<h1 id="auxilium-primary-github-repository">Auxilium Primary GitHub Repository</h1>
+<p>The original and primary Auxilium GitHub repository site, which is developer oriented, is at <a href="https://github.com/ericmotleybytes/auxilium" class="uri">https://github.com/ericmotleybytes/auxilium</a>.</p>
+<h1 id="recommended-collaborative-development-process">Recommended Collaborative Development Process</h1>
+<p>The GitHub recommended collaborative development process is also supported and recommended for Auxilium. This is sometimes called the &quot;fork and branch&quot; workflow. The basic workflow is as follows.</p>
+<ol style="list-style-type: decimal">
+<li><p>Get a GitHub account if you do not already have one. The free account option is fine.</p></li>
+<li><p>&quot;Fork&quot; the main Auxilium repository at <a href="https://github.com/ericmotleybytes/auxilium" class="uri">https://github.com/ericmotleybytes/auxilium</a>.</p></li>
+<li><p>&quot;Clone&quot; the forked repository to your local system.</p></li>
+<li><p>Add a Git remote for the original repository.</p></li>
+<li><p>Create a feature branch in which to place your changes.</p></li>
+<li><p>Make your changes to the new branch.</p></li>
+<li><p>Commit the changes to the branch.</p></li>
+<li><p>Push the branch to GitHub.</p></li>
+<li><p>Open a pull request from the new branch to the original repo.</p></li>
+<li><p>Clean up after your pull request is merged.</p></li>
+</ol>
+<p>A good tutorial for this process is available at <a href="http://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/" class="uri">http://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/</a>. GitHub also has good documentation such as their repository fork description at <a href="https://help.github.com/articles/fork-a-repo/" class="uri">https://help.github.com/articles/fork-a-repo/</a>.</p>
+<h1 id="tools">Tools</h1>
+<p>All runtime Auxilium programs are written in pure <a href="https://en.wikipedia.org/wiki/Bash_(Unix_shell)">Bash</a> version 4.2 or higher. So to just use Auxilium, Bash is the only absolute prerequisite.</p>
+<p>For development several additional tools are required to support development unit testing and documentation generation. These tools include:</p>
+<ul>
+<li><p>Bats. The Bash Automated Testing System. Avalable at <a href="https://github.com/sstephenson/bats" class="uri">https://github.com/sstephenson/bats</a>.</p></li>
+<li><p>Pandoc. A universal document converter. See <a href="http://pandoc.org/" class="uri">http://pandoc.org/</a> and <a href="https://github.com/jgm/pandoc" class="uri">https://github.com/jgm/pandoc</a>.</p></li>
+<li><p>LaTeX. Used by Pandoc to generate PDF files. <em>TeX Live</em> is recommended. See <a href="http://www.tug.org/texlive/" class="uri">http://www.tug.org/texlive/</a>.</p></li>
+<li><p>Pandoc Preprocessor. The &quot;pp&quot; Pandoc-oriented text preprocessor. See <a href="http://cdsoft.fr/pp/" class="uri">http://cdsoft.fr/pp/</a> and <a href="https://github.com/CDSoft/pp" class="uri">https://github.com/CDSoft/pp</a>.</p></li>
+</ul>
+<h1 id="platforms">Platforms</h1>
+<p>Auxilium programs are all written in <a href="https://en.wikipedia.org/wiki/Bash_(Unix_shell)">Bash</a>, the standard <a href="https://en.wikipedia.org/wiki/Linux">Linux</a> shell language. Bash is an interpretive language, so as long as your platform has a relatively new version of Bash installed, it <em>should</em> be able to run the runtime Auxilium Bash scripts. There is no need of different runtime versions of Auxilium for different hardware platforms because there are no hard-compiled programs.</p>
+<p>That being said, to date Auxilium has only been tested on Linux platforms. The author, however, would be very interested in user experience reports.</p>
+<h1 id="authors">Authors</h1>
+<p>Eric Alan Christiansen<br />
+eric@motleybytes.com<br />
+<a href="https://www.linkedin.com/in/ericchristiansen/" class="uri">https://www.linkedin.com/in/ericchristiansen/</a></p>
+<h1 id="legal">Legal</h1>
+<h2 id="copyright">Copyright</h2>
+<p>Copyright © 2017 Eric Alan Christiansen.</p>
+<h2 id="licensing">Licensing</h2>
+<p>This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to use and/or redistribute it under the conditions of the GNU General Public License v3.0.</p>
+<p>See <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class="uri">https://www.gnu.org/licenses/gpl-3.0.en.html</a></p>
+<h1 id="see-also">See Also</h1>
+<ul>
+<li><p><a href="https://ericmotleybytes.github.io/auxilium/" class="uri">https://ericmotleybytes.github.io/auxilium/</a> : The Auxilium Information and Downloads site.</p></li>
+<li><p><a href="https://github.com/ericmotleybytes/auxilium" class="uri">https://github.com/ericmotleybytes/auxilium</a> : The master auxilium GitHub repository. You can also report bugs, describe issues, and request enhancements here.</p></li>
+<li><p><a href="http://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/" class="uri">http://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/</a> : A good tutorial on the GitHub &quot;fork and branch&quot; workflow.</p></li>
+<li><p><a href="https://help.github.com/articles/fork-a-repo/" class="uri">https://help.github.com/articles/fork-a-repo/</a> : GitHub documentation about how to &quot;fork&quot; a repository.</p></li>
+<li><p><a href="https://github.com/sstephenson/bats" class="uri">https://github.com/sstephenson/bats</a> : Bats, the Bash Automated Testing System.</p></li>
+<li><p><a href="http://pandoc.org/" class="uri">http://pandoc.org/</a> : Pandoc information page.</p></li>
+<li><p><a href="https://github.com/jgm/pandoc" class="uri">https://github.com/jgm/pandoc</a> : Pandoc GitHub page.</p></li>
+<li><p><a href="http://www.tug.org/texlive/LaTeX" class="uri">http://www.tug.org/texlive/LaTeX</a> : The 'TeX Live' LaTeX system.</p></li>
+<li><p><a href="http://cdsoft.fr/pp/" class="uri">http://cdsoft.fr/pp/</a> : &quot;pp&quot;, the pandoc preprocessor.</p></li>
+<li><p><a href="https://github.com/CDSoft/pp" class="uri">https://github.com/CDSoft/pp</a> : &quot;pp&quot;, the pandoc preprocessor on GitHub.</p></li>
+<li><p><a href="https://testanything.org/" class="uri">https://testanything.org/</a> : A description of TAP, the unit testing Test Anything Protocol.</p></li>
+</ul>
+</body>
+</html>

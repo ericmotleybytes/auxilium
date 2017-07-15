@@ -41,7 +41,7 @@
 <body>
 <div id="header">
 <h1 class="title">Auxilium User's Guide</h1>
-<h1 class="subtitle">Version 0.1.5</h1>
+<h1 class="subtitle">Version 0.1.6</h1>
 </div>
 <div id="TOC">
 <ul>
@@ -58,6 +58,7 @@
 <li><a href="#auxchecktap">auxchecktap</a></li>
 <li><a href="#auxguid">auxguid</a></li>
 </ul></li>
+<li><a href="#platforms">Platforms</a></li>
 <li><a href="#authors">Authors</a></li>
 <li><a href="#legal">Legal</a><ul>
 <li><a href="#copyright">Copyright</a></li>
@@ -76,25 +77,26 @@
 <li><p><strong>auxalias</strong>. Creates static or dynamic aliases for all auxilium sourceable scripts.</p></li>
 <li><p><strong>auxchecktap</strong>. Scans and checks TAP format unit test result logs, producing a summarized TAP test results log.</p></li>
 <li><p><strong>auxguid</strong>. Generates a pseudo random 128-bit (32 hex character) GUID/UUID.</p></li>
+<li><p><strong>auxilium</strong>. Displays version info for auxilium and all of its compoents.</p></li>
 </ul>
 <h1 id="auxilium-installation">Auxilium Installation</h1>
 <h2 id="install-of-auxilium-runtime-distribution">Install of auxilium runtime distribution</h2>
-<p>Runtime installation is relatively easy. As an example, below is a sample installation of auxilium 0.1.5, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
+<p>Runtime installation is relatively easy. As an example, below is a sample installation of auxilium 0.1.6, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
 <ol style="list-style-type: decimal">
 <li><p>Download the runtime distribution. There are at least two ways of doing this:</p>
 <ol style="list-style-type: lower-alpha">
-<li><p>Primary download method: Right-click on the &quot;0.1.5&quot; link on this page at <a href="https://ericmotleybytes.github.io/auxilium/" class="uri">https://ericmotleybytes.github.io/auxilium/</a> and select &quot;save link as...&quot;.</p></li>
+<li><p>Primary download method: Right-click on the &quot;0.1.6&quot; link on this page at <a href="https://ericmotleybytes.github.io/auxilium/" class="uri">https://ericmotleybytes.github.io/auxilium/</a> and select &quot;save link as...&quot;.</p></li>
 <li><p>Alternate download method: Use the &quot;wget&quot; program to get the tar file.</p>
 <pre><code>$ wget https://github.com/ericmotleybytes/auxilium\
-/releases/download/0.1.5\
-/auxilium-run-0.1.5.tar.gz</code></pre>
-<p>This will create the file &quot;auxilium-run-0.1.5.tar.gz&quot;.</p></li>
+/releases/download/0.1.6\
+/auxilium-run-0.1.6.tar.gz</code></pre>
+<p>This will create the file &quot;auxilium-run-0.1.6.tar.gz&quot;.</p></li>
 </ol></li>
 <li><p>Unpack the tar file.</p>
-<pre><code>$ tar -xzf auxilium-run-0.1.5.tar.gz</code></pre>
-<p>This will create a sub-directory called &quot;auxilium-run-0.1.5&quot; which contains additional files and directories.</p></li>
-<li><p>Set the default directory to the &quot;auxilium-run-0.1.5&quot; sub-directory.</p>
-<pre><code>$ cd auxilium-run-0.1.5</code></pre></li>
+<pre><code>$ tar -xzf auxilium-run-0.1.6.tar.gz</code></pre>
+<p>This will create a sub-directory called &quot;auxilium-run-0.1.6&quot; which contains additional files and directories.</p></li>
+<li><p>Set the default directory to the &quot;auxilium-run-0.1.6&quot; sub-directory.</p>
+<pre><code>$ cd auxilium-run-0.1.6</code></pre></li>
 <li><p>Use make to install auxilium under your desired directory prefix.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Personal install: To install auxilium under a personal directory, for example under the ~/local directory, issue the following command:</p>
@@ -115,10 +117,10 @@
 <p>If your MANPATH is defined resonably you should be able to see an overview of auxilium by typing:</p>
 <pre><code>$ man auxilium</code></pre>
 <h2 id="uninstall-of-auxilium-runtime-distribution">Uninstall of auxilium runtime distribution</h2>
-<p>You can also easily uninstall auxilium. As an example, below is a sample uninstall of auxilium 0.1.5, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
+<p>You can also easily uninstall auxilium. As an example, below is a sample uninstall of auxilium 0.1.6, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
 <ol style="list-style-type: decimal">
-<li><p>Set the default directory to the &quot;auxilium-run-0.1.5&quot; sub-directory.</p>
-<pre><code>$ cd auxilium-run-0.1.5</code></pre></li>
+<li><p>Set the default directory to the &quot;auxilium-run-0.1.6&quot; sub-directory.</p>
+<pre><code>$ cd auxilium-run-0.1.6</code></pre></li>
 <li><p>Use make to uninstall auxilium under your desired directory prefix.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Personal uninstall: To uninstall auxilium from under a personal directory where it was previously installed, for example under the ~/local directory, issue the following command:</p>
@@ -140,8 +142,8 @@
 </ol></li>
 <li><p>Set the default directory to the original download directory and delete the tar distribution file and the unpacked files.</p>
 <pre><code>$ cd &lt;download-directory&gt;
-$ rm auxilium-run-0.1.5.tar.gz
-$ rm -rf auxilium-run-0.1.5</code></pre></li>
+$ rm auxilium-run-0.1.6.tar.gz
+$ rm -rf auxilium-run-0.1.6</code></pre></li>
 </ol>
 <p>You have now uninstalled auxilium.</p>
 <h1 id="utilities">Utilities</h1>
@@ -587,6 +589,9 @@ $ echo &quot;$?&quot;
 <pre><code>$ auxguid --upper
 39EB59630C67184D7E0E5B1E259A215A</code></pre></li>
 </ul>
+<h1 id="platforms">Platforms</h1>
+<p>Auxilium programs are all written in <a href="https://en.wikipedia.org/wiki/Bash_(Unix_shell)">Bash</a>, the standard <a href="https://en.wikipedia.org/wiki/Linux">Linux</a> shell language. Bash is an interpretive language, so as long as your platform has a relatively new version of Bash installed, it <em>should</em> be able to run the runtime Auxilium Bash scripts. There is no need of different runtime versions of Auxilium for different hardware platforms because there are no hard-compiled programs.</p>
+<p>That being said, to date Auxilium has only been tested on Linux platforms. The author, however, would be very interested in user experience reports.</p>
 <h1 id="authors">Authors</h1>
 <p>Eric Alan Christiansen<br />
 eric@motleybytes.com<br />

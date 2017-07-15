@@ -14,6 +14,7 @@ PANDOCPDF2=$(PANDOCPDF1) -M margin-left=1in -M margin-right=1in
 PANDOCPDF=$(PANDOCPDF2) -M margin-top=1in -M margin-bottom=1in
 PANDOCPDFMANUAL=$(PANDOCPDF) --toc
 AUXILIUM_UG_SUBTITLE=Version $(THISREL)
+AUXILIUM_DG_SUBTITLE=Version $(THISREL)
 
 .PHONY: helpbuild
 helpbuild:
@@ -48,6 +49,7 @@ depends: doc/man/auxenv.ppi.md.dep \
   doc/include/template-aliasing.ppi.md.dep \
   doc/html/index.ppi.md.dep \
   doc/manuals/auxilium-user-guide.ppi.md.dep \
+  doc/manuals/auxilium-dev-guide.ppi.md.dep \
   doc/docs/index.ppi.md.dep \
   doc/readme/readme.ppi.md.dep
 
@@ -79,6 +81,9 @@ doc/html/index.ppi.md.dep : doc/html/index.ppi.md
 	sbin/pp-dep $< > $@
 
 doc/manuals/auxilium-user-guide.ppi.md.dep : doc/manuals/auxilium-user-guide.ppi.md
+	sbin/pp-dep $< > $@
+
+doc/manuals/auxilium-dev-guide.ppi.md.dep : doc/manuals/auxilium-dev-guide.ppi.md
 	sbin/pp-dep $< > $@
 
 doc/docs/index.ppi.md.dep : doc/docs/index.ppi.md
@@ -117,6 +122,8 @@ docs: doc/include/auxenv-aliasing.ppo.md \
     share/html/auxilium/index.html \
     share/html/auxilium/auxilium-user-guide.html \
     share/html/auxilium/auxilium-user-guide.pdf \
+    share/html/auxilium/auxilium-dev-guide.html \
+    share/html/auxilium/auxilium-dev-guide.pdf \
   doc/docs/index.html \
   doc/readme/readme.ppo.md \
   doc/readme/readme.html \
@@ -266,7 +273,7 @@ share/html/auxilium/index.html : doc/html/index.ppo.md \
 	$(PANDOCHTMLMAN) $< --output=$@ -M title="auxilium documentation"
           --template=doc/templates/man.html.pandoc.template -H doc/css/man.css
 
-# users guide
+# user guide
 
 doc/manuals/auxilium-user-guide.ppo.md : doc/manuals/auxilium-user-guide.ppi.md \
   $(shell sbin/pp-putdep doc/manuals/auxilium-user-guide.ppi.md.dep)
@@ -287,6 +294,30 @@ share/html/auxilium/auxilium-user-guide.pdf : doc/manuals/auxilium-user-guide.pp
           -M title="$(shell head -1 doc/include/auxilium-user-guide-title.md)" \
           -M date="Version $(THISREL)" --toc-depth=2 \
           --template=doc/templates/info.latex.pandoc.template
+
+# developer guide
+
+doc/manuals/auxilium-dev-guide.ppo.md : doc/manuals/auxilium-dev-guide.ppi.md \
+  $(shell sbin/pp-putdep doc/manuals/auxilium-dev-guide.ppi.md.dep)
+	pp $< > $@
+
+share/html/auxilium/auxilium-dev-guide.html : \
+  doc/manuals/auxilium-dev-guide.ppo.md \
+  doc/css/manual.css \
+  doc/include/auxilium-dev-guide-title.md
+	$(PANDOCHTMLMANUAL) $< --output=$@ \
+          -M title="$(shell head -1 doc/include/auxilium-dev-guide-title.md)" \
+          -M subtitle="$(AUXILIUM_DG_SUBTITLE)" --toc-depth=2 -H doc/css/manual.css
+
+share/html/auxilium/auxilium-dev-guide.pdf : doc/manuals/auxilium-dev-guide.ppo.md \
+  doc/templates/info.latex.pandoc.template \
+  doc/include/auxilium-dev-guide-title.md
+	$(PANDOCPDFMANUAL) $< --output=$@ \
+          -M title="$(shell head -1 doc/include/auxilium-dev-guide-title.md)" \
+          -M date="Version $(THISREL)" --toc-depth=2 \
+          --template=doc/templates/info.latex.pandoc.template
+
+# info and download site
 
 doc/docs/index.ppo.md : doc/docs/index.ppi.md \
   data/releases.dat \

@@ -50,7 +50,7 @@ function auxalias_main () {
         params+=("$p")
     done
     local scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
-    local version="$scriptname: version 2.0 (2017-07-07)"
+    local version="$scriptname version 2.0 (2017-07-07)"
     local thisfile
     local thisdir
     local param

@@ -54,7 +54,7 @@ function auxsource_main_func() {
     local scriptspec=$(readlink -f "${BASH_SOURCE[0]}")  # full spec
     local scriptname=$(basename "$scriptspec")           # basename part
     local scriptdir=$(dirname "$scriptspec")             # dirpart
-    local version="${scriptname}: version 2.2 (2017-07-08)"
+    local version="${scriptname} version 2.2 (2017-07-08)"
     local param
     local sourcefile=""
     local sourceargs=()

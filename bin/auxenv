@@ -40,10 +40,12 @@
 # define all logic in functions to isolate local variables
 #
 function auxenv_version_func() {
+    local Version
     local scriptname=${BASH_SOURCE[0]##*/}  # just keep basename part
-    echo "$scriptname: version 2.1 (2017-06-27)"
+    Version="$scriptname version 2.1 (2017-06-27)"
+    echo "$Version"
     local scriptspec=$(readlink -f "${BASH_SOURCE[0]}")
-    echo "Location: $scriptspec"
+    echo "location=$scriptspec"
     return 0
 }
 function auxenv_help_func() {

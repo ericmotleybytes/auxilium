@@ -44,7 +44,7 @@ function ct_debug() {
 #
 cmdfile=$(readlink -f "$0")
 cmdname="${cmdfile##*/}"
-version="$cmdname: version 1.0 (2017-06-28)"
+version="$cmdname version 1.0 (2017-06-28)"
 filespecs=()
 curexptestcnt=$((0))    # current file expected test count
 curtestcnt=$((0))       # current file test count (pass or fail)

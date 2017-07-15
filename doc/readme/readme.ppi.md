@@ -41,6 +41,14 @@ available online in both HTML and PDF formats:
 
 !include(../include/auxchecktap-examples.md)
 
+## auxguid examples
+
+!include(../include/auxguid-examples.md)
+
+# Platforms
+
+!include(../include/auxilium-platforms.md)
+
 # Authors
 
 !include(../include/authors.md)

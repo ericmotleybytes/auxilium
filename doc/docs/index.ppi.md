@@ -1,6 +1,6 @@
 ## Auxilium Introduction
 
-This is the auxilium information and download page.
+This is the auxilium information and download site.
 
 !include(../include/auxilium-introduction.ppi.md)
 
@@ -56,6 +56,14 @@ and pdf format (auxilium-user-guide.pdf).
 ### auxchecktap examples
 
 !include(../include/auxchecktap-examples.md)
+
+### auxguid examples
+
+!include(../include/auxguid-examples.md)
+
+## Platforms
+
+!include(../include/auxilium-platforms.md)
 
 ## Authors
 

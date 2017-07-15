@@ -13,7 +13,7 @@ load test_helper
             fi
         done
         [[ $linecnt -ge 1 ]]
-        [[ "$saveline" =~ ^auxenv\:\ version\ .*$ ]]
+        [[ "$saveline" =~ ^auxenv\ version\ .*$ ]]
     done
 }
 # all done
