@@ -11,6 +11,8 @@
 
 * [auxilum user guide (html)](auxilium-user-guide.html "auxilium user guide html")
 * [auxilum user guide (pdf)](auxilium-user-guide.pdf "auxilium user guide pdf")
+* [auxilum developer guide (html)](auxilium-dev-guide.html "auxilium user guide html")
+* [auxilum developer guide (pdf)](auxilium-dev-guide.pdf "auxilium user guide pdf")
 
 ## See Also
 

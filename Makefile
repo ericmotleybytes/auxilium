@@ -3,6 +3,7 @@
 ###
 SYS_PREFIX=/usr/local
 DEV_PREFIX=$(HOME)/local
+DEV_PREFIX2=~/local
 PREFIX=$(DEV_PREFIX)
 CURDATE=$(shell date +%Y-%m-%d)
 CURDATETIME=$(shell date +%Y-%m-%dT%H:%M:%S%z)
@@ -29,7 +30,8 @@ help:
 	@echo "Available help topics:"
 	@echo "  make               # display this screen."
 	@echo "  make help          # display this screen."
-	@echo "  make helpbuild     # help building sources."
+	@echo "  make helpbuild     # help building/cleaning sources."
+	@echo "  make helpinstall   # help install/uninstall."
 	@echo "  make helpgit       # help common git tasks."
 	@echo "  make helprel       # help common GitHub release tasks."
 

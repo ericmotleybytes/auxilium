@@ -20,21 +20,13 @@ AUXILIUM_DG_SUBTITLE=Version $(THISREL)
 helpbuild:
 	@echo "Common building usage:"
 	@echo "  make helpbuild     # display this screen."
-	@echo "  make docs          # gen man and html documentation."
-	@echo "  make test          # run tests and save result to logs."
-	@echo "  make checktest     # summary check of test logs."
+	@echo "  make build         # build docs and more."
+	@echo "  make test          # run tests."
+	@echo "  make checktest     # run tests and remember results."
 	@echo "Common build cleanup usage:"
+	@echo "  make clean         # clean tests and docs."
 	@echo "  make cleantest     # copy test log files."
 	@echo "  make cleandocs     # delete working copy of gen'd docs."
-	@echo "  make clean         # clean tests and docs."
-	@echo "Common installing usage:"
-	@echo "  make install       # copy files to under $(DEV_PREFIX)."
-	@echo "  make sysinstall    # copy files to under $(SYS_PREFIX) as root."
-	@echo "  make install PREFIX=<prefix> # custom copy files."
-	@echo "Common uninstalling usage:"
-	@echo "  make uninstall     # delete files installed under $(DEV_PREFIX)."
-	@echo "  make sysuninstall  # delete files installed under $(SYS_PREFIX) as root."
-	@echo "  make uninstall PREFIX=<prefix> # custom uninstall files."
 
 #### Dependency stuff ####
 

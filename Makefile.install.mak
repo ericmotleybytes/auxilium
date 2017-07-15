@@ -2,6 +2,18 @@
 # This file designed to be included by Makefile.
 ###
 
+#### install help stuff ####
+.PHONY: helpinstall
+helpinstall:
+	@echo "Common installing usage:"
+	@echo "  make install       # copy files to under $(DEV_PREFIX2)."
+	@echo "  make sysinstall    # copy files to under $(SYS_PREFIX) as root."
+	@echo "  make install PREFIX=<prefix> # custom copy files."
+	@echo "Common uninstalling usage:"
+	@echo "  make uninstall     # delete files installed under $(DEV_PREFIX2)."
+	@echo "  make sysuninstall  # delete files installed under $(SYS_PREFIX) as root."
+	@echo "  make uninstall PREFIX=<prefix> # custom uninstall files."
+
 #### install stuff ####
 
 .PHONY: sysinstall
@@ -17,7 +29,7 @@ install : installinfo \
   $(PREFIX)/bin/auxalias \
   $(PREFIX)/bin/auxchecktap \
   $(PREFIX)/bin/auxguid \
-  $(PREFIX)/bin/auxauxilium \
+  $(PREFIX)/bin/auxilium \
   $(PREFIX)/share \
   $(PREFIX)/share/man \
   $(PREFIX)/share/man/man1 \
@@ -46,16 +58,16 @@ install : installinfo \
 
 .PHONY: installinfo
 installinfo:
-	@echo "INFO: doing auxilium install under $(PREFIX) as user $$(whoami)."
+	@echo "[INFO: doing auxilium install under $(PREFIX) as user $$(whoami).]"
 
 .PHONY: installinfo2
 installinfo2:
-	@echo "INFO: Auxilium installed under $(PREFIX) as user $$(whoami)."
+	@echo "[INFO: Auxilium installed under $(PREFIX) as user $$(whoami).]"
 	@fullprefix=$$(readlink -f $(PREFIX)) ; \
   curuser=$$(whoami) ; \
   rcfile=~/.bashrc; \
   if [ "$$curuser" == "root" ]; then rcfile=/etc/bashrc; fi ; \
-  echo "NOTE: We recommended adding \"source $$fullprefix/bin/auxalias\" to $$rcfile."
+  echo "[NOTE: We recommended adding \"source $$fullprefix/bin/auxalias\" to $$rcfile.]"
 
 $(PREFIX)/bin:
 	mkdir "$@"

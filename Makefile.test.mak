@@ -13,6 +13,7 @@ test/auxilium.taplog : bin/auxenv \
   bin/auxalias \
   bin/auxchecktap \
   bin/auxguid \
+  bin/auxilium \
   $(wildcard test/*.bash) \
   $(wildcard test/*.bats)
 	cd test; bats -t . | tee auxilium.taplog
