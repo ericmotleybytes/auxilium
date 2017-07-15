@@ -49,6 +49,11 @@
 <li><a href="#auxilium-primary-github-repository">Auxilium Primary GitHub Repository</a></li>
 <li><a href="#recommended-collaborative-development-process">Recommended Collaborative Development Process</a></li>
 <li><a href="#tools">Tools</a></li>
+<li><a href="#a-make-driven-process.">A &quot;make&quot; driven process.</a><ul>
+<li><a href="#building-auxilium">Building Auxilium</a></li>
+<li><a href="#installing-auxilium">Installing Auxilium</a></li>
+<li><a href="#releasing-auxilium">Releasing Auxilium</a></li>
+</ul></li>
 <li><a href="#platforms">Platforms</a></li>
 <li><a href="#authors">Authors</a></li>
 <li><a href="#legal">Legal</a><ul>
@@ -86,6 +91,71 @@
 <li><p>LaTeX. Used by Pandoc to generate PDF files. <em>TeX Live</em> is recommended. See <a href="http://www.tug.org/texlive/" class="uri">http://www.tug.org/texlive/</a>.</p></li>
 <li><p>Pandoc Preprocessor. The &quot;pp&quot; Pandoc-oriented text preprocessor. See <a href="http://cdsoft.fr/pp/" class="uri">http://cdsoft.fr/pp/</a> and <a href="https://github.com/CDSoft/pp" class="uri">https://github.com/CDSoft/pp</a>.</p></li>
 </ul>
+<h1 id="a-make-driven-process.">A &quot;make&quot; driven process.</h1>
+<p>Auxilium uses the &quot;make&quot; utility to drive the development build and release process.</p>
+<p>You can clone Auxilium to your local server the top level git root directrory is usually just called &quot;auxilium&quot;, and in this document we will refer to it this way. Specifying &quot;auxilium/bin&quot; refers to the &quot;bin&quot; subdirectory under the auxilium git root directory. For brevity, sometime the &quot;auxilium&quot; part if left off, so &quot;bin&quot; also refers to the &quot;bin&quot; subdirectory under the auxilium root directory.</p>
+<p>The master development Makefile is at &quot;auxilium/Makefile&quot;. It includes several other Makefiles. They all work together. All important auxilium development build and release tasks are defined in this Makefile and its inclusions. This makefile has a number of different help screens to help you know what it can do. A master help screen, which explains how to see several additional help screens, can be viewed as follows:</p>
+<pre><code>$ cd auxilium
+$ make help
+Available help topics:
+  make               # display this screen.
+  make help          # display this screen.
+  make helpbuild     # help building/cleaning sources.
+  make helpinstall   # help install/uninstall.
+  make helpgit       # help common git tasks.
+  make helprel       # help common GitHub release tasks.</code></pre>
+<h2 id="building-auxilium">Building Auxilium</h2>
+<p>You can see the make options available to build Auxilium as follows.</p>
+<pre><code>$ cd auxilium
+$ make helpbuild
+Common building usage:
+  make helpbuild     # display this screen.
+  make build         # build docs and more.
+  make test          # run tests.
+  make checktest     # run tests and remember results.
+Common build cleanup usage:
+  make clean         # clean tests and docs.
+  make cleantest     # copy test log files.
+  make cleandocs     # delete working copy of gen'd docs.</code></pre>
+<p>The process to build auxilium from scratch is simple.</p>
+<pre><code>$ cd auxilium
+$ make clean
+...(output not shown)...
+$ make build
+...(output not shown)...</code></pre>
+<p>The process to run all the unit tests is also simple.</p>
+<pre><code>$ cd auxilium
+$ make checktest
+...(output not shown)...</code></pre>
+<p>The Makefile is very smart about dependencies, which makes incremental re-building easy. each &quot;make build&quot; only rebuilds what it things is needed. Once in a while, however, it is prudent to do a &quot;make clean&quot;, which will force the next &quot;make build&quot; to rebuild everything.</p>
+<h2 id="installing-auxilium">Installing Auxilium</h2>
+<p>You can see the make options available to install Auxilium as follows.</p>
+<pre><code>$ cd auxilium
+$ make helpinstall
+Common installing usage:
+  make install       # copy files to under ~/local.
+  make sysinstall    # copy files to under /usr/local as root.
+  make install PREFIX=&lt;prefix&gt; # custom copy files.
+Common uninstalling usage:
+  make uninstall     # delete files installed under ~/local.
+  make sysuninstall  # delete files installed under /usr/local as root.
+  make uninstall PREFIX=&lt;prefix&gt; # custom uninstall files.</code></pre>
+<p>It is easy to install to your own personal area.</p>
+<pre><code>$ cd auxilium
+$ make install PREFIX=~/local
+...(output not shown)...</code></pre>
+<p>If you want to install to a system area and you are not logged in as root, you might be able to use sudo to get the right access privileges.</p>
+<pre><code>$ cd auxilium
+$ sudo make install PREFIX=/usr/local
+...(output not shown)...</code></pre>
+<p>You can uninstall auxilium in a similar manner with the uninstall option.</p>
+<pre><code>$ cd auxilium
+$ make uninstall PREFIX=~/local
+...(output not shown)...
+$ sudo make uninstall PREFIX=/usr/local
+...(output not shown)...</code></pre>
+<h2 id="releasing-auxilium">Releasing Auxilium</h2>
+<p>Generally, as a contributing developer working on a linked and forked child repository, you should not perform any releases nor any of the tasks listed on the &quot;make helprel&quot; screen. Of course, if you decided to release your version of auxilium separately (which is not recommended) these release options could prove helpful.</p>
 <h1 id="platforms">Platforms</h1>
 <p>Auxilium programs are all written in <a href="https://en.wikipedia.org/wiki/Bash_(Unix_shell)">Bash</a>, the standard <a href="https://en.wikipedia.org/wiki/Linux">Linux</a> shell language. Bash is an interpretive language, so as long as your platform has a relatively new version of Bash installed, it <em>should</em> be able to run the runtime Auxilium Bash scripts. There is no need of different runtime versions of Auxilium for different hardware platforms because there are no hard-compiled programs.</p>
 <p>That being said, to date Auxilium has only been tested on Linux platforms. The author, however, would be very interested in user experience reports.</p>

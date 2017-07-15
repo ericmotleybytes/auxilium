@@ -8,6 +8,8 @@
     -   [auxalias examples](#auxalias-examples)
     -   [auxwhere examples](#auxwhere-examples)
     -   [auxchecktap examples](#auxchecktap-examples)
+    -   [auxguid examples](#auxguid-examples)
+-   [Platforms](#platforms)
 -   [Authors](#authors)
 -   [Legal](#legal)
 -   [See Also](#see-also)
@@ -35,6 +37,8 @@ The core auxilium utilities include:
 -   **auxchecktap**. Scans and checks TAP format unit test result logs, producing a summarized TAP test results log.
 
 -   **auxguid**. Generates a pseudo random 128-bit (32 hex character) GUID/UUID.
+
+-   **auxilium**. Displays version info for auxilium and all of its compoents.
 
 Runtime Auxilium Downloads
 ==========================
@@ -191,47 +195,66 @@ Here are some examples of using auxchecktap.
 
 -   Scanning a unit test results log file:
 
-        $ auxchecktap auxilium.taplog
+        $ auxchecktap example1.taplog
+        1..3
+        ok 1 [TAPFILE: '/home/tester/test/example1.taplog' 89 tests, 0 errors]
+        ok 2 [TAPTOTAL: 1 file, 89 tests, 0 errors]
+        ok 3 [TAPGRAND: 1 file, 89 tests, 0 errors]
         1..1
-        ok 1 /home/ericc/github/auxilium/test/auxilium.taplog: 85 tests.
+        ok 1 /home/tester/test/auxilium.taplog: 85 tests.
         $ echo "$?"
         0
 
 -   Scanning multiple unit test result log files:
 
-        $ auxchecktap tmp*.taplog
-        1..3
-        ok 1 /home/ericc/github/auxilium/test/tmp1.taplog: 85 tests.
-        ok 2 /home/ericc/github/auxilium/test/tmp2.taplog: 80 tests.
-        ok 3 /home/ericc/github/auxilium/test/tmp3.taplog: 90 tests.
+        $ auxchecktap example*.taplog
+        1..6
+        ok 1 [TAPFILE: '/home/tester/test/example1.taplog' 89 tests, 0 errors]
+        ok 2 [TAPFILE: '/home/tester/test/example2.taplog' 88 tests, 0 errors]
+        ok 3 [TAPFILE: '/home/tester/test/example3.taplog' 40 tests, 0 errors]
+        ok 4 [TAPFILE: '/home/tester/test/example4.taplog' 20 tests, 0 errors]
+        ok 5 [TAPTOTAL: 4 files, 237 tests, 0 errors]
+        ok 6 [TAPGRAND: 4 files, 237 tests, 0 errors]
         $ echo "$?"
         0
 
 -   Scanning a unit test log file with a failed unit test report in it:
 
         $ auxchecktap another.taplog
-        1..1
-        not ok 1 /home/ericc/github/auxilium/test/another.taplog: 85 tests.
+        1..3
+        not ok 1 [TAPFILE: '/home/tester/test/another.taplog' 3 tests, 1 error]
         # Found 1 failed test.
+        not ok 2 [TAPTOTAL: 1 file, 3 tests, 1 error]
+        not ok 3 [TAPGRAND: 1 file, 3 tests, 1 error]
         $ echo "$?"
         1
 
--   Reading TAP output from standard input:
+auxguid examples
+----------------
 
-        $ # an example what the bats unit test tool produces.
-        $ # (see https://github.com/sstephenson/bats)
-        $ bats --tap test-00510-auxenv-insert.bats
-        1..4
-        ok 1 check auxenv insert before dir
-        ok 2 check auxenv insert after dir
-        ok 3 check auxenv insert before pos
-        ok 4 check auxenv insert after pos
-        $ # piping unit test results info auxchecktap...
-        $ bats --tap test-00510-auxenv-insert.bats | auxchecktap
-        1..1
-        ok 1 /dev/stdin: 4 tests.
-        $ echo "$?"
-        0
+Here are some examples of using auxguid.
+
+-   Generate a GUID/UUID:
+
+        $ auxguid
+        2c7459630bbf26bc01ee5a33259a215a
+
+-   Generate a lowercase GUID/UUID:
+
+        $ auxguid --lower
+        5bb659630c1f28006a2d5a57259a215a
+
+-   Generate an uppercase GUID/UUID:
+
+        $ auxguid --upper
+        39EB59630C67184D7E0E5B1E259A215A
+
+Platforms
+=========
+
+Auxilium programs are all written in [Bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)), the standard [Linux](https://en.wikipedia.org/wiki/Linux) shell language. Bash is an interpretive language, so as long as your platform has a relatively new version of Bash installed, it *should* be able to run the runtime Auxilium Bash scripts. There is no need of different runtime versions of Auxilium for different hardware platforms because there are no hard-compiled programs.
+
+That being said, to date Auxilium has only been tested on Linux platforms. The author, however, would be very interested in user experience reports.
 
 Authors
 =======

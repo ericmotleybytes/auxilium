@@ -41,7 +41,7 @@
 <body>
 <div id="header">
 <h1 class="title">Auxilium User's Guide</h1>
-<h1 class="subtitle">Version 0.1.6</h1>
+<h1 class="subtitle">Version 1.0.0</h1>
 </div>
 <div id="TOC">
 <ul>
@@ -81,22 +81,22 @@
 </ul>
 <h1 id="auxilium-installation">Auxilium Installation</h1>
 <h2 id="install-of-auxilium-runtime-distribution">Install of auxilium runtime distribution</h2>
-<p>Runtime installation is relatively easy. As an example, below is a sample installation of auxilium 0.1.6, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
+<p>Runtime installation is relatively easy. As an example, below is a sample installation of auxilium 1.0.0, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
 <ol style="list-style-type: decimal">
 <li><p>Download the runtime distribution. There are at least two ways of doing this:</p>
 <ol style="list-style-type: lower-alpha">
-<li><p>Primary download method: Right-click on the &quot;0.1.6&quot; link on this page at <a href="https://ericmotleybytes.github.io/auxilium/" class="uri">https://ericmotleybytes.github.io/auxilium/</a> and select &quot;save link as...&quot;.</p></li>
+<li><p>Primary download method: Right-click on the &quot;1.0.0&quot; link on this page at <a href="https://ericmotleybytes.github.io/auxilium/" class="uri">https://ericmotleybytes.github.io/auxilium/</a> and select &quot;save link as...&quot;.</p></li>
 <li><p>Alternate download method: Use the &quot;wget&quot; program to get the tar file.</p>
 <pre><code>$ wget https://github.com/ericmotleybytes/auxilium\
-/releases/download/0.1.6\
-/auxilium-run-0.1.6.tar.gz</code></pre>
-<p>This will create the file &quot;auxilium-run-0.1.6.tar.gz&quot;.</p></li>
+/releases/download/1.0.0\
+/auxilium-run-1.0.0.tar.gz</code></pre>
+<p>This will create the file &quot;auxilium-run-1.0.0.tar.gz&quot;.</p></li>
 </ol></li>
 <li><p>Unpack the tar file.</p>
-<pre><code>$ tar -xzf auxilium-run-0.1.6.tar.gz</code></pre>
-<p>This will create a sub-directory called &quot;auxilium-run-0.1.6&quot; which contains additional files and directories.</p></li>
-<li><p>Set the default directory to the &quot;auxilium-run-0.1.6&quot; sub-directory.</p>
-<pre><code>$ cd auxilium-run-0.1.6</code></pre></li>
+<pre><code>$ tar -xzf auxilium-run-1.0.0.tar.gz</code></pre>
+<p>This will create a sub-directory called &quot;auxilium-run-1.0.0&quot; which contains additional files and directories.</p></li>
+<li><p>Set the default directory to the &quot;auxilium-run-1.0.0&quot; sub-directory.</p>
+<pre><code>$ cd auxilium-run-1.0.0</code></pre></li>
 <li><p>Use make to install auxilium under your desired directory prefix.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Personal install: To install auxilium under a personal directory, for example under the ~/local directory, issue the following command:</p>
@@ -117,10 +117,10 @@
 <p>If your MANPATH is defined resonably you should be able to see an overview of auxilium by typing:</p>
 <pre><code>$ man auxilium</code></pre>
 <h2 id="uninstall-of-auxilium-runtime-distribution">Uninstall of auxilium runtime distribution</h2>
-<p>You can also easily uninstall auxilium. As an example, below is a sample uninstall of auxilium 0.1.6, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
+<p>You can also easily uninstall auxilium. As an example, below is a sample uninstall of auxilium 1.0.0, which is pretty much the same for other auxilium versions if you simply adjust the release version number.</p>
 <ol style="list-style-type: decimal">
-<li><p>Set the default directory to the &quot;auxilium-run-0.1.6&quot; sub-directory.</p>
-<pre><code>$ cd auxilium-run-0.1.6</code></pre></li>
+<li><p>Set the default directory to the &quot;auxilium-run-1.0.0&quot; sub-directory.</p>
+<pre><code>$ cd auxilium-run-1.0.0</code></pre></li>
 <li><p>Use make to uninstall auxilium under your desired directory prefix.</p>
 <ol style="list-style-type: lower-alpha">
 <li><p>Personal uninstall: To uninstall auxilium from under a personal directory where it was previously installed, for example under the ~/local directory, issue the following command:</p>
@@ -142,8 +142,8 @@
 </ol></li>
 <li><p>Set the default directory to the original download directory and delete the tar distribution file and the unpacked files.</p>
 <pre><code>$ cd &lt;download-directory&gt;
-$ rm auxilium-run-0.1.6.tar.gz
-$ rm -rf auxilium-run-0.1.6</code></pre></li>
+$ rm auxilium-run-1.0.0.tar.gz
+$ rm -rf auxilium-run-1.0.0</code></pre></li>
 </ol>
 <p>You have now uninstalled auxilium.</p>
 <h1 id="utilities">Utilities</h1>
@@ -491,47 +491,41 @@ alias auxenv='eval source $(auxwhere auxenv)'</code></pre></li>
 <h3 id="auxchecktap-exit-status">auxchecktap exit status</h3>
 <p>auxchecktap completes with an exit status of 0 if no errors are detected and no failed of missing unit test results were uncovered. It completes with a non-zero status is there were any usage errors, or if any fail uni tests were reported, or if missing unit tests were uncovered.</p>
 <h3 id="auxchecktap-description">auxchecktap description</h3>
-<p><em>auxchecktap</em> is an executable bash script which scans TAP format unit test results read from either standard input or one or more files. It outputs a summary of the scan to standard output also in TAP format.</p>
+<p><em>auxchecktap</em> is an executable bash script which scans TAP format unit test results read from either standard input or one or more files. It outputs a summary of the scan to standard output also in TAP format. The summary includes one &quot;TAPFILE&quot; report line per log file scanned. The summary also includes one &quot;TAPTOTAL&quot; summary line with totals for all the log files auxtapcheck just finished scanning. Finally, the summary also includes one &quot;TAPGRAND&quot; summary line with grand totals for the just scanned files plus any indirect &quot;TAPGRAND&quot; totals that the log files might have had embedded in them. Thus, if auxchecktap scans the output of other auxchecktap logs the TAPGRAND summary line indicates the total picture. This allows a hierarchy of unit test results to be quickly and easily checked.</p>
 <p>auxchecktap is part of the auxilium installation package.</p>
 <h3 id="auxchecktap-examples">auxchecktap examples</h3>
 <p>Here are some examples of using auxchecktap.</p>
 <ul>
 <li><p>Scanning a unit test results log file:</p>
-<pre><code>$ auxchecktap auxilium.taplog
+<pre><code>$ auxchecktap example1.taplog
+1..3
+ok 1 [TAPFILE: '/home/tester/test/example1.taplog' 89 tests, 0 errors]
+ok 2 [TAPTOTAL: 1 file, 89 tests, 0 errors]
+ok 3 [TAPGRAND: 1 file, 89 tests, 0 errors]
 1..1
-ok 1 /home/ericc/github/auxilium/test/auxilium.taplog: 85 tests.
+ok 1 /home/tester/test/auxilium.taplog: 85 tests.
 $ echo &quot;$?&quot;
 0</code></pre></li>
 <li><p>Scanning multiple unit test result log files:</p>
-<pre><code>$ auxchecktap tmp*.taplog
-1..3
-ok 1 /home/ericc/github/auxilium/test/tmp1.taplog: 85 tests.
-ok 2 /home/ericc/github/auxilium/test/tmp2.taplog: 80 tests.
-ok 3 /home/ericc/github/auxilium/test/tmp3.taplog: 90 tests.
+<pre><code>$ auxchecktap example*.taplog
+1..6
+ok 1 [TAPFILE: '/home/tester/test/example1.taplog' 89 tests, 0 errors]
+ok 2 [TAPFILE: '/home/tester/test/example2.taplog' 88 tests, 0 errors]
+ok 3 [TAPFILE: '/home/tester/test/example3.taplog' 40 tests, 0 errors]
+ok 4 [TAPFILE: '/home/tester/test/example4.taplog' 20 tests, 0 errors]
+ok 5 [TAPTOTAL: 4 files, 237 tests, 0 errors]
+ok 6 [TAPGRAND: 4 files, 237 tests, 0 errors]
 $ echo &quot;$?&quot;
 0</code></pre></li>
 <li><p>Scanning a unit test log file with a failed unit test report in it:</p>
 <pre><code>$ auxchecktap another.taplog
-1..1
-not ok 1 /home/ericc/github/auxilium/test/another.taplog: 85 tests.
+1..3
+not ok 1 [TAPFILE: '/home/tester/test/another.taplog' 3 tests, 1 error]
 # Found 1 failed test.
+not ok 2 [TAPTOTAL: 1 file, 3 tests, 1 error]
+not ok 3 [TAPGRAND: 1 file, 3 tests, 1 error]
 $ echo &quot;$?&quot;
 1</code></pre></li>
-<li><p>Reading TAP output from standard input:</p>
-<pre><code>$ # an example what the bats unit test tool produces.
-$ # (see https://github.com/sstephenson/bats)
-$ bats --tap test-00510-auxenv-insert.bats
-1..4
-ok 1 check auxenv insert before dir
-ok 2 check auxenv insert after dir
-ok 3 check auxenv insert before pos
-ok 4 check auxenv insert after pos
-$ # piping unit test results info auxchecktap...
-$ bats --tap test-00510-auxenv-insert.bats | auxchecktap
-1..1
-ok 1 /dev/stdin: 4 tests.
-$ echo &quot;$?&quot;
-0</code></pre></li>
 </ul>
 <h2 id="auxguid">auxguid</h2>
 <p>auxguid - generate a 32 hex character (128 bit) GUID/UUID</p>
