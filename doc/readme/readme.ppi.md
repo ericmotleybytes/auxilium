@@ -49,6 +49,10 @@ available online in both HTML and PDF formats:
 
 !include(../include/auxilium-platforms.md)
 
+# Contributing
+
+!include(../include/auxilium-contributing.md)
+
 # Authors
 
 !include(../include/authors.md)

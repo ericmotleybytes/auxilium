@@ -65,6 +65,10 @@ and pdf format (auxilium-user-guide.pdf).
 
 !include(../include/auxilium-platforms.md)
 
+## Contributing
+
+!include(../include/auxilium-contributing.md)
+
 ## Authors
 
 !include(../include/authors.md)
