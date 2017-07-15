@@ -1,0 +1,90 @@
+1..89
+ok 1 test shell addition
+ok 2 test shell subtraction
+ok 3 test shell multiplication
+ok 4 test shell division
+ok 5 check auxenv alias
+ok 6 check auxsource alias
+ok 7 check auxenv help
+ok 8 check auxenv default help
+ok 9 check auxenv version
+ok 10 check auxenv show
+ok 11 check auxenv dump
+ok 12 check auxenv count
+ok 13 check auxenv count empty
+ok 14 check auxenv count unset
+ok 15 check auxenv get
+ok 16 check auxenv get empty
+ok 17 check auxenv get unset
+ok 18 check auxenv find
+ok 19 check auxenv find empty
+ok 20 check auxenv find unset
+ok 21 check auxenv prepend
+ok 22 check auxenv prepend to empty
+ok 23 check auxenv prepend to unset
+ok 24 check auxenv append
+ok 25 check auxenv append to empty
+ok 26 check auxenv append to unset
+ok 27 check auxenv insert before dir
+ok 28 check auxenv insert after dir
+ok 29 check auxenv insert before pos
+ok 30 check auxenv insert after pos
+ok 31 check auxenv remove
+ok 32 check auxenv remove symlink
+ok 33 check auxenv remove by position
+ok 34 check auxenv erase
+ok 35 check auxenv erase symlink
+ok 36 check auxenv erase by position
+ok 37 check auxenv reverse
+ok 38 check auxenv dedup
+ok 39 check auxenv dedup topdown
+ok 40 check auxenv dedup bottomup
+ok 41 check auxenv dedup empty/unset lists
+ok 42 check auxenv desym
+ok 43 check auxenv desym empty/unset lists
+ok 44 check auxenv weed
+ok 45 check auxenv weed empty/unset lists
+ok 46 check auxenv clean
+ok 47 check auxenv clean empty/unset lists
+ok 48 check auxenv show --ifs=c
+ok 49 check auxenv dump --ifs=c
+ok 50 check auxenv count --ifs=c
+ok 51 check auxenv get --ifs=c
+ok 52 check auxenv find --ifs-c
+ok 53 check auxenv prepend --ifs=c
+ok 54 check auxenv append --ifs=c
+ok 55 check auxenv insert before dir --ifs=c
+ok 56 check auxenv remove --ifs=c
+ok 57 check auxenv reverse --ifs=c
+ok 58 check auxenv dedup --ifs=c
+ok 59 check auxsource help --help
+ok 60 check auxsource help -h
+ok 61 check auxsource default help
+ok 62 check auxsource version --version
+ok 63 check auxsource version -v
+ok 64 check auxsource path file
+ok 65 check auxsource spec file
+ok 66 check auxguid help
+ok 67 check auxguid version
+ok 68 check auxguid guid generation lower
+ok 69 check auxguid guid generation upper
+ok 70 check auxguid guid generation warn
+ok 71 check auxguid guid generation debug
+ok 72 check auxguid guid generation uuidgen
+ok 73 check auxchecktap help
+ok 74 check auxchecktap version
+ok 75 check auxchecktap scan clean tap file
+ok 76 check auxchecktap scan dirty tap file
+ok 77 check auxchecktap scan brief dirty tap file
+ok 78 check auxchecktap scan multiple files
+ok 79 check auxchecktap scan clean file using stdin
+ok 80 check auxwhere help
+ok 81 check auxwhere version
+ok 82 check auxwhere short ops
+ok 83 check auxwhere long ops
+ok 84 check auxwhere dot
+ok 85 check auxwhere leading slash
+ok 86 check auxalias help
+ok 87 check auxalias version
+ok 88 check auxilium help
+ok 89 check auxilium version

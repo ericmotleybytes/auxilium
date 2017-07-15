@@ -1,0 +1,41 @@
+1..40
+ok 1 test shell addition
+ok 2 test shell subtraction
+ok 3 test shell multiplication
+ok 4 test shell division
+ok 5 check auxenv alias
+ok 6 check auxsource alias
+ok 7 check auxenv help
+ok 8 check auxenv default help
+ok 9 check auxenv version
+ok 10 check auxenv show
+ok 11 check auxenv dump
+ok 12 check auxenv count
+ok 13 check auxenv count empty
+ok 14 check auxenv count unset
+ok 15 check auxenv get
+ok 16 check auxenv get empty
+ok 17 check auxenv get unset
+ok 18 check auxenv find
+ok 19 check auxenv find empty
+ok 20 check auxenv find unset
+ok 21 check auxenv prepend
+ok 22 check auxenv prepend to empty
+ok 23 check auxenv prepend to unset
+ok 24 check auxenv append
+ok 25 check auxenv append to empty
+ok 26 check auxenv append to unset
+ok 27 check auxenv insert before dir
+ok 28 check auxenv insert after dir
+ok 29 check auxenv insert before pos
+ok 30 check auxenv insert after pos
+ok 31 check auxenv remove
+ok 32 check auxenv remove symlink
+ok 33 check auxenv remove by position
+ok 34 check auxenv erase
+ok 35 check auxenv erase symlink
+ok 36 check auxenv erase by position
+ok 37 check auxenv reverse
+ok 38 check auxenv dedup
+ok 39 check auxenv dedup topdown
+ok 40 check auxenv dedup bottomup
