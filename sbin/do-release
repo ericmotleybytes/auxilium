@@ -443,6 +443,10 @@ function create_devtime_tarball() {
     fi
     aux_info "Dev-time distribution tar file created ($tarfile2)."
 }
+function increment_next_release_version() {
+    "$reporoot"/sbin/adjust-release --verbose --warn --patch=+1
+    return 0
+}
 #
 # begin main program
 #
@@ -520,6 +524,7 @@ unit_test_runtime_staging_area
 tag_local_files
 push_tag_to_remote
 create_devtime_tarball
+increment_next_release_version
 # script hard work done
 aux_notice "Looks like this script finished nicely, congratulations."
 aux_notice "You still need to:"

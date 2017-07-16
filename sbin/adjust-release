@@ -1,0 +1,287 @@
+#!/usr/bin/env bash
+##############################################################################
+# This script adjust release version numbers for auxilium.
+# The release data file for auxilium is data/releases.dat.
+# Assumes semantic versioning 2.0.0 (see http://semver.org/).
+#
+# Usage:
+#     adjust-release [options]
+#
+# Options:
+#     -n <relname>      # release name to change, default is "THISREL"
+#     --name=<relname>  # release name to change, default is "THISREL"
+#     -f <file>         # data file, default <scrdir>/../data/releases.dat
+#     --file=<file>     # data file, default <scrdir>/../data/releases.dat
+#     -o <file>         # out file, default is whatever -f
+#     --output=<file>   # out file, default is whatever -f
+#     -M <n> | --major=<n>  # increment major portion by n, default is 0
+#     -m <n> | --minor=<n>  # increment major portion by n, default is 0
+#     -p <n> | --patch=<n>  # increment patch portion by n, default is 0
+#     -s <n.n.n> | --set=<n.n.n>  # set version to <n.n.n>"
+#     -d | --debug   # output extra debug info to stderr
+#     -w | --warn    # output nonfatal warnings to stderr
+#     -b | --verbose # output extra info to stdout
+#     -v | --version # display version info
+#     -h | --help    # display help info
+#
+##############################################################################
+# set abort on syntax error
+set -e
+#
+# define functions
+#
+function aux_debug() {
+    msg="$1"
+    if [ "$DebugFlag" == "y" ]; then
+        echo "DEBUG: $msg" >&2
+    fi
+    return 0
+}
+function aux_warn() {
+    msg="$1"
+    if [ "$WarnFlag" == "y" ]; then
+        echo "WARNING: ($CmdName) $msg" >&2
+    fi
+    return 0
+}
+function aux_verbose() {
+    msg="$1"
+    if [ "$VerboseFlag" == "y" ]; then
+        echo "INFO: $msg"
+    fi
+    return 0
+}
+function aux_die() {
+    msg="$1"
+    echo "ERROR: ($CmdName) $msg" >&2
+    exit 1
+}
+function show_help() {
+    echo "$CmdName - adjust semantic version numbers"
+    echo "  Usage:"
+    echo "      adjust-release [options]"
+    echo "  Options:"
+    echo "      -n <relname>     # release name to change, default is 'THISREL'"
+    echo "      --name=<relname> # release name to change, default is 'THISREL'"
+    echo "      -f <file>         # data file, default <scrdir>/../data/releases.dat"
+    echo "      --file=<file>     # data file, default <scrdir>/../data/releases.dat"
+    echo "      -o <file>         # out file, default is whatever -f"
+    echo "      --output=<file>   # out file, default is whatever -f"
+    echo "      -M [%]<n> | --major=[%]<n>  # incr/%set major part by/to n, default is 0"
+    echo "      -m [%]<n> | --minor=[%]<n>  # incr/%set major part by/tp n, default is 0"
+    echo "      -p [%]<n> | --patch=[%]<n>  # incr/%set patch part by/to n, default is 0"
+    echo "      -s <n.n.n> | --set=<n.n.n>  # set version to <n.n.n>"
+    echo "      -d | --debug   # output extra debug info to stderr"
+    echo "      -w | --warn    # output nonfatal warnings to stderr"
+    echo "      -b | --verbose # output extra info to stdout"
+    echo "      -v | --version # display version info"
+    echo "      -h | --help    # display help info"
+    exit 0
+}
+function show_version() {
+    echo "$Version"
+    exit 0
+}
+function check_if_number() {
+    local number="$1"
+    if [[ ! "$number" =~ ^[-+]?[0-9]+$ ]]; then
+        aux_die "Not a number ($number)."
+    fi
+    return 0
+}
+function parse_adjustment() {
+    local adjust="$1"
+    local partname="$2"
+    local incrvarname="${partname}Incr"
+    local setvarname="${partname}Set"
+    if [ "${adjust:0:1}" == "%" ]; then
+        check_if_number "${adjust:1}"
+        eval $setvarname="${adjust:1}"
+    else
+        check_if_number "${adjust}"
+        eval $incrvarname="$adjust"
+    fi
+    return 0
+}
+function parse_set() {
+    local vers="$1"
+    if [[ ! "$vers" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        aux_die "Bad semantic version ($vers)."
+    fi
+    vers="${vers//./ }"  # replace all . with space
+    vers=($vers)         # convert to an array
+    MajorSet="${vers[0]}"
+    MinorSet="${vers[1]}"
+    PatchSet="${vers[2]}"
+    return 0
+}
+#
+# begin main program
+#
+CmdFile=$(readlink -f "$0")
+CmdName="${CmdFile##*/}"
+CmdDir=$(dirname "$CmdFile")
+RootDir=$(readlink -f "$CmdDir/..")
+Version="$CmdName version 1.0.0 (2017-07-15)"
+DebugFlag="n"
+WarnFlag="n"
+VerboseFlag="n"
+RelName="THISREL"
+InputFile="$CmdDir/../data/releases.dat"
+OutputFile=""
+InputLines=()
+OutputLines=()
+MajorIncr=$((0))
+MinorIncr=$((0))
+PatchIncr=$((0))
+MajorSet=""
+MinorSet=""
+PatchSet=""
+LinesChanged=$((0))
+while [ $# -gt 0 ]; do
+    param="$1"
+    shift
+    if   [[ "$param" == "-v" || "$param" == "--version" ]]; then
+        show_version
+    elif [[ "$param" == "-h" || "$param" == "--help"    ]]; then
+        show_help
+    elif [[ "$param" == "-d" || "$param" == "--debug"   ]]; then
+        DebugFlag="y"
+    elif [[ "$param" == "-w" || "$param" == "--warn"    ]]; then
+        WarnFlag="y"
+    elif [[ "$param" == "-b" || "$param" == "--verbose" ]]; then
+        VerboseFlag="y"
+    elif [[ "$param" == "-n" ]]; then
+        RelName="$1"
+        shift
+    elif [[ "${param:0:7}" == "--name=" ]]; then
+        Relname="${param:7}"
+    elif [[ "$param" == "-f" ]]; then
+        InputFile="$1"
+        shift
+    elif [[ "${param:0:7}" == "--file=" ]]; then
+        InputFile="${param:7}"
+    elif [[ "$param" == "-o" ]]; then
+        OutputFile="$1"
+        shift
+    elif [[ "${param:0:9}" == "--output=" ]]; then
+        OutputFile="${param:9}"
+    elif [[ "$param" == "-M" ]]; then
+        adjust="$1"
+        shift
+        parse_adjustment "$adjust" "Major"
+    elif [[ "${param:0:8}" == "--major=" ]]; then
+        adjust="${param:8}"
+        parse_adjustment "$adjust" "Major"
+    elif [[ "$param" == "-m" ]]; then
+        adjust="$1"
+        shift
+        parse_adjustment "$adjust" "Minor"
+    elif [[ "${param:0:8}" == "--minor=" ]]; then
+        adjust="${param:8}"
+        parse_adjustment "$adjust" "Minor"
+    elif [[ "$param" == "-p" ]]; then
+        adjust="$1"
+        shift
+        parse_adjustment "$adjust" "Patch"
+    elif [[ "${param:0:8}" == "--patch=" ]]; then
+        adjust="${param:8}"
+        parse_adjustment "$adjust" "Patch"
+    elif [[ "$param" == "-s" ]]; then
+        newvers="$1"
+        shift
+        parse_set "$newvers"
+    elif [[ "${param:0:6}" == "--set=" ]]; then
+        newvers="${param:6}"
+        parse_set "$newvers"
+    else
+        aux_die "bad command line option ($param)."
+    fi
+done
+# check that input file exists
+if [ ! -e "$InputFile" ]; then
+    aux_die "File not found ($InputFile)"
+fi
+InputFile=$(readlink -f "$InputFile")
+# set output file if needed
+if [ -z "$OutputFile" ]; then
+    OutputFile="$InputFile"
+fi
+# save length of release name
+# read input file into array
+RelNameLen="${#RelName}"
+readarray -t InputLines < "$InputFile"
+aux_verbose "Reading '$InputFile'."
+# loop through input lines
+for line in "${InputLines[@]}"; do
+    testline="${line// /}"  # remove spaces
+    if [ "${testline:0:$RelNameLen}=" == "${RelName}=" ]; then
+        testline="${testline:$RelNameLen}"  # strip leading name
+        oldVers="${testline:1}"             # strip leading '='
+        if [[ ! "$oldVers" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            aux_die "Bad release name version format ($line)"
+        fi
+        fromVers="$oldVers"        # save
+        oldVers="${oldVers//./ }"  # replace all . with spaces
+        newVers=($oldVers)         # convert to array
+        oldVers=($oldVers)         # convert to array
+        changesMade=$((0))
+        if [ ! -z "$MajorSet" ]; then
+            newVers[0]=$(($MajorSet))
+            changesMade=$(($changesMade+1))
+        elif [[ $MajorIncr -ne 0 ]]; then
+            newVers[0]=$((${oldVers[0]}+$MajorIncr))
+            changesMade=$(($changesMade+1))
+        fi
+        if [ ! -z "$MinorSet" ]; then
+            newVers[1]=$(($MinorSet))
+            changesMade=$(($changesMade+1))
+        elif [[ $MinorIncr -ne 0 ]]; then
+            newVers[1]=$((${oldVers[1]}+$MinorIncr))
+            changesMade=$(($changesMade+1))
+        fi
+        if [ ! -z "$PatchSet" ]; then
+            newVers[2]=$(($PatchSet))
+            changesMade=$(($changesMade+1))
+        elif [[ $PatchIncr -ne 0 ]]; then
+            newVers[2]=$((${oldVers[2]}+$PatchIncr))
+            changesMade=$(($changesMade+1))
+        fi
+        if [[ ${newVers[0]} -lt 0 ]]; then
+            aux_warn "Negative number ${newVers[0]} changed to 0."
+            newVers[0]=$((0));
+        fi
+        if [[ ${newVers[1]} -lt 0 ]]; then
+            aux_warn "Negative number ${newVers[1]} changed to 0."
+            newVers[1]=$((0));
+        fi
+        if [[ ${newVers[2]} -lt 0 ]]; then
+            aux_warn "Negative number ${newVers[2]} changed to 0."
+            newVers[2]=$((0));
+        fi
+        if [[ $changesMade -gt 0 ]]; then
+            LinesChanges=$(($LinesChanged+1))
+            toVers="${newVers[0]}.${newVers[1]}.${newVers[2]}"
+            newLine="$RelName=$toVers"
+            OutputLines+=("$newLine")
+            aux_verbose "Changed '$RelName=$fromVers' to '$RelName=$toVers'"
+        else
+            toVers="$fromVers"
+            OutputLines+=("$line")
+            aux_verbose "Unchanged '$RelName=$fromVers'"
+        fi
+    else
+        OutputLines+=("$line")
+    fi
+done
+if [[ $LinesChanges -eq 0 ]]; then
+    aux_warn "No data lines changed."
+    aux_verbose "No data lines changed."
+fi
+# write output file
+aux_verbose "Writing '$OutputFile'."
+printf "%s\n" "${OutputLines[@]}" > "$OutputFile"
+#
+# all done
+#
+exit 0
