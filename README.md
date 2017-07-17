@@ -10,6 +10,7 @@
     -   [auxchecktap examples](#auxchecktap-examples)
     -   [auxguid examples](#auxguid-examples)
 -   [Platforms](#platforms)
+-   [Contributing](#contributing)
 -   [Authors](#authors)
 -   [Legal](#legal)
 -   [See Also](#see-also)
@@ -256,6 +257,15 @@ Auxilium programs are all written in [Bash](https://en.wikipedia.org/wiki/Bash_(
 
 That being said, to date Auxilium has only been tested on Linux platforms. The author, however, would be very interested in user experience reports.
 
+Contributing
+============
+
+Contributions are most welcome.
+
+Please post bug reports and feature requests on the [auxilium issue tracker](https://github.com/ericmotleybytes/auxilium/issues) at <https://github.com/ericmotleybytes/auxilium/issues>.
+
+To contribute project fixes or enhancements, please fork the project from the [Auxilium GitHub Repository](https://github.com/ericmotleybytes/auxilium) at <https://github.com/ericmotleybytes/auxilium> and then send pull requests for integration into the main distribution.
+
 Authors
 =======
 
@@ -266,11 +276,9 @@ eric@motleybytes.com
 Legal
 =====
 
-Copyright © 2017 Eric Alan Christiansen.
+Copyright © 2017 Eric Alan Christiansen
 
-This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to use and/or redistribute it under the conditions of the GNU General Public License v3.0.
-
-See <https://www.gnu.org/licenses/gpl-3.0.en.html>
+This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to use and/or redistribute it under the conditions of the MIT license (see <https://opensource.org/licenses/MIT>).
 
 See Also
 ========

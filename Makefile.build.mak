@@ -43,7 +43,8 @@ depends: doc/man/auxenv.ppi.md.dep \
   doc/manuals/auxilium-user-guide.ppi.md.dep \
   doc/manuals/auxilium-dev-guide.ppi.md.dep \
   doc/docs/index.ppi.md.dep \
-  doc/readme/readme.ppi.md.dep
+  doc/readme/readme.ppi.md.dep \
+  doc/readme/mit-license.ppi.md.dep
 
 doc/man/auxenv.ppi.md.dep : doc/man/auxenv.ppi.md
 	sbin/pp-dep $< > $@
@@ -84,6 +85,9 @@ doc/docs/index.ppi.md.dep : doc/docs/index.ppi.md
 doc/readme/readme.ppi.md.dep : doc/readme/readme.ppi.md
 	sbin/pp-dep $< > $@
 
+doc/readme/mit-license.ppi.md.dep : doc/readme/mit-license.ppi.md
+	sbin/pp-dep $< > $@
+
 #### Building stuff #####
 
 .PHONY: build
@@ -117,6 +121,9 @@ docs: doc/include/auxenv-aliasing.ppo.md \
     share/html/auxilium/auxilium-dev-guide.html \
     share/html/auxilium/auxilium-dev-guide.pdf \
   doc/docs/index.html \
+  doc/readme/mit-license.ppo.md \
+  doc/readme/mit-license.html \
+  doc/readme/LICENSE.md \
   doc/readme/readme.ppo.md \
   doc/readme/readme.html \
   doc/readme/README.md
@@ -329,7 +336,7 @@ doc/docs/index.html : doc/docs/index.ppo.md \
           -H doc/css/info.css \
           --template=doc/templates/info.html.pandoc.template
 
-# README.md stuff
+# README.md and LICENSE stuff
 
 doc/readme/readme.ppo.md : doc/readme/readme.ppi.md \
   $(shell sbin/pp-putdep doc/readme/readme.ppi.md.dep)
@@ -345,6 +352,24 @@ doc/readme/readme.html : doc/readme/readme.ppo.md \
           -H doc/css/man.css
 
 doc/readme/README.md : doc/readme/readme.ppo.md
+	pandoc -s --from=markdown --to=markdown_github \
+          --toc $< --output=$@ \
+          -M title="$(shell head -1 doc/include/auxilium-title.md)"
+
+doc/readme/mit-license.ppo.md : doc/readme/mit-license.ppi.md \
+  $(shell sbin/pp-putdep doc/readme/mit-license.ppi.md.dep)
+	pp $< > $@
+
+doc/readme/mit-license.html : doc/readme/mit-license.ppo.md \
+  doc/include/auxilium-title.md \
+  doc/css/man.css \
+  doc/templates/man.html.pandoc.template
+	$(PANDOCHTMLMAN) $< --output=$@ \
+          -M title="$(shell head -1 doc/include/auxilium-title.md)" \
+          --template=doc/templates/man.html.pandoc.template \
+          -H doc/css/man.css
+
+doc/readme/LICENSE.md : doc/readme/mit-license.ppo.md
 	pandoc -s --from=markdown --to=markdown_github \
           --toc $< --output=$@ \
           -M title="$(shell head -1 doc/include/auxilium-title.md)"
@@ -365,6 +390,7 @@ cleandocs:
 	rm -f doc/manuals/auxilium-user-guide.ppi.md.dep
 	rm -f doc/docs/index.ppi.md.dep
 	rm -f doc/readme/readme.ppi.md.dep
+	rm -f doc/readme/mit-license.ppi.md.dep
 	rm -f doc/man/auxenv.ppo.md
 	rm -f doc/man/auxsource.ppo.md
 	rm -f doc/man/auxwhere.ppo.md
@@ -395,6 +421,9 @@ cleandocs:
 	rm -f doc/readme/readme.ppo.md
 	rm -f doc/readme/readme.html
 	rm -f doc/readme/README.md
+	rm -f doc/readme/mit-license.ppo.md
+	rm -f doc/readme/mit-license.html
+	rm -f doc/readme/LICENSE.md
 
 #### Aggregate stuff ####
 

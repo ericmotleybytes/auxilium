@@ -1,1 +1,1 @@
-Copyright © !exec(date +%Y) Eric Alan Christiansen.
+Copyright © !exec(date +%Y) Eric Alan Christiansen

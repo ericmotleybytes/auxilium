@@ -76,10 +76,13 @@ docs/index.html : doc/docs/index.html
 	cp $< $@
 
 .PHONY: stage-readme
-stage-readme: README.md
+stage-readme: README.md LICENSE.md
 	@echo "[README.md staged.]"
 
 README.md : doc/readme/README.md
+	cp $< $@
+
+LICENSE.md : doc/readme/LICENSE.md
 	cp $< $@
 
 .PHONY: runtime-dist
@@ -89,7 +92,7 @@ runtime-dist: \
   dist/$(RUNTIME)/Makefile \
   dist/$(RUNTIME)/Makefile.install.mak \
   dist/$(RUNTIME)/Makefile.test.mak \
-  dist/$(RUNTIME)/LICENSE \
+  dist/$(RUNTIME)/LICENSE.md \
   dist/$(RUNTIME)/test \
   dist/$(RUNTIME).tar.gz
 
@@ -113,7 +116,7 @@ dist/$(RUNTIME)/Makefile.test.mak : Makefile.test.mak
 	cp -a "$<" "$@"
 	chmod $(SRCMODE) "$@"
 
-dist/$(RUNTIME)/LICENSE : LICENSE
+dist/$(RUNTIME)/LICENSE.md : LICENSE.md
 	cp -a "$<" "$@"
 	chmod $(SRCMODE) "$@"
 
@@ -150,6 +153,7 @@ devtime-dist: dist/$(DEVTIME).tar.gz
 dist/$(DEVTIME).tar.gz : dist/$(DEVTIME)/README.md
 	cd dist; tar -czf $(DEVTIME).tar.gz $(DEVTIME)
 
+# extract all the tarball, but use README.MD as the makefile dependency
 dist/$(DEVTIME)/README.md : dist/$(DEVTIME)
 	cd dist/$(DEVTIME) ; \
           tar --strip-components=1 -xzf ../$(THISREL).tar.gz
