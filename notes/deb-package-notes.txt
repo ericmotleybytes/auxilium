@@ -1,0 +1,10 @@
+How to make a debian .deb package:
+- Creating the .deb file:
+  - https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwily4bVlpfqAhVM_J4KHWZ_D74QFjAEegQIDxAN&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dep88vVfzDAo&usg=AOvVaw1loUZN2T4PqVRjLgFfYl8a
+  - Installed via apt (or dpkg).
+- Distributing the .deb file:
+  - https://www.debian.org/doc/manuals/distribute-deb/distribute-deb.html
+- Alien .rpm and universal repository: (rpm and yum)
+  - https://linuxize.com/post/install-rpm-packages-on-ubuntu/
+  - https://rpm-packaging-guide.github.io/
+  - https://rikers.org/rpmbook/node45.html
